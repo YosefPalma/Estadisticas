@@ -175,7 +175,6 @@
             display: block;
         }
         
-        /* Ocultar info de imagen en todos los modos */
         .image-info {
             display: none;
         }
@@ -580,190 +579,192 @@
             background-color: rgba(0, 0, 0, 0.9);
             transform: scale(1.1);
         }
+        
         /* ===== BOTÓN ADMIN EN MODO VISUALIZACIÓN ===== */
-.admin-access-btn {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-size: 1rem;
-    cursor: pointer;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    opacity: 0.3;
-}
-
-.admin-access-btn:hover {
-    background-color: rgba(0, 0, 0, 0.9);
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-body.viewer-mode .admin-access-btn {
-    display: flex;
-}
-
-body.admin-mode .admin-access-btn,
-body:not(.viewer-mode) .admin-access-btn {
-    display: none;
-}
-
-/* Modal de contraseña */
-.password-modal {
-    background-color: rgba(0, 0, 0, 0.95);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.password-modal.hidden {
-    display: none;
-}
-
-.modal-content {
-    background: linear-gradient(135deg, #1a2a6c, #2d3748);
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
-    width: 90%;
-    max-width: 400px;
-    animation: slideUp 0.4s ease;
-}
-
-@keyframes slideUp {
-    from { 
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to { 
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.modal-content h3 {
-    margin-bottom: 20px;
-    color: #4facfe;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.5rem;
-}
-
-.password-input-modal {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 2px solid #4facfe;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: white;
-    font-size: 1rem;
-    margin-bottom: 20px;
-}
-
-.modal-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-.modal-btn {
-    flex: 1;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: none;
-}
-
-.modal-btn.primary {
-    background-color: #4facfe;
-    color: white;
-}
-
-.modal-btn.primary:hover {
-    background-color: #3a9ce9;
-    transform: translateY(-2px);
-}
-
-.modal-btn.secondary {
-    background-color: #6b7280;
-    color: white;
-}
-
-.modal-btn.secondary:hover {
-    background-color: #4b5563;
-}
-
-.modal-error {
-    color: #ef4444;
-    font-size: 0.9rem;
-    margin-top: 10px;
-    text-align: center;
-    min-height: 20px;
-}
-
-/* Animación de shake para errores */
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    20%, 40%, 60%, 80% { transform: translateX(5px); }
-}
+        .admin-access-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            opacity: 0.3;
+        }
+        
+        .admin-access-btn:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        body.viewer-mode .admin-access-btn {
+            display: flex;
+        }
+        
+        body.admin-mode .admin-access-btn,
+        body:not(.viewer-mode) .admin-access-btn {
+            display: none;
+        }
+        
+        /* Modal de contraseña */
+        .password-modal {
+            background-color: rgba(0, 0, 0, 0.95);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .password-modal.hidden {
+            display: none;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a2a6c, #2d3748);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+            width: 90%;
+            max-width: 400px;
+            animation: slideUp 0.4s ease;
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #4facfe;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .password-input-modal {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #4facfe;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .modal-btn.primary {
+            background-color: #4facfe;
+            color: white;
+        }
+        
+        .modal-btn.primary:hover {
+            background-color: #3a9ce9;
+            transform: translateY(-2px);
+        }
+        
+        .modal-btn.secondary {
+            background-color: #6b7280;
+            color: white;
+        }
+        
+        .modal-btn.secondary:hover {
+            background-color: #4b5563;
+        }
+        
+        .modal-error {
+            color: #ef4444;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            text-align: center;
+            min-height: 20px;
+        }
+        
+        /* Animación de shake para errores */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
     </style>
 </head>
 <body class="viewer-mode">
     <!-- Botón admin en modo visualización -->
-<button id="admin-access-btn" class="admin-access-btn" title="Acceder al panel de administración">
-    <i class="fas fa-user-shield"></i>
-</button>
+    <button id="admin-access-btn" class="admin-access-btn" title="Acceder al panel de administración">
+        <i class="fas fa-user-shield"></i>
+    </button>
 
-<!-- Modal para contraseña -->
-<div id="password-modal" class="password-modal hidden">
-    <div class="modal-content">
-        <h3><i class="fas fa-lock"></i> Acceso Administrador</h3>
-        <p style="margin-bottom: 20px; opacity: 0.9;">Ingresa la contraseña para acceder al panel de administración:</p>
-        
-        <input type="password" id="admin-password-modal" class="password-input-modal" placeholder="Contraseña" autocomplete="off">
-        
-        <div class="modal-buttons">
-            <button type="button" id="modal-login-btn" class="modal-btn primary">
-                <i class="fas fa-sign-in-alt"></i> Acceder
-            </button>
-            <button type="button" id="modal-cancel-btn" class="modal-btn secondary">
-                <i class="fas fa-times"></i> Cancelar
-            </button>
+    <!-- Modal para contraseña -->
+    <div id="password-modal" class="password-modal hidden">
+        <div class="modal-content">
+            <h3><i class="fas fa-lock"></i> Acceso Administrador</h3>
+            <p style="margin-bottom: 20px; opacity: 0.9;">Ingresa la contraseña para acceder al panel de administración:</p>
+            
+            <input type="password" id="admin-password-modal" class="password-input-modal" placeholder="Contraseña" autocomplete="off">
+            
+            <div class="modal-buttons">
+                <button type="button" id="modal-login-btn" class="modal-btn primary">
+                    <i class="fas fa-sign-in-alt"></i> Acceder
+                </button>
+                <button type="button" id="modal-cancel-btn" class="modal-btn secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+            
+            <div id="modal-error" class="modal-error hidden">
+                Contraseña incorrecta
+            </div>
+            
+            <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.7; text-align: center;">
+                Solo el administrador puede agregar o eliminar imágenes.
+            </p>
         </div>
-        
-        <div id="modal-error" class="modal-error hidden">
-            Contraseña incorrecta
-        </div>
-        
-        <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.7; text-align: center;">
-            Solo el administrador puede agregar o eliminar imágenes.
-        </p>
     </div>
-</div>
+    
     <!-- Botón para cambiar de modo (solo admin) -->
     <button id="mode-toggle" class="mode-toggle hidden" title="Cambiar vista">
         <i class="fas fa-expand"></i>
@@ -907,80 +908,17 @@ const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_
         const viewerModeBtn = document.getElementById('viewer-mode-btn');
         const passwordError = document.getElementById('password-error');
         const modeToggle = document.getElementById('mode-toggle');
-        const appHeader = document.getElementById('app-header');
-        // Agrega estas líneas con las otras variables globales:
-const adminAccessBtn = document.getElementById('admin-access-btn');
-const passwordModal = document.getElementById('password-modal');
-const adminPasswordModal = document.getElementById('admin-password-modal');
-const modalLoginBtn = document.getElementById('modal-login-btn');
-const modalCancelBtn = document.getElementById('modal-cancel-btn');
-const modalError = document.getElementById('modal-error');
+        const adminAccessBtn = document.getElementById('admin-access-btn');
+        const passwordModal = document.getElementById('password-modal');
+        const adminPasswordModal = document.getElementById('admin-password-modal');
+        const modalLoginBtn = document.getElementById('modal-login-btn');
+        const modalCancelBtn = document.getElementById('modal-cancel-btn');
+        const modalError = document.getElementById('modal-error');
+        
         // ============================================
         // FUNCIONES PRINCIPALES
         // ============================================
-        // Mostrar modal de contraseña
-function showPasswordModal() {
-    console.log("Mostrando modal de contraseña");
-    passwordModal.classList.remove('hidden');
-    adminPasswordModal.value = '';
-    modalError.classList.add('hidden');
-    adminPasswordModal.focus();
-    
-    // Bloquear scroll del body
-    document.body.style.overflow = 'hidden';
-}
-
-// Ocultar modal de contraseña
-function hidePasswordModal() {
-    console.log("Ocultando modal de contraseña");
-    passwordModal.classList.add('hidden');
-    
-    // Restaurar scroll del body
-    document.body.style.overflow = '';
-}
-
-// Verificar contraseña y cambiar a modo admin
-function verifyPasswordAndSwitchToAdmin() {
-    const password = adminPasswordModal.value;
-    
-    if (password === ADMIN_PASSWORD) {
-        console.log("Contraseña correcta, cambiando a modo administrador");
         
-        // Cambiar a modo administrador
-        isAdmin = true;
-        isViewerMode = false;
-        localStorage.setItem('carousel_is_admin', 'true');
-        localStorage.setItem('carousel_mode', 'admin');
-        
-        // Ocultar modal
-        hidePasswordModal();
-        
-        // Aplicar cambios
-        applyCurrentMode();
-        
-        // Configurar eventos de administrador
-        setupAdminEventListeners();
-        
-        // Cargar imágenes y actualizar lista
-        if (supabaseClient) {
-            loadImagesFromSupabase();
-        } else {
-            loadImagesFromLocalStorage();
-        }
-        
-    } else {
-        console.log("Contraseña incorrecta");
-        modalError.classList.remove('hidden');
-        adminPasswordModal.value = '';
-        adminPasswordModal.focus();
-        
-        // Agitar el input para indicar error
-        adminPasswordModal.style.animation = 'none';
-        setTimeout(() => {
-            adminPasswordModal.style.animation = 'shake 0.5s ease';
-        }, 10);
-    }
-}
         // Inicializar la aplicación
         async function initializeApp() {
             console.log("Inicializando aplicación...");
@@ -1000,23 +938,24 @@ function verifyPasswordAndSwitchToAdmin() {
             
             // 3. Configurar eventos
             setupEventListeners();
-            // Configurar eventos de admin si ya estamos en modo admin
-if (isAdmin) {
-    setupAdminEventListeners();
-}
+            
             // 4. Mostrar estado inicial
             updateCarousel();
             updateImageList();
-            startAutoSlide();
             
             // 5. Aplicar modo inicial
             applyCurrentMode();
+            
+            // 6. Garantizar que el auto-desplazamiento esté activo
+            console.log("Aplicación inicializada, verificando auto-desplazamiento...");
+            
+            // Verificar periódicamente que el auto-desplazamiento esté activo
             setInterval(() => {
-        if (images.length > 1 && !autoSlideInterval) {
-            console.log("Auto-desplazamiento no activo, reiniciando...");
-            startAutoSlide();
-        }
-    }, 10000); // Verificar cada 10 segundos
+                if (images.length > 1 && !autoSlideInterval) {
+                    console.log("Auto-desplazamiento no activo, reiniciando...");
+                    startAutoSlide();
+                }
+            }, 10000);
         }
         
         // Verificar modo guardado
@@ -1034,108 +973,43 @@ if (isAdmin) {
                 console.log("Modo administrador activado (guardado)");
             } else {
                 // Mostrar prompt para seleccionar modo
-                passwordPrompt.classList.remove('hidden');
-                console.log("Mostrando selección de modo");
+                if (passwordPrompt) passwordPrompt.classList.remove('hidden');
+                console.log("Mostrando selección de modo inicial");
             }
         }
         
         // Aplicar el modo actual
         function applyCurrentMode() {
-            // Aplicar el modo actual
-function applyCurrentMode() {
-    if (isViewerMode) {
-        // Modo visualización
-        document.body.classList.add('viewer-mode');
-        document.body.classList.remove('admin-mode');
-        if (adminPanel) adminPanel.classList.add('hidden');
-        if (modeToggle) modeToggle.classList.add('hidden');
-        if (adminAccessBtn) adminAccessBtn.classList.remove('hidden');
-        console.log("Aplicando modo visualización");
-        
-    } else if (isAdmin) {
-        // Modo administrador
-        document.body.classList.add('admin-mode');
-        document.body.classList.remove('viewer-mode');
-        if (adminPanel) adminPanel.classList.remove('hidden');
-        if (modeToggle) {
-            modeToggle.classList.remove('hidden');
-            // Actualizar icono
-            const icon = modeToggle.querySelector('i');
-            if (icon) {
-                icon.className = 'fas fa-expand';
-                modeToggle.title = 'Ver carrusel en pantalla completa';
-            }
-        }
-        if (adminAccessBtn) adminAccessBtn.classList.add('hidden');
-        console.log("Aplicando modo administrador");
-    }
-}
             if (isViewerMode) {
                 // Modo visualización
                 document.body.classList.add('viewer-mode');
                 document.body.classList.remove('admin-mode');
-                adminPanel.classList.add('hidden');
-                modeToggle.classList.add('hidden');
-                passwordPrompt.classList.add('hidden');
+                if (adminPanel) adminPanel.classList.add('hidden');
+                if (modeToggle) modeToggle.classList.add('hidden');
+                if (adminAccessBtn) adminAccessBtn.classList.remove('hidden');
+                if (passwordPrompt) passwordPrompt.classList.add('hidden');
                 console.log("Aplicando modo visualización");
+                
             } else if (isAdmin) {
                 // Modo administrador
                 document.body.classList.add('admin-mode');
                 document.body.classList.remove('viewer-mode');
-                adminPanel.classList.remove('hidden');
-                modeToggle.classList.remove('hidden');
-                passwordPrompt.classList.add('hidden');
+                if (adminPanel) adminPanel.classList.remove('hidden');
+                if (modeToggle) {
+                    modeToggle.classList.remove('hidden');
+                    // Actualizar icono
+                    const icon = modeToggle.querySelector('i');
+                    if (icon) {
+                        icon.className = 'fas fa-expand';
+                        modeToggle.title = 'Ver carrusel en pantalla completa';
+                    }
+                }
+                if (adminAccessBtn) adminAccessBtn.classList.add('hidden');
+                if (passwordPrompt) passwordPrompt.classList.add('hidden');
                 console.log("Aplicando modo administrador");
             }
         }
-        // Configurar eventos específicos de administrador
-function setupAdminEventListeners() {
-    console.log("Configurando eventos de administrador");
-    
-    if (addImageBtn) {
-        addImageBtn.addEventListener('click', () => fileInput.click());
-    }
-    
-    if (uploadArea) {
-        uploadArea.addEventListener('click', () => fileInput.click());
-    }
-    
-    if (fileInput) {
-        fileInput.addEventListener('change', handleImageUpload);
-    }
-    
-    if (clearAllBtn) {
-        clearAllBtn.addEventListener('click', deleteAllImages);
-    }
-    
-    // Arrastrar y soltar
-    if (uploadArea) {
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.style.backgroundColor = 'rgba(79, 172, 254, 0.2)';
-        });
         
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.style.backgroundColor = '';
-        });
-        
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.style.backgroundColor = '';
-            
-            if (e.dataTransfer.files.length) {
-                fileInput.files = e.dataTransfer.files;
-                const event = new Event('change', { bubbles: true });
-                fileInput.dispatchEvent(event);
-            }
-        });
-    }
-    
-    // Botón para cambiar modo de vista
-    if (modeToggle) {
-        modeToggle.addEventListener('click', toggleViewMode);
-    }
-}
         // Cambiar entre modos
         function toggleViewMode() {
             if (isAdmin) {
@@ -1144,15 +1018,298 @@ function setupAdminEventListeners() {
                 
                 // Actualizar icono del botón
                 const icon = modeToggle.querySelector('i');
-                if (isViewerMode) {
-                    icon.className = 'fas fa-compress';
-                    modeToggle.title = 'Ver panel de administración';
-                } else {
-                    icon.className = 'fas fa-expand';
-                    modeToggle.title = 'Ver carrusel en pantalla completa';
+                if (icon) {
+                    if (isViewerMode) {
+                        icon.className = 'fas fa-compress';
+                        modeToggle.title = 'Volver al panel de administración';
+                    } else {
+                        icon.className = 'fas fa-expand';
+                        modeToggle.title = 'Ver carrusel en pantalla completa';
+                    }
                 }
             }
         }
+        
+        // ============================================
+        // MODAL DE CONTRASEÑA
+        // ============================================
+        
+        // Mostrar modal de contraseña
+        function showPasswordModal() {
+            console.log("Mostrando modal de contraseña");
+            if (passwordModal) {
+                passwordModal.classList.remove('hidden');
+                if (adminPasswordModal) {
+                    adminPasswordModal.value = '';
+                    adminPasswordModal.focus();
+                }
+                if (modalError) modalError.classList.add('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        // Ocultar modal de contraseña
+        function hidePasswordModal() {
+            console.log("Ocultando modal de contraseña");
+            if (passwordModal) passwordModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        
+        // Verificar contraseña y cambiar a modo admin
+        function verifyPasswordAndSwitchToAdmin() {
+            const password = adminPasswordModal ? adminPasswordModal.value : '';
+            
+            if (password === ADMIN_PASSWORD) {
+                console.log("Contraseña correcta, cambiando a modo administrador");
+                
+                // Cambiar a modo administrador
+                isAdmin = true;
+                isViewerMode = false;
+                localStorage.setItem('carousel_is_admin', 'true');
+                localStorage.setItem('carousel_mode', 'admin');
+                
+                // Ocultar modal
+                hidePasswordModal();
+                
+                // Aplicar cambios
+                applyCurrentMode();
+                
+                // Configurar eventos de administrador
+                setupAdminEventListeners();
+                
+                // Cargar imágenes y actualizar lista
+                if (supabaseClient) {
+                    loadImagesFromSupabase();
+                } else {
+                    loadImagesFromLocalStorage();
+                }
+                
+            } else {
+                console.log("Contraseña incorrecta");
+                if (modalError) modalError.classList.remove('hidden');
+                if (adminPasswordModal) {
+                    adminPasswordModal.value = '';
+                    adminPasswordModal.focus();
+                    adminPasswordModal.style.animation = 'none';
+                    setTimeout(() => {
+                        adminPasswordModal.style.animation = 'shake 0.5s ease';
+                    }, 10);
+                }
+            }
+        }
+        
+        // Configurar eventos específicos de administrador
+        function setupAdminEventListeners() {
+            console.log("Configurando eventos de administrador");
+            
+            if (addImageBtn) {
+                addImageBtn.addEventListener('click', () => {
+                    if (fileInput) fileInput.click();
+                });
+            }
+            
+            if (uploadArea) {
+                uploadArea.addEventListener('click', () => {
+                    if (fileInput) fileInput.click();
+                });
+            }
+            
+            if (fileInput) {
+                fileInput.addEventListener('change', handleImageUpload);
+            }
+            
+            if (clearAllBtn) {
+                clearAllBtn.addEventListener('click', deleteAllImages);
+            }
+            
+            // Arrastrar y soltar
+            if (uploadArea) {
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.style.backgroundColor = 'rgba(79, 172, 254, 0.2)';
+                });
+                
+                uploadArea.addEventListener('dragleave', () => {
+                    uploadArea.style.backgroundColor = '';
+                });
+                
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.style.backgroundColor = '';
+                    
+                    if (e.dataTransfer.files.length && fileInput) {
+                        fileInput.files = e.dataTransfer.files;
+                        const event = new Event('change', { bubbles: true });
+                        fileInput.dispatchEvent(event);
+                    }
+                });
+            }
+            
+            // Botón para cambiar modo de vista
+            if (modeToggle) {
+                modeToggle.addEventListener('click', toggleViewMode);
+            }
+        }
+        
+        // ============================================
+        // CONFIGURAR EVENTOS
+        // ============================================
+        
+        function setupEventListeners() {
+            // Botón de acceso admin en modo visualización
+            if (adminAccessBtn) {
+                adminAccessBtn.addEventListener('click', showPasswordModal);
+            }
+
+            // Modal events
+            if (modalLoginBtn) {
+                modalLoginBtn.addEventListener('click', verifyPasswordAndSwitchToAdmin);
+            }
+
+            if (modalCancelBtn) {
+                modalCancelBtn.addEventListener('click', hidePasswordModal);
+            }
+
+            // Permitir Enter en modal
+            if (adminPasswordModal) {
+                adminPasswordModal.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        verifyPasswordAndSwitchToAdmin();
+                    }
+                });
+            }
+
+            // Cerrar modal al hacer clic fuera
+            if (passwordModal) {
+                passwordModal.addEventListener('click', (e) => {
+                    if (e.target === passwordModal) {
+                        hidePasswordModal();
+                    }
+                });
+            }
+            
+            // Carrusel - navegación
+            if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+            if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+            
+            // Swipe para móviles
+            if (carouselTrack) {
+                let touchStartX = 0;
+                let touchEndX = 0;
+                
+                carouselTrack.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                }, { passive: true });
+                
+                carouselTrack.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    handleSwipe();
+                }, { passive: true });
+                
+                function handleSwipe() {
+                    const swipeThreshold = 50;
+                    const difference = touchStartX - touchEndX;
+                    
+                    if (Math.abs(difference) > swipeThreshold) {
+                        if (difference > 0) {
+                            nextSlide();
+                        } else {
+                            prevSlide();
+                        }
+                    }
+                }
+            }
+            
+            // Modo administrador (del prompt inicial)
+            if (adminLoginBtn) {
+                adminLoginBtn.addEventListener('click', () => {
+                    const password = adminPasswordInput ? adminPasswordInput.value : '';
+                    
+                    if (password === ADMIN_PASSWORD || password === '') {
+                        isAdmin = true;
+                        isViewerMode = false;
+                        localStorage.setItem('carousel_is_admin', 'true');
+                        localStorage.setItem('carousel_mode', 'admin');
+                        applyCurrentMode();
+                        setupAdminEventListeners();
+                        
+                        // Cargar imágenes
+                        if (supabaseClient) {
+                            loadImagesFromSupabase();
+                        } else {
+                            loadImagesFromLocalStorage();
+                        }
+                        
+                    } else {
+                        if (passwordError) passwordError.classList.remove('hidden');
+                        if (adminPasswordInput) {
+                            adminPasswordInput.value = '';
+                            adminPasswordInput.focus();
+                        }
+                    }
+                });
+            }
+            
+            // Modo visualización (del prompt inicial)
+            if (viewerModeBtn) {
+                viewerModeBtn.addEventListener('click', () => {
+                    isAdmin = false;
+                    isViewerMode = true;
+                    localStorage.setItem('carousel_mode', 'viewer');
+                    localStorage.removeItem('carousel_is_admin');
+                    applyCurrentMode();
+                    
+                    // Cargar imágenes
+                    if (supabaseClient) {
+                        loadImagesFromSupabase();
+                    } else {
+                        loadImagesFromLocalStorage();
+                    }
+                });
+            }
+            
+            // Cambiar modo de vista (toggle)
+            if (modeToggle) {
+                modeToggle.addEventListener('click', toggleViewMode);
+            }
+            
+            // Permitir cerrar con ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    // Cerrar modal de contraseña si está abierto
+                    if (passwordModal && !passwordModal.classList.contains('hidden')) {
+                        hidePasswordModal();
+                    }
+                    // Cerrar prompt inicial si está abierto
+                    else if (passwordPrompt && !passwordPrompt.classList.contains('hidden')) {
+                        // Forzar modo visualización
+                        isAdmin = false;
+                        isViewerMode = true;
+                        localStorage.setItem('carousel_mode', 'viewer');
+                        applyCurrentMode();
+                        
+                        if (supabaseClient) {
+                            loadImagesFromSupabase();
+                        } else {
+                            loadImagesFromLocalStorage();
+                        }
+                    }
+                    // Salir de pantalla completa si es admin en modo visualización
+                    else if (isAdmin && isViewerMode) {
+                        toggleViewMode();
+                    }
+                }
+            });
+            
+            // Configurar eventos de admin si ya estamos en modo admin
+            if (isAdmin) {
+                setupAdminEventListeners();
+            }
+        }
+        
+        // ============================================
+        // SUPABASE
+        // ============================================
         
         // Inicializar Supabase
         async function initializeSupabase() {
@@ -1177,7 +1334,7 @@ function setupAdminEventListeners() {
                 }
                 
                 updateConnectionStatus(true, "Conectado - Sincronizado");
-                deviceCountElement.classList.remove('hidden');
+                if (deviceCountElement) deviceCountElement.classList.remove('hidden');
                 
                 // Generar ID de dispositivo
                 deviceId = localStorage.getItem('device_id') || 
@@ -1202,12 +1359,14 @@ function setupAdminEventListeners() {
         
         // Actualizar estado de conexión
         function updateConnectionStatus(connected, message) {
-            if (connected) {
-                connectionStatus.className = 'connection-status connected';
-                connectionStatus.innerHTML = `<i class="fas fa-wifi"></i><span>${message}</span>`;
-            } else {
-                connectionStatus.className = 'connection-status disconnected';
-                connectionStatus.innerHTML = `<i class="fas fa-plug"></i><span>${message}</span>`;
+            if (connectionStatus) {
+                if (connected) {
+                    connectionStatus.className = 'connection-status connected';
+                    connectionStatus.innerHTML = `<i class="fas fa-wifi"></i><span>${message}</span>`;
+                } else {
+                    connectionStatus.className = 'connection-status disconnected';
+                    connectionStatus.innerHTML = `<i class="fas fa-plug"></i><span>${message}</span>`;
+                }
             }
         }
         
@@ -1246,7 +1405,7 @@ function setupAdminEventListeners() {
                 
                 if (error) throw error;
                 
-                connectedDevicesSpan.textContent = count || 0;
+                if (connectedDevicesSpan) connectedDevicesSpan.textContent = count || 0;
                 
             } catch (error) {
                 console.error("Error actualizando contador de dispositivos:", error);
@@ -1273,7 +1432,10 @@ function setupAdminEventListeners() {
         
         // Cargar imágenes desde Supabase
         async function loadImagesFromSupabase() {
-            if (!supabaseClient) return;
+            if (!supabaseClient) {
+                loadImagesFromLocalStorage();
+                return;
+            }
             
             try {
                 const { data, error } = await supabaseClient
@@ -1304,6 +1466,10 @@ function setupAdminEventListeners() {
             }
         }
         
+        // ============================================
+        // MANEJO DE IMÁGENES
+        // ============================================
+        
         // Cargar imágenes desde localStorage
         function loadImagesFromLocalStorage() {
             const storedImages = localStorage.getItem('carousel_images_backup');
@@ -1312,7 +1478,6 @@ function setupAdminEventListeners() {
                 images = JSON.parse(storedImages);
                 console.log(`Cargadas ${images.length} imágenes desde localStorage`);
             } else {
-                // Sin imágenes por defecto en modo visualización
                 images = [];
                 console.log("No hay imágenes guardadas");
             }
@@ -1329,21 +1494,23 @@ function setupAdminEventListeners() {
         // Actualizar el carrusel
         function updateCarousel() {
             // Limpiar el carrusel
-            carouselTrack.innerHTML = '';
-            carouselIndicators.innerHTML = '';
+            if (carouselTrack) carouselTrack.innerHTML = '';
+            if (carouselIndicators) carouselIndicators.innerHTML = '';
             
             // Si no hay imágenes
             if (images.length === 0) {
-                carouselTrack.innerHTML = `
-                    <div class="carousel-slide" style="display: flex; align-items: center; justify-content: center; background: #000;">
-                        <div style="text-align: center; padding: 20px;">
-                            <i class="fas fa-image" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.3;"></i>
-                            <h2 style="margin-bottom: 10px; color: #666;">No hay imágenes</h2>
-                            <p style="color: #666;">Esperando que el administrador agregue imágenes...</p>
+                if (carouselTrack) {
+                    carouselTrack.innerHTML = `
+                        <div class="carousel-slide" style="display: flex; align-items: center; justify-content: center; background: #000;">
+                            <div style="text-align: center; padding: 20px;">
+                                <i class="fas fa-image" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                                <h2 style="margin-bottom: 10px; color: #666;">No hay imágenes</h2>
+                                <p style="color: #666;">Esperando que el administrador agregue imágenes...</p>
+                            </div>
                         </div>
-                    </div>
-                `;
-                imageCounter.textContent = "0 / 0";
+                    `;
+                }
+                if (imageCounter) imageCounter.textContent = "0 / 0";
                 return;
             }
             
@@ -1351,17 +1518,17 @@ function setupAdminEventListeners() {
             images.forEach((image, index) => {
                 const slide = document.createElement('div');
                 slide.className = 'carousel-slide';
-                slide.innerHTML = `
-                    <img src="${image.url}" alt="Imagen ${index + 1}" class="carousel-image">
-                `;
-                carouselTrack.appendChild(slide);
+                slide.innerHTML = `<img src="${image.url}" alt="Imagen ${index + 1}" class="carousel-image">`;
+                if (carouselTrack) carouselTrack.appendChild(slide);
                 
                 // Crear indicadores
-                const indicator = document.createElement('div');
-                indicator.className = `indicator ${index === currentSlide ? 'active' : ''}`;
-                indicator.dataset.index = index;
-                indicator.addEventListener('click', () => goToSlide(index));
-                carouselIndicators.appendChild(indicator);
+                if (carouselIndicators) {
+                    const indicator = document.createElement('div');
+                    indicator.className = `indicator ${index === currentSlide ? 'active' : ''}`;
+                    indicator.dataset.index = index;
+                    indicator.addEventListener('click', () => goToSlide(index));
+                    carouselIndicators.appendChild(indicator);
+                }
             });
             
             // Asegurar que currentSlide esté dentro del rango
@@ -1370,13 +1537,16 @@ function setupAdminEventListeners() {
             }
             
             // Actualizar contador y posición
-            imageCounter.textContent = `${currentSlide + 1} / ${images.length}`;
-            carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+            if (imageCounter) imageCounter.textContent = `${currentSlide + 1} / ${images.length}`;
+            if (carouselTrack) carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+            
+            // Reiniciar auto-desplazamiento
+            startAutoSlide();
         }
         
         // Actualizar la lista de imágenes en el panel admin
         function updateImageList() {
-            if (!isAdmin) return;
+            if (!isAdmin || !imageList) return;
             
             imageList.innerHTML = '';
             
@@ -1402,7 +1572,40 @@ function setupAdminEventListeners() {
             });
         }
         
-        // Navegación del carrusel
+        // ============================================
+        // NAVEGACIÓN Y AUTO-DESPLAZAMIENTO
+        // ============================================
+        
+        function startAutoSlide() {
+            clearInterval(autoSlideInterval);
+            
+            if (images.length > 1) {
+                console.log("Iniciando auto-desplazamiento continuo...");
+                autoSlideInterval = setInterval(() => {
+                    if (images.length === 0) return;
+                    
+                    let nextSlideIndex = currentSlide + 1;
+                    if (nextSlideIndex >= images.length) {
+                        nextSlideIndex = 0;
+                    }
+                    goToSlide(nextSlideIndex);
+                    
+                }, 5000);
+            }
+        }
+        
+        function stopAutoSlide() {
+            clearInterval(autoSlideInterval);
+        }
+        
+        function nextSlide() {
+            goToSlide(currentSlide + 1);
+        }
+        
+        function prevSlide() {
+            goToSlide(currentSlide - 1);
+        }
+        
         function goToSlide(slideIndex) {
             if (images.length === 0) return;
             
@@ -1414,7 +1617,9 @@ function setupAdminEventListeners() {
                 currentSlide = slideIndex;
             }
             
-            carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+            if (carouselTrack) {
+                carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+            }
             
             // Actualizar indicadores
             document.querySelectorAll('.indicator').forEach((indicator, index) => {
@@ -1425,264 +1630,14 @@ function setupAdminEventListeners() {
                 }
             });
             
-            imageCounter.textContent = `${currentSlide + 1} / ${images.length}`;
-        }
-        
-        function nextSlide() {
-            goToSlide(currentSlide + 1);
-        }
-        
-        function prevSlide() {
-            goToSlide(currentSlide - 1);
-        }
-        
-        function startAutoSlide() {
-    clearInterval(autoSlideInterval);
-    
-    if (images.length > 1) {
-        console.log("Iniciando auto-desplazamiento continuo...");
-        autoSlideInterval = setInterval(() => {
-            // Verificar que haya imágenes
-            if (images.length === 0) return;
-            
-            // Avanzar al siguiente slide
-            let nextSlideIndex = currentSlide + 1;
-            if (nextSlideIndex >= images.length) {
-                nextSlideIndex = 0;
-            }
-            goToSlide(nextSlideIndex);
-            
-            console.log(`Auto-desplazamiento: ${currentSlide + 1}/${images.length}`);
-        }, 5000); // 5 segundos
-    } else {
-        console.log("No hay suficientes imágenes para auto-desplazamiento");
-    }
-}
-
-function stopAutoSlide() {
-    // Esta función ahora solo se llama manualmente si es necesario
-    clearInterval(autoSlideInterval);
-    console.log("Auto-desplazamiento detenido manualmente");
-}
-
-// ============================================
-// CONFIGURAR EVENTOS - SIN PAUSA POR MOUSE
-// ============================================
-
-// Configurar eventos
-function setupEventListeners() {
-    // Botón de acceso admin en modo visualización
-if (adminAccessBtn) {
-    adminAccessBtn.addEventListener('click', () => {
-        console.log("Botón admin clickeado en modo visualización");
-        showPasswordModal();
-    });
-}
-
-// Modal events
-if (modalLoginBtn) {
-    modalLoginBtn.addEventListener('click', verifyPasswordAndSwitchToAdmin);
-    
-    // Permitir Enter para enviar
-    adminPasswordModal.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            verifyPasswordAndSwitchToAdmin();
-        }
-    });
-}
-
-if (modalCancelBtn) {
-    modalCancelBtn.addEventListener('click', hidePasswordModal);
-}
-
-// Cerrar modal al hacer clic fuera
-passwordModal.addEventListener('click', (e) => {
-    if (e.target === passwordModal) {
-        hidePasswordModal();
-    }
-});
-
-// Cerrar modal con ESC
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !passwordModal.classList.contains('hidden')) {
-        hidePasswordModal();
-    }
-});
-    // Carrusel - solo navegación manual
-    if (prevBtn) prevBtn.addEventListener('click', () => {
-        prevSlide();
-        // NO detenemos el auto-desplazamiento
-    });
-    
-    if (nextBtn) nextBtn.addEventListener('click', () => {
-        nextSlide();
-        // NO detenemos el auto-desplazamiento
-    });
-    
-    // REMOVER LOS EVENTOS QUE PAUSAN EL AUTO-DESPLAZAMIENTO:
-    // Eliminar estos eventos completamente:
-    // - mouseenter (NO pausar)
-    // - mouseleave (NO reanudar)
-    // - touchstart (NO pausar)
-    // - touchend (NO reanudar)
-    
-    // En su lugar, solo manejamos la navegación manual:
-    if (carouselTrack) {
-        // Swipe para móviles (solo navegación, sin pausar)
-        let touchStartX = 0;
-        let touchEndX = 0;
-        
-        carouselTrack.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
-        
-        carouselTrack.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, { passive: true });
-        
-        function handleSwipe() {
-            const swipeThreshold = 50;
-            const difference = touchStartX - touchEndX;
-            
-            if (Math.abs(difference) > swipeThreshold) {
-                if (difference > 0) {
-                    nextSlide(); // Swipe izquierda
-                } else {
-                    prevSlide(); // Swipe derecha
-                }
-                // NO detenemos el auto-desplazamiento
+            if (imageCounter) {
+                imageCounter.textContent = `${currentSlide + 1} / ${images.length}`;
             }
         }
         
-        // Click en el carrusel también puede avanzar (opcional)
-        carouselTrack.addEventListener('click', (e) => {
-            // Solo si se hace click en la mitad derecha/izquierda
-            const rect = carouselTrack.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const width = rect.width;
-            
-            if (x > width * 0.66) {
-                nextSlide(); // Click en tercio derecho
-            } else if (x < width * 0.33) {
-                prevSlide(); // Click en tercio izquierdo
-            }
-            // NO detenemos el auto-desplazamiento
-        });
-    }
-    
-    // ... (el resto del código de eventos permanece igual para admin)
-}
-
-// ============================================
-// FUNCIONES DE NAVEGACIÓN - SIN DETENER AUTO
-// ============================================
-
-function nextSlide() {
-    goToSlide(currentSlide + 1);
-    // IMPORTANTE: NO llamar a stopAutoSlide() aquí
-}
-
-function prevSlide() {
-    goToSlide(currentSlide - 1);
-    // IMPORTANTE: NO llamar a stopAutoSlide() aquí
-}
-
-// Navegación del carrusel
-function goToSlide(slideIndex) {
-    if (images.length === 0) return;
-    
-    if (slideIndex < 0) {
-        currentSlide = images.length - 1;
-    } else if (slideIndex >= images.length) {
-        currentSlide = 0;
-    } else {
-        currentSlide = slideIndex;
-    }
-    
-    // Asegurar que el carrusel track exista
-    if (carouselTrack) {
-        carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
-    }
-    
-    // Actualizar indicadores
-    document.querySelectorAll('.indicator').forEach((indicator, index) => {
-        if (index === currentSlide) {
-            indicator.classList.add('active');
-        } else {
-            indicator.classList.remove('active');
-        }
-    });
-    
-    // Actualizar contador
-    if (imageCounter) {
-        imageCounter.textContent = `${currentSlide + 1} / ${images.length}`;
-    }
-}
-
-// ============================================
-// ACTUALIZAR CARRUSEL - MANTENER AUTO
-// ============================================
-
-// Actualizar el carrusel
-function updateCarousel() {
-    // Limpiar el carrusel
-    if (carouselTrack) carouselTrack.innerHTML = '';
-    if (carouselIndicators) carouselIndicators.innerHTML = '';
-    
-    // Si no hay imágenes
-    if (images.length === 0) {
-        if (carouselTrack) {
-            carouselTrack.innerHTML = `
-                <div class="carousel-slide" style="display: flex; align-items: center; justify-content: center; background: #000;">
-                    <div style="text-align: center; padding: 20px;">
-                        <i class="fas fa-image" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.3;"></i>
-                        <h2 style="margin-bottom: 10px; color: #666;">No hay imágenes</h2>
-                        <p style="color: #666;">Esperando que el administrador agregue imágenes...</p>
-                    </div>
-                </div>
-            `;
-        }
-        if (imageCounter) imageCounter.textContent = "0 / 0";
-        stopAutoSlide(); // Detener si no hay imágenes
-        return;
-    }
-    
-    // Crear slides para cada imagen
-    images.forEach((image, index) => {
-        const slide = document.createElement('div');
-        slide.className = 'carousel-slide';
-        slide.innerHTML = `
-            <img src="${image.url}" alt="Imagen ${index + 1}" class="carousel-image">
-        `;
-        if (carouselTrack) carouselTrack.appendChild(slide);
-        
-        // Crear indicadores
-        if (carouselIndicators) {
-            const indicator = document.createElement('div');
-            indicator.className = `indicator ${index === currentSlide ? 'active' : ''}`;
-            indicator.dataset.index = index;
-            indicator.addEventListener('click', () => {
-                goToSlide(index);
-                // NO detenemos el auto-desplazamiento
-            });
-            carouselIndicators.appendChild(indicator);
-        }
-    });
-    
-    // Asegurar que currentSlide esté dentro del rango
-    if (currentSlide >= images.length) {
-        currentSlide = Math.max(0, images.length - 1);
-    }
-    
-    // Actualizar contador y posición
-    if (imageCounter) imageCounter.textContent = `${currentSlide + 1} / ${images.length}`;
-    if (carouselTrack) carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
-    
-    // IMPORTANTE: Siempre reiniciar el auto-desplazamiento
-    console.log("Actualizando carrusel, reiniciando auto-desplazamiento...");
-    startAutoSlide();
-}
+        // ============================================
+        // FUNCIONES DE ADMINISTRADOR
+        // ============================================
         
         // Agregar imagen
         async function addImage(imageUrl, title = "Imagen") {
@@ -1866,149 +1821,11 @@ function updateCarousel() {
             }
             
             // Limpiar input
-            fileInput.value = '';
-        }
-        
-        // Configurar eventos
-        function setupEventListeners() {
-            // Carrusel
-            prevBtn.addEventListener('click', prevSlide);
-            nextBtn.addEventListener('click', nextSlide);
-            
-            // Pausar auto-desplazamiento
-            carouselTrack.addEventListener('mouseenter', stopAutoSlide);
-            carouselTrack.addEventListener('mouseleave', startAutoSlide);
-            
-            // Touch events para móviles
-            let touchStartX = 0;
-            let touchEndX = 0;
-            
-            carouselTrack.addEventListener('touchstart', (e) => {
-                touchStartX = e.changedTouches[0].screenX;
-            }, { passive: true });
-            
-            carouselTrack.addEventListener('touchend', (e) => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipe();
-            }, { passive: true });
-            
-            function handleSwipe() {
-                const swipeThreshold = 50;
-                const difference = touchStartX - touchEndX;
-                
-                if (Math.abs(difference) > swipeThreshold) {
-                    if (difference > 0) {
-                        nextSlide(); // Swipe izquierda
-                    } else {
-                        prevSlide(); // Swipe derecha
-                    }
-                }
-            }
-            
-            // Panel de administración
-            if (isAdmin) {
-                addImageBtn.addEventListener('click', () => fileInput.click());
-                uploadArea.addEventListener('click', () => fileInput.click());
-                fileInput.addEventListener('change', handleImageUpload);
-                clearAllBtn.addEventListener('click', deleteAllImages);
-                
-                // Arrastrar y soltar
-                uploadArea.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    uploadArea.style.backgroundColor = 'rgba(79, 172, 254, 0.2)';
-                });
-                
-                uploadArea.addEventListener('dragleave', () => {
-                    uploadArea.style.backgroundColor = '';
-                });
-                
-                uploadArea.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    uploadArea.style.backgroundColor = '';
-                    
-                    if (e.dataTransfer.files.length) {
-                        fileInput.files = e.dataTransfer.files;
-                        const event = new Event('change', { bubbles: true });
-                        fileInput.dispatchEvent(event);
-                    }
-                });
-            }
-            
-            // Modo administrador
-            adminLoginBtn.addEventListener('click', () => {
-                const password = adminPasswordInput.value;
-                
-                if (password === ADMIN_PASSWORD || password === '') {
-                    isAdmin = true;
-                    isViewerMode = false;
-                    localStorage.setItem('carousel_is_admin', 'true');
-                    localStorage.setItem('carousel_mode', 'admin');
-                    applyCurrentMode();
-                    
-                    // Actualizar eventos para el panel admin
-                    addImageBtn.addEventListener('click', () => fileInput.click());
-                    uploadArea.addEventListener('click', () => fileInput.click());
-                    fileInput.addEventListener('change', handleImageUpload);
-                    clearAllBtn.addEventListener('click', deleteAllImages);
-                    
-                    // Cargar imágenes y actualizar lista
-                    if (supabaseClient) {
-                        loadImagesFromSupabase();
-                    } else {
-                        loadImagesFromLocalStorage();
-                    }
-                    
-                } else {
-                    passwordError.classList.remove('hidden');
-                    adminPasswordInput.value = '';
-                    adminPasswordInput.focus();
-                }
-            });
-            
-            // Modo visualización
-            viewerModeBtn.addEventListener('click', () => {
-                isAdmin = false;
-                isViewerMode = true;
-                localStorage.setItem('carousel_mode', 'viewer');
-                localStorage.removeItem('carousel_is_admin');
-                applyCurrentMode();
-                
-                // Cargar imágenes
-                if (supabaseClient) {
-                    loadImagesFromSupabase();
-                } else {
-                    loadImagesFromLocalStorage();
-                }
-            });
-            
-            // Cambiar modo de vista
-            modeToggle.addEventListener('click', toggleViewMode);
-            
-            // Permitir cerrar con ESC
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && !passwordPrompt.classList.contains('hidden')) {
-                    // Si no se ha elegido modo, forzar modo visualización
-                    isAdmin = false;
-                    isViewerMode = true;
-                    localStorage.setItem('carousel_mode', 'viewer');
-                    applyCurrentMode();
-                    
-                    if (supabaseClient) {
-                        loadImagesFromSupabase();
-                    } else {
-                        loadImagesFromLocalStorage();
-                    }
-                }
-                
-                // También permitir ESC para salir de pantalla completa si es admin
-                if (e.key === 'Escape' && isAdmin && isViewerMode) {
-                    toggleViewMode();
-                }
-            });
+            if (fileInput) fileInput.value = '';
         }
         
         // ============================================
-        // INICIALIZACIÓN
+        // INICIALIZAR APLICACIÓN
         // ============================================
         document.addEventListener('DOMContentLoaded', () => {
             console.log("DOM cargado, inicializando aplicación...");
