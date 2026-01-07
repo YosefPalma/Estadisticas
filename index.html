@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrusel de Imágenes Compartido</title>
+    <title>Carrusel de Imágenes Sincronizado - Supabase</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -46,16 +46,25 @@
         .subtitle {
             font-size: 1.1rem;
             opacity: 0.8;
+            margin-bottom: 10px;
         }
         
-        .admin-indicator {
-            background-color: #10b981;
-            color: white;
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             padding: 8px 15px;
             border-radius: 20px;
-            display: inline-block;
+            font-size: 0.9rem;
             margin-top: 10px;
-            font-weight: bold;
+        }
+        
+        .connected {
+            background-color: #10b981;
+        }
+        
+        .disconnected {
+            background-color: #ef4444;
         }
         
         .carousel-container {
@@ -85,6 +94,7 @@
         .carousel-slide {
             min-width: 100%;
             height: 100%;
+            position: relative;
         }
         
         .carousel-image {
@@ -92,6 +102,16 @@
             height: 100%;
             object-fit: cover;
             display: block;
+        }
+        
+        .image-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            padding: 15px;
+            color: white;
         }
         
         .carousel-controls {
@@ -172,6 +192,44 @@
             gap: 10px;
         }
         
+        .admin-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .admin-btn {
+            background-color: #4facfe;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 200px;
+            justify-content: center;
+        }
+        
+        .admin-btn:hover {
+            background-color: #3a9ce9;
+            transform: translateY(-2px);
+        }
+        
+        .admin-btn.delete {
+            background-color: #ef4444;
+        }
+        
+        .admin-btn.delete:hover {
+            background-color: #dc2626;
+        }
+        
         .upload-area {
             border: 3px dashed #4facfe;
             border-radius: 10px;
@@ -194,26 +252,6 @@
         
         #file-input {
             display: none;
-        }
-        
-        .upload-btn {
-            background-color: #4facfe;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .upload-btn:hover {
-            background-color: #3a9ce9;
-            transform: translateY(-2px);
         }
         
         .current-images {
@@ -298,6 +336,29 @@
             margin-bottom: 8px;
         }
         
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            font-size: 1.2rem;
+            color: #4facfe;
+        }
+        
+        .loading i {
+            margin-right: 10px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
         @media (max-width: 768px) {
             .carousel {
                 height: 400px;
@@ -309,6 +370,14 @@
             
             .image-list {
                 grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+            
+            .admin-controls {
+                flex-direction: column;
+            }
+            
+            .admin-btn {
+                min-width: 100%;
             }
         }
         
@@ -324,25 +393,99 @@
             }
         }
         
-        .hidden {
-            display: none !important;
+        .device-count {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .password-prompt {
+            background-color: rgba(0, 0, 0, 0.8);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .password-box {
+            background: linear-gradient(135deg, #2d3748, #1a2a6c);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .password-box h3 {
+            margin-bottom: 20px;
+            color: #4facfe;
+        }
+        
+        .password-form {
+            margin-bottom: 15px;
+        }
+        
+        .password-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #4facfe;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .password-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #4facfe;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .password-btn:hover {
+            background-color: #3a9ce9;
+        }
+        
+        .error-message {
+            color: #ef4444;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-images"></i> Carrusel de Imágenes Compartido</h1>
-            <p class="subtitle">Visualiza las imágenes en todos los dispositivos conectados</p>
-            <div id="admin-indicator" class="admin-indicator hidden">
-                <i class="fas fa-user-shield"></i> Modo Administrador Activo
+            <h1><i class="fas fa-images"></i> Carrusel de Imágenes Sincronizado</h1>
+            <p class="subtitle">Imágenes compartidas en tiempo real entre todos los dispositivos</p>
+            <div id="connection-status" class="connection-status disconnected">
+                <i class="fas fa-plug"></i>
+                <span>Conectando a Supabase...</span>
+            </div>
+            <div id="device-count" class="device-count">
+                <i class="fas fa-users"></i> <span id="connected-devices">0</span> dispositivos conectados
             </div>
         </header>
         
         <div class="carousel-container">
             <div class="carousel">
                 <div class="carousel-track" id="carousel-track">
-                    <!-- Las imágenes se insertarán aquí dinámicamente -->
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <span>Cargando imágenes...</span>
+                    </div>
                 </div>
                 
                 <div class="carousel-controls">
@@ -354,7 +497,7 @@
                     </button>
                 </div>
                 
-                <div class="image-counter" id="image-counter">1 / 0</div>
+                <div class="image-counter" id="image-counter">0 / 0</div>
             </div>
             
             <div class="carousel-indicators" id="carousel-indicators">
@@ -364,22 +507,34 @@
         
         <div id="admin-panel" class="admin-panel hidden">
             <h2><i class="fas fa-cog"></i> Panel de Administración</h2>
-            <p>Solo tú puedes ver este panel. Desde aquí puedes agregar o eliminar imágenes del carrusel.</p>
+            <p>Solo tú puedes ver este panel. Desde aquí puedes gestionar las imágenes del carrusel.</p>
+            
+            <div class="admin-controls">
+                <button class="admin-btn" id="add-image-btn">
+                    <i class="fas fa-plus"></i> Agregar Imágenes
+                </button>
+                <button class="admin-btn delete" id="clear-all-btn">
+                    <i class="fas fa-trash"></i> Eliminar Todas
+                </button>
+                <button class="admin-btn" id="add-sample-btn">
+                    <i class="fas fa-magic"></i> Agregar Ejemplos
+                </button>
+            </div>
             
             <div class="upload-area" id="upload-area">
                 <i class="fas fa-cloud-upload-alt"></i>
                 <h3>Arrastra imágenes aquí o haz clic para seleccionar</h3>
                 <p>Formatos aceptados: JPG, PNG, GIF (Máximo 5MB por imagen)</p>
                 <input type="file" id="file-input" accept="image/*" multiple>
-                <button class="upload-btn" id="upload-trigger">
-                    <i class="fas fa-folder-open"></i> Seleccionar Imágenes
-                </button>
             </div>
             
             <div class="current-images">
                 <h3>Imágenes Actuales en el Carrusel</h3>
                 <div class="image-list" id="image-list">
-                    <!-- Las imágenes actuales se mostrarán aquí -->
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <span>Cargando...</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -387,18 +542,61 @@
         <div class="instructions">
             <h3><i class="fas fa-info-circle"></i> Instrucciones</h3>
             <ul>
-                <li>El carrusel se actualiza automáticamente en todos los dispositivos cuando agregas nuevas imágenes</li>
-                <li>Usa las flechas izquierda/derecha o los puntos inferiores para navegar entre imágenes</li>
+                <li>Las imágenes se sincronizan automáticamente entre todos los dispositivos</li>
+                <li>Cualquier cambio realizado se verá inmediatamente en todos los dispositivos</li>
+                <li>Usa las flechas izquierda/derecha o los puntos inferiores para navegar</li>
                 <li>El carrusel avanza automáticamente cada 5 segundos</li>
                 <li>Solo el dispositivo administrador puede agregar o eliminar imágenes</li>
             </ul>
         </div>
     </div>
 
+    <div id="password-prompt" class="password-prompt hidden">
+        <div class="password-box">
+            <h3><i class="fas fa-lock"></i> Acceso de Administrador</h3>
+            <p>Ingresa la contraseña para activar el modo administrador:</p>
+            <form id="password-form" class="password-form">
+                <input type="password" id="admin-password" class="password-input" placeholder="Contraseña" required>
+                <button type="submit" id="password-submit" class="password-btn">Acceder</button>
+            </form>
+            <div id="password-error" class="error-message hidden">Contraseña incorrecta</div>
+            <p style="margin-top: 15px; font-size: 0.8rem; opacity: 0.7;">
+                Si no eres el administrador, cierra esta ventana para ver solo el carrusel.
+            </p>
+        </div>
+    </div>
+
+    <!-- Cargar Supabase con defer para evitar problemas -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    
     <script>
-        // Identificador único para el administrador
-        // En un caso real, esto debería venir de un login o verificación
-        const ADMIN_ID = "admin_device_001";
+        // Configuración de Supabase - ¡REEMPLAZA ESTOS VALORES CON LOS TUYOS!
+const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_ANON_KEY = 'sb_publishable_UJiY23LT_8zNLtLUx0guWw_l760sXI7';
+        
+        // Contraseña del administrador (cámbiala por una segura)
+        const ADMIN_PASSWORD = 'admin123';
+        
+        // Variables de estado
+        let currentSlide = 0;
+        let autoSlideInterval;
+        let images = [];
+        let isAdmin = false;
+        let supabaseClient;
+        let deviceId;
+        
+        // Esperar a que el DOM esté completamente cargado
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Inicializar Supabase y la aplicación
+            await initializeSupabase();
+            initApp();
+            
+            // Actualizar última actividad cada minuto
+            setInterval(() => {
+                if (supabaseClient) {
+                    registerDevice();
+                }
+            }, 60000);
+        });
         
         // Elementos del DOM
         const carouselTrack = document.getElementById('carousel-track');
@@ -407,70 +605,228 @@
         const carouselIndicators = document.getElementById('carousel-indicators');
         const imageCounter = document.getElementById('image-counter');
         const adminPanel = document.getElementById('admin-panel');
-        const adminIndicator = document.getElementById('admin-indicator');
+        const connectionStatus = document.getElementById('connection-status');
+        const connectedDevicesSpan = document.getElementById('connected-devices');
         const fileInput = document.getElementById('file-input');
-        const uploadTrigger = document.getElementById('upload-trigger');
+        const addImageBtn = document.getElementById('add-image-btn');
+        const clearAllBtn = document.getElementById('clear-all-btn');
+        const addSampleBtn = document.getElementById('add-sample-btn');
         const uploadArea = document.getElementById('upload-area');
         const imageList = document.getElementById('image-list');
+        const passwordPrompt = document.getElementById('password-prompt');
+        const passwordForm = document.getElementById('password-form');
+        const adminPasswordInput = document.getElementById('admin-password');
+        const passwordError = document.getElementById('password-error');
         
-        // Variables de estado
-        let currentSlide = 0;
-        let autoSlideInterval;
-        let images = [];
-        let isAdmin = false;
-        
-        // Verificar si este dispositivo es el administrador
-        function checkIfAdmin() {
-            // En un caso real, esto podría ser una verificación más compleja
-            // Para este ejemplo, usamos localStorage para marcar un dispositivo como admin
-            const storedAdminId = localStorage.getItem('carousel_admin_id');
-            
-            if (storedAdminId === ADMIN_ID) {
-                isAdmin = true;
-                adminPanel.classList.remove('hidden');
-                adminIndicator.classList.remove('hidden');
-                console.log("Modo administrador activado");
-            } else {
-                // Si no hay admin registrado, este dispositivo se convierte en admin
-                // (para propósitos de demostración)
-                const shouldBeAdmin = confirm("¿Este es el dispositivo que agregará imágenes? (Sí = Modo Admin, No = Solo Visualización)");
-                
-                if (shouldBeAdmin) {
-                    localStorage.setItem('carousel_admin_id', ADMIN_ID);
-                    isAdmin = true;
-                    adminPanel.classList.remove('hidden');
-                    adminIndicator.classList.remove('hidden');
-                    alert("Modo administrador activado. Solo este dispositivo puede agregar imágenes.");
-                } else {
-                    isAdmin = false;
-                    alert("Modo de solo visualización activado.");
+        // Inicializar Supabase
+        async function initializeSupabase() {
+            try {
+                // Verificar si Supabase está disponible
+                if (typeof window.supabase === 'undefined') {
+                    console.error("Supabase no está cargado. Verifica la conexión a internet.");
+                    updateConnectionStatus(false);
+                    loadImagesFromLocalStorage();
+                    return;
                 }
+                
+                // Crear cliente Supabase
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                    auth: {
+                        persistSession: false,
+                        autoRefreshToken: false,
+                        detectSessionInUrl: false
+                    }
+                });
+                
+                // Verificar conexión con un tiempo de espera
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Timeout')), 5000)
+                );
+                
+                const connectPromise = supabaseClient.from('images').select('count').limit(1);
+                
+                const { data, error } = await Promise.race([connectPromise, timeoutPromise]);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                updateConnectionStatus(true);
+                
+                // Generar ID único para este dispositivo
+                deviceId = localStorage.getItem('device_id');
+                if (!deviceId) {
+                    deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('device_id', deviceId);
+                }
+                
+                // Registrar dispositivo activo
+                await registerDevice();
+                
+                // Configurar suscripción en tiempo real
+                setupRealtimeSubscription();
+                
+                // Cargar imágenes iniciales
+                await loadImages();
+                
+            } catch (error) {
+                console.error("Error inicializando Supabase:", error);
+                updateConnectionStatus(false);
+                
+                // Mostrar error al usuario
+                showError("Error de conexión a la base de datos. Usando modo local.");
+                
+                // Usar localStorage como respaldo
+                loadImagesFromLocalStorage();
             }
         }
         
-        // Cargar imágenes desde localStorage
-        function loadImages() {
-            const storedImages = localStorage.getItem('carousel_images');
+        // Actualizar estado de conexión
+        function updateConnectionStatus(connected) {
+            if (connected) {
+                connectionStatus.className = 'connection-status connected';
+                connectionStatus.innerHTML = '<i class="fas fa-wifi"></i><span>Conectado - Sincronizado</span>';
+            } else {
+                connectionStatus.className = 'connection-status disconnected';
+                connectionStatus.innerHTML = '<i class="fas fa-plug"></i><span>Sin conexión - Modo local</span>';
+            }
+        }
+        
+        // Mostrar error
+        function showError(message) {
+            carouselTrack.innerHTML = `
+                <div class="carousel-slide" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #2c3e50, #4a6491);">
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 4rem; margin-bottom: 20px; color: #ef4444;"></i>
+                        <h2 style="margin-bottom: 10px;">Error de Conexión</h2>
+                        <p>${message}</p>
+                        <p style="margin-top: 15px; font-size: 0.9rem;">Los cambios no se sincronizarán entre dispositivos.</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Registrar dispositivo
+        async function registerDevice() {
+            if (!supabaseClient) return;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('devices')
+                    .upsert({
+                        id: deviceId,
+                        last_active: new Date().toISOString(),
+                        user_agent: navigator.userAgent
+                    });
+                
+                if (error) throw error;
+                
+                // Actualizar contador de dispositivos
+                await updateDeviceCount();
+                
+            } catch (error) {
+                console.error("Error registrando dispositivo:", error);
+            }
+        }
+        
+        // Actualizar contador de dispositivos
+        async function updateDeviceCount() {
+            if (!supabaseClient) return;
+            
+            try {
+                const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+                
+                const { data, error } = await supabaseClient
+                    .from('devices')
+                    .select('id', { count: 'exact' })
+                    .gt('last_active', fiveMinutesAgo);
+                
+                if (error) throw error;
+                
+                connectedDevicesSpan.textContent = data.length || 0;
+                
+            } catch (error) {
+                console.error("Error actualizando contador de dispositivos:", error);
+            }
+        }
+        
+        // Configurar suscripción en tiempo real
+        function setupRealtimeSubscription() {
+            if (!supabaseClient) return;
+            
+            // Suscribirse a cambios en la tabla de imágenes
+            supabaseClient
+                .channel('images-channel')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'images' }, 
+                    async (payload) => {
+                        console.log('Cambio detectado en imágenes:', payload);
+                        await loadImages();
+                    }
+                )
+                .subscribe();
+            
+            // Suscribirse a cambios en la tabla de dispositivos
+            supabaseClient
+                .channel('devices-channel')
+                .on('postgres_changes',
+                    { event: '*', schema: 'public', table: 'devices' },
+                    async () => {
+                        await updateDeviceCount();
+                    }
+                )
+                .subscribe();
+        }
+        
+        // Cargar imágenes desde Supabase
+        async function loadImages() {
+            if (!supabaseClient) {
+                loadImagesFromLocalStorage();
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('images')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                images = data || [];
+                
+                // Actualizar la vista
+                updateCarousel();
+                updateImageList();
+                
+                // Guardar en localStorage como respaldo
+                saveImagesToLocalStorage();
+                
+            } catch (error) {
+                console.error("Error cargando imágenes:", error);
+                // En caso de error, usar localStorage
+                loadImagesFromLocalStorage();
+            }
+        }
+        
+        // Cargar imágenes desde localStorage (respaldo)
+        function loadImagesFromLocalStorage() {
+            const storedImages = localStorage.getItem('carousel_images_backup');
             if (storedImages) {
                 images = JSON.parse(storedImages);
+                updateCarousel();
+                updateImageList();
             } else {
-                // Imágenes de ejemplo por defecto
-                images = [
-                    { id: 1, url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb', alt: 'Paisaje montañoso' },
-                    { id: 2, url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba', alt: 'Aurora boreal' },
-                    { id: 3, url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b', alt: 'Playa al atardecer' },
-                    { id: 4, url: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d', alt: 'Bosque nevado' }
-                ];
-                saveImages();
+                // Si no hay imágenes, mostrar estado vacío
+                images = [];
+                updateCarousel();
+                updateImageList();
             }
-            
-            updateCarousel();
-            updateImageList();
         }
         
-        // Guardar imágenes en localStorage
-        function saveImages() {
-            localStorage.setItem('carousel_images', JSON.stringify(images));
+        // Guardar imágenes en localStorage (respaldo)
+        function saveImagesToLocalStorage() {
+            localStorage.setItem('carousel_images_backup', JSON.stringify(images));
         }
         
         // Actualizar el carrusel con las imágenes actuales
@@ -486,7 +842,7 @@
                         <div style="text-align: center; padding: 20px;">
                             <i class="fas fa-image" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;"></i>
                             <h2 style="margin-bottom: 10px;">No hay imágenes</h2>
-                            <p>El administrador aún no ha agregado imágenes al carrusel.</p>
+                            <p>Agrega imágenes desde el panel de administración.</p>
                         </div>
                     </div>
                 `;
@@ -498,7 +854,10 @@
             images.forEach((image, index) => {
                 const slide = document.createElement('div');
                 slide.className = 'carousel-slide';
-                slide.innerHTML = `<img src="${image.url}" alt="${image.alt}" class="carousel-image">`;
+                slide.innerHTML = `
+                    <img src="${image.url}" alt="${image.title || 'Imagen del carrusel'}" class="carousel-image">
+                    ${image.title ? `<div class="image-info">${image.title}</div>` : ''}
+                `;
                 carouselTrack.appendChild(slide);
                 
                 // Crear indicadores
@@ -508,6 +867,11 @@
                 indicator.addEventListener('click', () => goToSlide(index));
                 carouselIndicators.appendChild(indicator);
             });
+            
+            // Asegurarse de que currentSlide esté dentro del rango
+            if (currentSlide >= images.length) {
+                currentSlide = Math.max(0, images.length - 1);
+            }
             
             // Actualizar contador
             imageCounter.textContent = `${currentSlide + 1} / ${images.length}`;
@@ -534,7 +898,7 @@
                 const imageItem = document.createElement('div');
                 imageItem.className = 'image-item';
                 imageItem.innerHTML = `
-                    <img src="${image.url}" alt="${image.alt}">
+                    <img src="${image.url}" alt="${image.title || 'Imagen'}">
                     <button class="delete-btn" data-id="${image.id}">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -602,53 +966,156 @@
             clearInterval(autoSlideInterval);
         }
         
-        // Agregar una nueva imagen
-        function addImage(imageUrl, altText = "Nueva imagen") {
-            // Generar un ID único
-            const newId = images.length > 0 ? Math.max(...images.map(img => img.id)) + 1 : 1;
-            
-            // Agregar la nueva imagen
-            images.push({
-                id: newId,
-                url: imageUrl,
-                alt: altText
-            });
-            
-            // Guardar en localStorage
-            saveImages();
-            
-            // Actualizar la interfaz
-            updateCarousel();
-            updateImageList();
-            
-            // Ir a la nueva imagen
-            goToSlide(images.length - 1);
-        }
-        
-        // Eliminar una imagen
-        function deleteImage(imageId) {
-            if (!confirm("¿Estás seguro de que quieres eliminar esta imagen?")) return;
-            
-            // Encontrar el índice de la imagen
-            const imageIndex = images.findIndex(img => img.id === imageId);
-            
-            // Eliminar la imagen del array
-            images.splice(imageIndex, 1);
-            
-            // Si la imagen eliminada era la actual, ajustar el índice
-            if (currentSlide >= images.length && images.length > 0) {
-                currentSlide = images.length - 1;
+        // Agregar una nueva imagen a Supabase
+        async function addImage(imageUrl, title = "Nueva imagen") {
+            if (!isAdmin) {
+                alert("Solo el administrador puede agregar imágenes");
+                return;
             }
             
-            // Guardar en localStorage
-            saveImages();
+            if (!supabaseClient) {
+                alert("No hay conexión a la base de datos");
+                return;
+            }
             
-            // Actualizar la interfaz
-            updateCarousel();
-            updateImageList();
+            try {
+                const newImage = {
+                    url: imageUrl,
+                    title: title,
+                    created_at: new Date().toISOString()
+                };
+                
+                const { data, error } = await supabaseClient
+                    .from('images')
+                    .insert([newImage])
+                    .select();
+                
+                if (error) throw error;
+                
+                console.log("Imagen agregada:", data);
+                
+            } catch (error) {
+                console.error("Error agregando imagen:", error);
+                alert("Error al agregar la imagen: " + error.message);
+                
+                // En caso de error, agregar localmente
+                newImage.id = Date.now();
+                images.unshift(newImage);
+                updateCarousel();
+                updateImageList();
+                saveImagesToLocalStorage();
+            }
         }
         
-        // Manejar la carga de imágenes
+        // Eliminar una imagen de Supabase
+        async function deleteImage(imageId) {
+            if (!isAdmin) {
+                alert("Solo el administrador puede eliminar imágenes");
+                return;
+            }
+            
+            if (!confirm("¿Estás seguro de que quieres eliminar esta imagen?")) return;
+            
+            if (!supabaseClient) {
+                alert("No hay conexión a la base de datos");
+                return;
+            }
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('images')
+                    .delete()
+                    .eq('id', imageId);
+                
+                if (error) throw error;
+                
+                console.log("Imagen eliminada:", imageId);
+                
+            } catch (error) {
+                console.error("Error eliminando imagen:", error);
+                alert("Error al eliminar la imagen: " + error.message);
+                
+                // En caso de error, eliminar localmente
+                const index = images.findIndex(img => img.id === imageId);
+                if (index !== -1) {
+                    images.splice(index, 1);
+                    updateCarousel();
+                    updateImageList();
+                    saveImagesToLocalStorage();
+                }
+            }
+        }
+        
+        // Eliminar todas las imágenes
+        async function deleteAllImages() {
+            if (!isAdmin) {
+                alert("Solo el administrador puede eliminar imágenes");
+                return;
+            }
+            
+            if (!confirm("¿Estás seguro de que quieres eliminar TODAS las imágenes?")) return;
+            
+            if (!supabaseClient) {
+                alert("No hay conexión a la base de datos");
+                return;
+            }
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('images')
+                    .delete()
+                    .neq('id', 0); // Eliminar todas las imágenes
+                
+                if (error) throw error;
+                
+                console.log("Todas las imágenes eliminadas");
+                
+            } catch (error) {
+                console.error("Error eliminando todas las imágenes:", error);
+                alert("Error al eliminar las imágenes: " + error.message);
+                
+                // En caso de error, limpiar localmente
+                images = [];
+                updateCarousel();
+                updateImageList();
+                saveImagesToLocalStorage();
+            }
+        }
+        
+        // Agregar imágenes de ejemplo
+        async function addSampleImages() {
+            if (!isAdmin) {
+                alert("Solo el administrador puede agregar imágenes");
+                return;
+            }
+            
+            const sampleImages = [
+                {
+                    url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=900&auto=format&fit=crop',
+                    title: 'Montañas y lago'
+                },
+                {
+                    url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=900&auto=format&fit=crop',
+                    title: 'Aurora boreal'
+                },
+                {
+                    url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=900&auto=format&fit=crop',
+                    title: 'Atardecer en la playa'
+                }
+            ];
+            
+            try {
+                for (const img of sampleImages) {
+                    await addImage(img.url, img.title);
+                }
+                
+            } catch (error) {
+                console.error("Error agregando imágenes de ejemplo:", error);
+                alert("Error al agregar imágenes de ejemplo");
+            }
+        }
+        
+        // Manejar la carga de imágenes locales
         function handleImageUpload(e) {
             const files = e.target.files;
             
@@ -675,22 +1142,43 @@
                     continue;
                 }
                 
-                // Crear una URL local para la imagen
-                const imageUrl = URL.createObjectURL(file);
-                addImage(imageUrl, file.name);
+                // Convertir la imagen a base64
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    // Usar la imagen en base64
+                    const base64Image = event.target.result;
+                    addImage(base64Image, file.name.replace(/\.[^/.]+$/, ""));
+                };
+                reader.onerror = function() {
+                    alert(`Error al leer el archivo ${file.name}`);
+                };
+                reader.readAsDataURL(file);
             }
             
             // Limpiar el input de archivo
             fileInput.value = '';
         }
         
-        // Inicializar la aplicación
-        function init() {
-            // Verificar si este dispositivo es el administrador
-            checkIfAdmin();
+        // Verificar si el usuario es administrador
+        function checkAdminStatus() {
+            const isAdminStored = localStorage.getItem('carousel_is_admin');
             
-            // Cargar imágenes
-            loadImages();
+            if (isAdminStored === 'true') {
+                isAdmin = true;
+                adminPanel.classList.remove('hidden');
+            } else {
+                // Mostrar prompt de contraseña después de un breve retraso
+                setTimeout(() => {
+                    passwordPrompt.classList.remove('hidden');
+                    adminPasswordInput.focus();
+                }, 500);
+            }
+        }
+        
+        // Inicializar la aplicación
+        function initApp() {
+            // Verificar estado de administrador
+            checkAdminStatus();
             
             // Configurar eventos del carrusel
             prevBtn.addEventListener('click', prevSlide);
@@ -702,9 +1190,11 @@
             
             // Configurar eventos del panel de administración (si es admin)
             if (isAdmin) {
-                uploadTrigger.addEventListener('click', () => fileInput.click());
+                addImageBtn.addEventListener('click', () => fileInput.click());
                 uploadArea.addEventListener('click', () => fileInput.click());
                 fileInput.addEventListener('change', handleImageUpload);
+                clearAllBtn.addEventListener('click', deleteAllImages);
+                addSampleBtn.addEventListener('click', addSampleImages);
                 
                 // Permitir arrastrar y soltar
                 uploadArea.addEventListener('dragover', (e) => {
@@ -722,17 +1212,40 @@
                     
                     if (e.dataTransfer.files.length) {
                         fileInput.files = e.dataTransfer.files;
-                        handleImageUpload({ target: fileInput });
+                        const event = new Event('change', { bubbles: true });
+                        fileInput.dispatchEvent(event);
                     }
                 });
             }
             
+            // Configurar evento de contraseña
+            passwordForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const password = adminPasswordInput.value;
+                
+                if (password === ADMIN_PASSWORD) {
+                    isAdmin = true;
+                    localStorage.setItem('carousel_is_admin', 'true');
+                    adminPanel.classList.remove('hidden');
+                    passwordPrompt.classList.add('hidden');
+                    updateImageList();
+                } else {
+                    passwordError.classList.remove('hidden');
+                    adminPasswordInput.value = '';
+                    adminPasswordInput.focus();
+                }
+            });
+            
+            // Cerrar prompt al hacer clic fuera
+            passwordPrompt.addEventListener('click', (e) => {
+                if (e.target === passwordPrompt) {
+                    passwordPrompt.classList.add('hidden');
+                }
+            });
+            
             // Iniciar auto-desplazamiento
             startAutoSlide();
         }
-        
-        // Iniciar la aplicación cuando el DOM esté listo
-        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
