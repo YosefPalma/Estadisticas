@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrusel de Imágenes Compartido</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #2d3748);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+        
+        .admin-indicator {
+            background-color: #10b981;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        .carousel-container {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .carousel {
+            position: relative;
+            max-width: 900px;
+            height: 500px;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .carousel-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.5s ease-in-out;
+        }
+        
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+        }
+        
+        .carousel-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .carousel-controls {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            padding: 0 15px;
+        }
+        
+        .carousel-btn {
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .carousel-btn:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+            transform: scale(1.1);
+        }
+        
+        .carousel-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .indicator.active {
+            background-color: #4facfe;
+            transform: scale(1.2);
+        }
+        
+        .image-counter {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .admin-panel {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .admin-panel h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #4facfe;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .upload-area {
+            border: 3px dashed #4facfe;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            background-color: rgba(79, 172, 254, 0.1);
+        }
+        
+        .upload-area i {
+            font-size: 3rem;
+            color: #4facfe;
+            margin-bottom: 15px;
+        }
+        
+        #file-input {
+            display: none;
+        }
+        
+        .upload-btn {
+            background-color: #4facfe;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .upload-btn:hover {
+            background-color: #3a9ce9;
+            transform: translateY(-2px);
+        }
+        
+        .current-images {
+            margin-top: 30px;
+        }
+        
+        .current-images h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #4facfe;
+        }
+        
+        .image-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .image-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 120px;
+        }
+        
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .image-item .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(239, 68, 68, 0.8);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .image-item .delete-btn:hover {
+            background-color: rgba(220, 38, 38, 1);
+        }
+        
+        .no-images {
+            text-align: center;
+            padding: 30px;
+            font-style: italic;
+            opacity: 0.7;
+            grid-column: 1 / -1;
+        }
+        
+        .instructions {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .instructions h3 {
+            color: #10b981;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .carousel {
+                height: 400px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .image-list {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .carousel {
+                height: 300px;
+            }
+            
+            .carousel-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-images"></i> Carrusel de Imágenes Compartido</h1>
+            <p class="subtitle">Visualiza las imágenes en todos los dispositivos conectados</p>
+            <div id="admin-indicator" class="admin-indicator hidden">
+                <i class="fas fa-user-shield"></i> Modo Administrador Activo
+            </div>
+        </header>
+        
+        <div class="carousel-container">
+            <div class="carousel">
+                <div class="carousel-track" id="carousel-track">
+                    <!-- Las imágenes se insertarán aquí dinámicamente -->
+                </div>
+                
+                <div class="carousel-controls">
+                    <button class="carousel-btn" id="prev-btn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-btn" id="next-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <div class="image-counter" id="image-counter">1 / 0</div>
+            </div>
+            
+            <div class="carousel-indicators" id="carousel-indicators">
+                <!-- Los indicadores se insertarán aquí dinámicamente -->
+            </div>
+        </div>
+        
+        <div id="admin-panel" class="admin-panel hidden">
+            <h2><i class="fas fa-cog"></i> Panel de Administración</h2>
+            <p>Solo tú puedes ver este panel. Desde aquí puedes agregar o eliminar imágenes del carrusel.</p>
+            
+            <div class="upload-area" id="upload-area">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>Arrastra imágenes aquí o haz clic para seleccionar</h3>
+                <p>Formatos aceptados: JPG, PNG, GIF (Máximo 5MB por imagen)</p>
+                <input type="file" id="file-input" accept="image/*" multiple>
+                <button class="upload-btn" id="upload-trigger">
+                    <i class="fas fa-folder-open"></i> Seleccionar Imágenes
+                </button>
+            </div>
+            
+            <div class="current-images">
+                <h3>Imágenes Actuales en el Carrusel</h3>
+                <div class="image-list" id="image-list">
+                    <!-- Las imágenes actuales se mostrarán aquí -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> Instrucciones</h3>
+            <ul>
+                <li>El carrusel se actualiza automáticamente en todos los dispositivos cuando agregas nuevas imágenes</li>
+                <li>Usa las flechas izquierda/derecha o los puntos inferiores para navegar entre imágenes</li>
+                <li>El carrusel avanza automáticamente cada 5 segundos</li>
+                <li>Solo el dispositivo administrador puede agregar o eliminar imágenes</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Identificador único para el administrador
+        // En un caso real, esto debería venir de un login o verificación
+        const ADMIN_ID = "admin_device_001";
+        
+        // Elementos del DOM
+        const carouselTrack = document.getElementById('carousel-track');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const carouselIndicators = document.getElementById('carousel-indicators');
+        const imageCounter = document.getElementById('image-counter');
+        const adminPanel = document.getElementById('admin-panel');
+        const adminIndicator = document.getElementById('admin-indicator');
+        const fileInput = document.getElementById('file-input');
+        const uploadTrigger = document.getElementById('upload-trigger');
+        const uploadArea = document.getElementById('upload-area');
+        const imageList = document.getElementById('image-list');
+        
+        // Variables de estado
+        let currentSlide = 0;
+        let autoSlideInterval;
+        let images = [];
+        let isAdmin = false;
+        
+        // Verificar si este dispositivo es el administrador
+        function checkIfAdmin() {
+            // En un caso real, esto podría ser una verificación más compleja
+            // Para este ejemplo, usamos localStorage para marcar un dispositivo como admin
+            const storedAdminId = localStorage.getItem('carousel_admin_id');
+            
+            if (storedAdminId === ADMIN_ID) {
+                isAdmin = true;
+                adminPanel.classList.remove('hidden');
+                adminIndicator.classList.remove('hidden');
+                console.log("Modo administrador activado");
+            } else {
+                // Si no hay admin registrado, este dispositivo se convierte en admin
+                // (para propósitos de demostración)
+                const shouldBeAdmin = confirm("¿Este es el dispositivo que agregará imágenes? (Sí = Modo Admin, No = Solo Visualización)");
+                
+                if (shouldBeAdmin) {
+                    localStorage.setItem('carousel_admin_id', ADMIN_ID);
+                    isAdmin = true;
+                    adminPanel.classList.remove('hidden');
+                    adminIndicator.classList.remove('hidden');
+                    alert("Modo administrador activado. Solo este dispositivo puede agregar imágenes.");
+                } else {
+                    isAdmin = false;
+                    alert("Modo de solo visualización activado.");
+                }
+            }
+        }
+        
+        // Cargar imágenes desde localStorage
+        function loadImages() {
+            const storedImages = localStorage.getItem('carousel_images');
+            if (storedImages) {
+                images = JSON.parse(storedImages);
+            } else {
+                // Imágenes de ejemplo por defecto
+                images = [
+                    { id: 1, url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb', alt: 'Paisaje montañoso' },
+                    { id: 2, url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba', alt: 'Aurora boreal' },
+                    { id: 3, url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b', alt: 'Playa al atardecer' },
+                    { id: 4, url: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d', alt: 'Bosque nevado' }
+                ];
+                saveImages();
+            }
+            
+            updateCarousel();
+            updateImageList();
+        }
+        
+        // Guardar imágenes en localStorage
+        function saveImages() {
+            localStorage.setItem('carousel_images', JSON.stringify(images));
+        }
+        
+        // Actualizar el carrusel con las imágenes actuales
+        function updateCarousel() {
+            // Limpiar el carrusel
+            carouselTrack.innerHTML = '';
+            carouselIndicators.innerHTML = '';
+            
+            // Si no hay imágenes, mostrar un mensaje
+            if (images.length === 0) {
+                carouselTrack.innerHTML = `
+                    <div class="carousel-slide" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #2c3e50, #4a6491);">
+                        <div style="text-align: center; padding: 20px;">
+                            <i class="fas fa-image" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;"></i>
+                            <h2 style="margin-bottom: 10px;">No hay imágenes</h2>
+                            <p>El administrador aún no ha agregado imágenes al carrusel.</p>
+                        </div>
+                    </div>
+                `;
+                imageCounter.textContent = "0 / 0";
+                return;
+            }
+            
+            // Crear slides para cada imagen
+            images.forEach((image, index) => {
+                const slide = document.createElement('div');
+                slide.className = 'carousel-slide';
+                slide.innerHTML = `<img src="${image.url}" alt="${image.alt}" class="carousel-image">`;
+                carouselTrack.appendChild(slide);
+                
+                // Crear indicadores
+                const indicator = document.createElement('div');
+                indicator.className = `indicator ${index === 0 ? 'active' : ''}`;
+                indicator.dataset.index = index;
+                indicator.addEventListener('click', () => goToSlide(index));
+                carouselIndicators.appendChild(indicator);
+            });
+            
+            // Actualizar contador
+            imageCounter.textContent = `${currentSlide + 1} / ${images.length}`;
+            
+            // Reposicionar el carrusel
+            goToSlide(currentSlide);
+            
+            // Reiniciar el intervalo de auto-desplazamiento
+            startAutoSlide();
+        }
+        
+        // Actualizar la lista de imágenes en el panel de admin
+        function updateImageList() {
+            if (!isAdmin) return;
+            
+            imageList.innerHTML = '';
+            
+            if (images.length === 0) {
+                imageList.innerHTML = '<div class="no-images">No hay imágenes en el carrusel. ¡Sube la primera!</div>';
+                return;
+            }
+            
+            images.forEach((image, index) => {
+                const imageItem = document.createElement('div');
+                imageItem.className = 'image-item';
+                imageItem.innerHTML = `
+                    <img src="${image.url}" alt="${image.alt}">
+                    <button class="delete-btn" data-id="${image.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                imageList.appendChild(imageItem);
+                
+                // Agregar evento para eliminar imagen
+                const deleteBtn = imageItem.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', () => deleteImage(image.id));
+            });
+        }
+        
+        // Ir a un slide específico
+        function goToSlide(slideIndex) {
+            // Asegurar que el índice esté dentro del rango
+            if (images.length === 0) return;
+            
+            if (slideIndex < 0) {
+                currentSlide = images.length - 1;
+            } else if (slideIndex >= images.length) {
+                currentSlide = 0;
+            } else {
+                currentSlide = slideIndex;
+            }
+            
+            // Mover el carrusel
+            carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+            
+            // Actualizar indicadores
+            document.querySelectorAll('.indicator').forEach((indicator, index) => {
+                if (index === currentSlide) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active');
+                }
+            });
+            
+            // Actualizar contador
+            imageCounter.textContent = `${currentSlide + 1} / ${images.length}`;
+        }
+        
+        // Avanzar al siguiente slide
+        function nextSlide() {
+            goToSlide(currentSlide + 1);
+        }
+        
+        // Retroceder al slide anterior
+        function prevSlide() {
+            goToSlide(currentSlide - 1);
+        }
+        
+        // Iniciar auto-desplazamiento
+        function startAutoSlide() {
+            // Limpiar intervalo previo
+            clearInterval(autoSlideInterval);
+            
+            // Solo iniciar auto-desplazamiento si hay imágenes
+            if (images.length > 1) {
+                autoSlideInterval = setInterval(nextSlide, 5000);
+            }
+        }
+        
+        // Detener auto-desplazamiento
+        function stopAutoSlide() {
+            clearInterval(autoSlideInterval);
+        }
+        
+        // Agregar una nueva imagen
+        function addImage(imageUrl, altText = "Nueva imagen") {
+            // Generar un ID único
+            const newId = images.length > 0 ? Math.max(...images.map(img => img.id)) + 1 : 1;
+            
+            // Agregar la nueva imagen
+            images.push({
+                id: newId,
+                url: imageUrl,
+                alt: altText
+            });
+            
+            // Guardar en localStorage
+            saveImages();
+            
+            // Actualizar la interfaz
+            updateCarousel();
+            updateImageList();
+            
+            // Ir a la nueva imagen
+            goToSlide(images.length - 1);
+        }
+        
+        // Eliminar una imagen
+        function deleteImage(imageId) {
+            if (!confirm("¿Estás seguro de que quieres eliminar esta imagen?")) return;
+            
+            // Encontrar el índice de la imagen
+            const imageIndex = images.findIndex(img => img.id === imageId);
+            
+            // Eliminar la imagen del array
+            images.splice(imageIndex, 1);
+            
+            // Si la imagen eliminada era la actual, ajustar el índice
+            if (currentSlide >= images.length && images.length > 0) {
+                currentSlide = images.length - 1;
+            }
+            
+            // Guardar en localStorage
+            saveImages();
+            
+            // Actualizar la interfaz
+            updateCarousel();
+            updateImageList();
+        }
+        
+        // Manejar la carga de imágenes
+        function handleImageUpload(e) {
+            const files = e.target.files;
+            
+            if (files.length === 0) return;
+            
+            // Limitar a 10 imágenes máximo
+            if (images.length + files.length > 10) {
+                alert("Solo puedes tener un máximo de 10 imágenes en el carrusel");
+                return;
+            }
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                // Verificar que sea una imagen
+                if (!file.type.startsWith('image/')) {
+                    alert(`${file.name} no es una imagen válida`);
+                    continue;
+                }
+                
+                // Verificar tamaño (máximo 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`${file.name} es demasiado grande (máximo 5MB)`);
+                    continue;
+                }
+                
+                // Crear una URL local para la imagen
+                const imageUrl = URL.createObjectURL(file);
+                addImage(imageUrl, file.name);
+            }
+            
+            // Limpiar el input de archivo
+            fileInput.value = '';
+        }
+        
+        // Inicializar la aplicación
+        function init() {
+            // Verificar si este dispositivo es el administrador
+            checkIfAdmin();
+            
+            // Cargar imágenes
+            loadImages();
+            
+            // Configurar eventos del carrusel
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+            
+            // Pausar auto-desplazamiento al interactuar con el carrusel
+            carouselTrack.addEventListener('mouseenter', stopAutoSlide);
+            carouselTrack.addEventListener('mouseleave', startAutoSlide);
+            
+            // Configurar eventos del panel de administración (si es admin)
+            if (isAdmin) {
+                uploadTrigger.addEventListener('click', () => fileInput.click());
+                uploadArea.addEventListener('click', () => fileInput.click());
+                fileInput.addEventListener('change', handleImageUpload);
+                
+                // Permitir arrastrar y soltar
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.style.backgroundColor = 'rgba(79, 172, 254, 0.2)';
+                });
+                
+                uploadArea.addEventListener('dragleave', () => {
+                    uploadArea.style.backgroundColor = '';
+                });
+                
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.style.backgroundColor = '';
+                    
+                    if (e.dataTransfer.files.length) {
+                        fileInput.files = e.dataTransfer.files;
+                        handleImageUpload({ target: fileInput });
+                    }
+                });
+            }
+            
+            // Iniciar auto-desplazamiento
+            startAutoSlide();
+        }
+        
+        // Iniciar la aplicación cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
