@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrusel de Imágenes Sincronizado - Supabase</title>
+    <title>Carrusel de Imágenes</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,10 +14,81 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a2a6c, #2d3748);
+            background: #000;
             color: white;
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* ===== MODO VISUALIZACIÓN ===== */
+        body.viewer-mode {
+            padding: 0;
+            background: #000;
+        }
+        
+        body.viewer-mode .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body.viewer-mode header,
+        body.viewer-mode .instructions,
+        body.viewer-mode .device-count,
+        body.viewer-mode .admin-panel,
+        body.viewer-mode .password-prompt,
+        body.viewer-mode .subtitle {
+            display: none !important;
+        }
+        
+        body.viewer-mode .carousel-container {
+            background-color: transparent;
+            border-radius: 0;
+            padding: 0;
+            margin: 0;
+            box-shadow: none;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+        
+        body.viewer-mode .carousel {
+            max-width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            box-shadow: none;
+        }
+        
+        body.viewer-mode .carousel-controls {
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+        
+        body.viewer-mode .carousel-controls:hover {
+            opacity: 1;
+        }
+        
+        body.viewer-mode .carousel-indicators {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            margin-top: 0;
+            z-index: 100;
+        }
+        
+        body.viewer-mode .image-counter {
+            background-color: rgba(0, 0, 0, 0.8);
+            bottom: 60px;
+            right: 20px;
+        }
+        
+        /* ===== MODO ADMIN ===== */
+        body.admin-mode {
             padding: 20px;
+            background: linear-gradient(135deg, #1a2a6c, #2d3748);
         }
         
         .container {
@@ -104,14 +175,9 @@
             display: block;
         }
         
+        /* Ocultar info de imagen en todos los modos */
         .image-info {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
-            padding: 15px;
-            color: white;
+            display: none;
         }
         
         .carousel-controls {
@@ -122,6 +188,7 @@
             justify-content: space-between;
             transform: translateY(-50%);
             padding: 0 15px;
+            z-index: 10;
         }
         
         .carousel-btn {
@@ -173,6 +240,7 @@
             padding: 5px 10px;
             border-radius: 20px;
             font-size: 0.9rem;
+            z-index: 10;
         }
         
         .admin-panel {
@@ -268,6 +336,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 15px;
+            min-height: 120px;
         }
         
         .image-item {
@@ -359,40 +428,6 @@
             display: none !important;
         }
         
-        @media (max-width: 768px) {
-            .carousel {
-                height: 400px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .image-list {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            }
-            
-            .admin-controls {
-                flex-direction: column;
-            }
-            
-            .admin-btn {
-                min-width: 100%;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .carousel {
-                height: 300px;
-            }
-            
-            .carousel-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 1.2rem;
-            }
-        }
-        
         .device-count {
             margin-top: 10px;
             font-size: 0.9rem;
@@ -400,7 +435,7 @@
         }
         
         .password-prompt {
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgba(0, 0, 0, 0.9);
             position: fixed;
             top: 0;
             left: 0;
@@ -409,7 +444,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 2000;
         }
         
         .password-box {
@@ -438,6 +473,7 @@
             background-color: rgba(255, 255, 255, 0.1);
             color: white;
             font-size: 1rem;
+            margin-bottom: 15px;
         }
         
         .password-btn {
@@ -451,10 +487,19 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
+            margin-bottom: 10px;
         }
         
         .password-btn:hover {
             background-color: #3a9ce9;
+        }
+        
+        .password-btn.secondary {
+            background-color: #6b7280;
+        }
+        
+        .password-btn.secondary:hover {
+            background-color: #4b5563;
         }
         
         .error-message {
@@ -463,18 +508,95 @@
             margin-top: 10px;
             text-align: center;
         }
+        
+        @media (max-width: 768px) {
+            .carousel {
+                height: 400px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .image-list {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+            
+            .admin-controls {
+                flex-direction: column;
+            }
+            
+            .admin-btn {
+                min-width: 100%;
+            }
+            
+            body.viewer-mode .carousel-indicators {
+                bottom: 10px;
+            }
+            
+            body.viewer-mode .image-counter {
+                bottom: 50px;
+                right: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .carousel {
+                height: 300px;
+            }
+            
+            .carousel-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            body.viewer-mode .carousel {
+                height: 100vh;
+            }
+        }
+        
+        /* Botón para cambiar de modo */
+        .mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .mode-toggle:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
     </style>
 </head>
-<body>
+<body class="viewer-mode">
+    <!-- Botón para cambiar de modo (solo admin) -->
+    <button id="mode-toggle" class="mode-toggle hidden" title="Cambiar vista">
+        <i class="fas fa-expand"></i>
+    </button>
+    
     <div class="container">
-        <header>
-            <h1><i class="fas fa-images"></i> Carrusel de Imágenes Sincronizado</h1>
-            <p class="subtitle">Imágenes compartidas en tiempo real entre todos los dispositivos</p>
+        <header id="app-header">
+            <h1><i class="fas fa-images"></i> Carrusel de Imágenes</h1>
+            <p class="subtitle">Panel de Administración</p>
             <div id="connection-status" class="connection-status disconnected">
                 <i class="fas fa-plug"></i>
-                <span>Conectando a Supabase...</span>
+                <span>Inicializando...</span>
             </div>
-            <div id="device-count" class="device-count">
+            <div id="device-count" class="device-count hidden">
                 <i class="fas fa-users"></i> <span id="connected-devices">0</span> dispositivos conectados
             </div>
         </header>
@@ -482,10 +604,7 @@
         <div class="carousel-container">
             <div class="carousel">
                 <div class="carousel-track" id="carousel-track">
-                    <div class="loading">
-                        <i class="fas fa-spinner"></i>
-                        <span>Cargando imágenes...</span>
-                    </div>
+                    <!-- Las imágenes se cargarán aquí -->
                 </div>
                 
                 <div class="carousel-controls">
@@ -516,9 +635,6 @@
                 <button class="admin-btn delete" id="clear-all-btn">
                     <i class="fas fa-trash"></i> Eliminar Todas
                 </button>
-                <button class="admin-btn" id="add-sample-btn">
-                    <i class="fas fa-magic"></i> Agregar Ejemplos
-                </button>
             </div>
             
             <div class="upload-area" id="upload-area">
@@ -531,10 +647,7 @@
             <div class="current-images">
                 <h3>Imágenes Actuales en el Carrusel</h3>
                 <div class="image-list" id="image-list">
-                    <div class="loading">
-                        <i class="fas fa-spinner"></i>
-                        <span>Cargando...</span>
-                    </div>
+                    <!-- Las imágenes se cargarán aquí -->
                 </div>
             </div>
         </div>
@@ -553,52 +666,46 @@
 
     <div id="password-prompt" class="password-prompt hidden">
         <div class="password-box">
-            <h3><i class="fas fa-lock"></i> Acceso de Administrador</h3>
-            <p>Ingresa la contraseña para activar el modo administrador:</p>
-            <form id="password-form" class="password-form">
-                <input type="password" id="admin-password" class="password-input" placeholder="Contraseña" required>
-                <button type="submit" id="password-submit" class="password-btn">Acceder</button>
-            </form>
+            <h3><i class="fas fa-lock"></i> Modo de Acceso</h3>
+            <p>¿Cómo quieres usar esta aplicación?</p>
+            <div class="password-form">
+                <input type="password" id="admin-password" class="password-input" placeholder="Contraseña de administrador (opcional)">
+                <button type="button" id="admin-login" class="password-btn">Modo Administrador</button>
+                <button type="button" id="viewer-mode-btn" class="password-btn secondary">Solo Visualización</button>
+            </div>
             <div id="password-error" class="error-message hidden">Contraseña incorrecta</div>
             <p style="margin-top: 15px; font-size: 0.8rem; opacity: 0.7;">
-                Si no eres el administrador, cierra esta ventana para ver solo el carrusel.
+                <strong>Modo Administrador:</strong> Puedes agregar y eliminar imágenes.<br>
+                <strong>Solo Visualización:</strong> Solo puedes ver el carrusel.
             </p>
         </div>
     </div>
 
-    <!-- Cargar Supabase con defer para evitar problemas -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <!-- Cargar Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
-        // Configuración de Supabase - ¡REEMPLAZA ESTOS VALORES CON LOS TUYOS!
+        // ============================================
+        // CONFIGURACIÓN
+        // ============================================
 const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_ANON_KEY = 'sb_publishable_UJiY23LT_8zNLtLUx0guWw_l760sXI7';
+        const ADMIN_PASSWORD = 'admin123'; // Cambia esta contraseña
         
-        // Contraseña del administrador (cámbiala por una segura)
-        const ADMIN_PASSWORD = 'admin123';
-        
-        // Variables de estado
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
         let currentSlide = 0;
         let autoSlideInterval;
         let images = [];
         let isAdmin = false;
-        let supabaseClient;
-        let deviceId;
+        let isViewerMode = false;
+        let supabaseClient = null;
+        let deviceId = null;
+        let needsRefresh = false;
         
-        // Esperar a que el DOM esté completamente cargado
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Inicializar Supabase y la aplicación
-            await initializeSupabase();
-            initApp();
-            
-            // Actualizar última actividad cada minuto
-            setInterval(() => {
-                if (supabaseClient) {
-                    registerDevice();
-                }
-            }, 60000);
-        });
-        
-        // Elementos del DOM
+        // ============================================
+        // ELEMENTOS DEL DOM
+        // ============================================
         const carouselTrack = document.getElementById('carousel-track');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
@@ -606,104 +713,174 @@ const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_
         const imageCounter = document.getElementById('image-counter');
         const adminPanel = document.getElementById('admin-panel');
         const connectionStatus = document.getElementById('connection-status');
+        const deviceCountElement = document.getElementById('device-count');
         const connectedDevicesSpan = document.getElementById('connected-devices');
         const fileInput = document.getElementById('file-input');
         const addImageBtn = document.getElementById('add-image-btn');
         const clearAllBtn = document.getElementById('clear-all-btn');
-        const addSampleBtn = document.getElementById('add-sample-btn');
         const uploadArea = document.getElementById('upload-area');
         const imageList = document.getElementById('image-list');
         const passwordPrompt = document.getElementById('password-prompt');
-        const passwordForm = document.getElementById('password-form');
         const adminPasswordInput = document.getElementById('admin-password');
+        const adminLoginBtn = document.getElementById('admin-login');
+        const viewerModeBtn = document.getElementById('viewer-mode-btn');
         const passwordError = document.getElementById('password-error');
+        const modeToggle = document.getElementById('mode-toggle');
+        const appHeader = document.getElementById('app-header');
+        
+        // ============================================
+        // FUNCIONES PRINCIPALES
+        // ============================================
+        
+        // Inicializar la aplicación
+        async function initializeApp() {
+            console.log("Inicializando aplicación...");
+            
+            // 1. Verificar modo guardado
+            checkSavedMode();
+            
+            // 2. Inicializar Supabase (si está configurado)
+            if (SUPABASE_URL && SUPABASE_URL !== 'https://tu-proyecto.supabase.co' && 
+                SUPABASE_ANON_KEY && SUPABASE_ANON_KEY !== 'tu-clave-anon-publica') {
+                await initializeSupabase();
+            } else {
+                // Usar modo local
+                updateConnectionStatus(false, "Modo Local");
+                loadImagesFromLocalStorage();
+            }
+            
+            // 3. Configurar eventos
+            setupEventListeners();
+            
+            // 4. Mostrar estado inicial
+            updateCarousel();
+            updateImageList();
+            startAutoSlide();
+            
+            // 5. Aplicar modo inicial
+            applyCurrentMode();
+            setInterval(() => {
+        if (images.length > 1 && !autoSlideInterval) {
+            console.log("Auto-desplazamiento no activo, reiniciando...");
+            startAutoSlide();
+        }
+    }, 10000); // Verificar cada 10 segundos
+        }
+        
+        // Verificar modo guardado
+        function checkSavedMode() {
+            const savedMode = localStorage.getItem('carousel_mode');
+            const isAdminStored = localStorage.getItem('carousel_is_admin');
+            
+            if (savedMode === 'viewer') {
+                isViewerMode = true;
+                isAdmin = false;
+                console.log("Modo visualización activado (guardado)");
+            } else if (isAdminStored === 'true') {
+                isAdmin = true;
+                isViewerMode = false;
+                console.log("Modo administrador activado (guardado)");
+            } else {
+                // Mostrar prompt para seleccionar modo
+                passwordPrompt.classList.remove('hidden');
+                console.log("Mostrando selección de modo");
+            }
+        }
+        
+        // Aplicar el modo actual
+        function applyCurrentMode() {
+            if (isViewerMode) {
+                // Modo visualización
+                document.body.classList.add('viewer-mode');
+                document.body.classList.remove('admin-mode');
+                adminPanel.classList.add('hidden');
+                modeToggle.classList.add('hidden');
+                passwordPrompt.classList.add('hidden');
+                console.log("Aplicando modo visualización");
+            } else if (isAdmin) {
+                // Modo administrador
+                document.body.classList.add('admin-mode');
+                document.body.classList.remove('viewer-mode');
+                adminPanel.classList.remove('hidden');
+                modeToggle.classList.remove('hidden');
+                passwordPrompt.classList.add('hidden');
+                console.log("Aplicando modo administrador");
+            }
+        }
+        
+        // Cambiar entre modos
+        function toggleViewMode() {
+            if (isAdmin) {
+                isViewerMode = !isViewerMode;
+                applyCurrentMode();
+                
+                // Actualizar icono del botón
+                const icon = modeToggle.querySelector('i');
+                if (isViewerMode) {
+                    icon.className = 'fas fa-compress';
+                    modeToggle.title = 'Ver panel de administración';
+                } else {
+                    icon.className = 'fas fa-expand';
+                    modeToggle.title = 'Ver carrusel en pantalla completa';
+                }
+            }
+        }
         
         // Inicializar Supabase
         async function initializeSupabase() {
             try {
-                // Verificar si Supabase está disponible
-                if (typeof window.supabase === 'undefined') {
-                    console.error("Supabase no está cargado. Verifica la conexión a internet.");
-                    updateConnectionStatus(false);
-                    loadImagesFromLocalStorage();
-                    return;
-                }
+                console.log("Inicializando Supabase...");
                 
                 // Crear cliente Supabase
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-                    auth: {
-                        persistSession: false,
-                        autoRefreshToken: false,
-                        detectSessionInUrl: false
-                    }
+                    auth: { persistSession: false }
                 });
                 
-                // Verificar conexión con un tiempo de espera
-                const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Timeout')), 5000)
-                );
-                
-                const connectPromise = supabaseClient.from('images').select('count').limit(1);
-                
-                const { data, error } = await Promise.race([connectPromise, timeoutPromise]);
+                // Verificar conexión
+                const { data, error } = await supabaseClient
+                    .from('images')
+                    .select('id')
+                    .limit(1)
+                    .maybeSingle();
                 
                 if (error) {
+                    console.error("Error de conexión a Supabase:", error);
                     throw error;
                 }
                 
-                updateConnectionStatus(true);
+                updateConnectionStatus(true, "Conectado - Sincronizado");
+                deviceCountElement.classList.remove('hidden');
                 
-                // Generar ID único para este dispositivo
-                deviceId = localStorage.getItem('device_id');
-                if (!deviceId) {
-                    deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                    localStorage.setItem('device_id', deviceId);
-                }
+                // Generar ID de dispositivo
+                deviceId = localStorage.getItem('device_id') || 
+                          'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('device_id', deviceId);
                 
-                // Registrar dispositivo activo
+                // Registrar dispositivo
                 await registerDevice();
                 
                 // Configurar suscripción en tiempo real
                 setupRealtimeSubscription();
                 
-                // Cargar imágenes iniciales
-                await loadImages();
+                // Cargar imágenes
+                await loadImagesFromSupabase();
                 
             } catch (error) {
-                console.error("Error inicializando Supabase:", error);
-                updateConnectionStatus(false);
-                
-                // Mostrar error al usuario
-                showError("Error de conexión a la base de datos. Usando modo local.");
-                
-                // Usar localStorage como respaldo
+                console.error("Error inicializando Supabase, usando modo local:", error);
+                updateConnectionStatus(false, "Modo Local - Sin conexión");
                 loadImagesFromLocalStorage();
             }
         }
         
         // Actualizar estado de conexión
-        function updateConnectionStatus(connected) {
+        function updateConnectionStatus(connected, message) {
             if (connected) {
                 connectionStatus.className = 'connection-status connected';
-                connectionStatus.innerHTML = '<i class="fas fa-wifi"></i><span>Conectado - Sincronizado</span>';
+                connectionStatus.innerHTML = `<i class="fas fa-wifi"></i><span>${message}</span>`;
             } else {
                 connectionStatus.className = 'connection-status disconnected';
-                connectionStatus.innerHTML = '<i class="fas fa-plug"></i><span>Sin conexión - Modo local</span>';
+                connectionStatus.innerHTML = `<i class="fas fa-plug"></i><span>${message}</span>`;
             }
-        }
-        
-        // Mostrar error
-        function showError(message) {
-            carouselTrack.innerHTML = `
-                <div class="carousel-slide" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #2c3e50, #4a6491);">
-                    <div style="text-align: center; padding: 20px;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 4rem; margin-bottom: 20px; color: #ef4444;"></i>
-                        <h2 style="margin-bottom: 10px;">Error de Conexión</h2>
-                        <p>${message}</p>
-                        <p style="margin-top: 15px; font-size: 0.9rem;">Los cambios no se sincronizarán entre dispositivos.</p>
-                    </div>
-                </div>
-            `;
         }
         
         // Registrar dispositivo
@@ -711,15 +888,13 @@ const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_
             if (!supabaseClient) return;
             
             try {
-                const { error } = await supabaseClient
+                await supabaseClient
                     .from('devices')
                     .upsert({
                         id: deviceId,
                         last_active: new Date().toISOString(),
-                        user_agent: navigator.userAgent
+                        user_agent: navigator.userAgent.substring(0, 100)
                     });
-                
-                if (error) throw error;
                 
                 // Actualizar contador de dispositivos
                 await updateDeviceCount();
@@ -736,14 +911,14 @@ const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_
             try {
                 const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
                 
-                const { data, error } = await supabaseClient
+                const { count, error } = await supabaseClient
                     .from('devices')
-                    .select('id', { count: 'exact' })
+                    .select('*', { count: 'exact', head: true })
                     .gt('last_active', fiveMinutesAgo);
                 
                 if (error) throw error;
                 
-                connectedDevicesSpan.textContent = data.length || 0;
+                connectedDevicesSpan.textContent = count || 0;
                 
             } catch (error) {
                 console.error("Error actualizando contador de dispositivos:", error);
@@ -754,36 +929,23 @@ const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_
         function setupRealtimeSubscription() {
             if (!supabaseClient) return;
             
-            // Suscribirse a cambios en la tabla de imágenes
+            // Suscribirse a cambios en imágenes
             supabaseClient
                 .channel('images-channel')
                 .on('postgres_changes', 
                     { event: '*', schema: 'public', table: 'images' }, 
-                    async (payload) => {
-                        console.log('Cambio detectado en imágenes:', payload);
-                        await loadImages();
-                    }
-                )
-                .subscribe();
-            
-            // Suscribirse a cambios en la tabla de dispositivos
-            supabaseClient
-                .channel('devices-channel')
-                .on('postgres_changes',
-                    { event: '*', schema: 'public', table: 'devices' },
-                    async () => {
-                        await updateDeviceCount();
+                    () => {
+                        console.log("Cambio detectado en imágenes, recargando...");
+                        needsRefresh = true;
+                        loadImagesFromSupabase();
                     }
                 )
                 .subscribe();
         }
         
         // Cargar imágenes desde Supabase
-        async function loadImages() {
-            if (!supabaseClient) {
-                loadImagesFromLocalStorage();
-                return;
-            }
+        async function loadImagesFromSupabase() {
+            if (!supabaseClient) return;
             
             try {
                 const { data, error } = await supabaseClient
@@ -794,55 +956,62 @@ const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_
                 if (error) throw error;
                 
                 images = data || [];
+                console.log(`Cargadas ${images.length} imágenes desde Supabase`);
                 
-                // Actualizar la vista
                 updateCarousel();
                 updateImageList();
-                
-                // Guardar en localStorage como respaldo
                 saveImagesToLocalStorage();
                 
+                // Recargar página si es necesario
+                if (needsRefresh && isViewerMode) {
+                    needsRefresh = false;
+                    setTimeout(() => {
+                        location.reload();
+                    }, 100);
+                }
+                
             } catch (error) {
-                console.error("Error cargando imágenes:", error);
-                // En caso de error, usar localStorage
+                console.error("Error cargando imágenes desde Supabase:", error);
                 loadImagesFromLocalStorage();
             }
         }
         
-        // Cargar imágenes desde localStorage (respaldo)
+        // Cargar imágenes desde localStorage
         function loadImagesFromLocalStorage() {
             const storedImages = localStorage.getItem('carousel_images_backup');
+            
             if (storedImages) {
                 images = JSON.parse(storedImages);
-                updateCarousel();
-                updateImageList();
+                console.log(`Cargadas ${images.length} imágenes desde localStorage`);
             } else {
-                // Si no hay imágenes, mostrar estado vacío
+                // Sin imágenes por defecto en modo visualización
                 images = [];
-                updateCarousel();
-                updateImageList();
+                console.log("No hay imágenes guardadas");
             }
+            
+            updateCarousel();
+            updateImageList();
         }
         
-        // Guardar imágenes en localStorage (respaldo)
+        // Guardar imágenes en localStorage
         function saveImagesToLocalStorage() {
             localStorage.setItem('carousel_images_backup', JSON.stringify(images));
         }
         
-        // Actualizar el carrusel con las imágenes actuales
+        // Actualizar el carrusel
         function updateCarousel() {
             // Limpiar el carrusel
             carouselTrack.innerHTML = '';
             carouselIndicators.innerHTML = '';
             
-            // Si no hay imágenes, mostrar un mensaje
+            // Si no hay imágenes
             if (images.length === 0) {
                 carouselTrack.innerHTML = `
-                    <div class="carousel-slide" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #2c3e50, #4a6491);">
+                    <div class="carousel-slide" style="display: flex; align-items: center; justify-content: center; background: #000;">
                         <div style="text-align: center; padding: 20px;">
-                            <i class="fas fa-image" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;"></i>
-                            <h2 style="margin-bottom: 10px;">No hay imágenes</h2>
-                            <p>Agrega imágenes desde el panel de administración.</p>
+                            <i class="fas fa-image" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                            <h2 style="margin-bottom: 10px; color: #666;">No hay imágenes</h2>
+                            <p style="color: #666;">Esperando que el administrador agregue imágenes...</p>
                         </div>
                     </div>
                 `;
@@ -855,35 +1024,29 @@ const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_
                 const slide = document.createElement('div');
                 slide.className = 'carousel-slide';
                 slide.innerHTML = `
-                    <img src="${image.url}" alt="${image.title || 'Imagen del carrusel'}" class="carousel-image">
-                    ${image.title ? `<div class="image-info">${image.title}</div>` : ''}
+                    <img src="${image.url}" alt="Imagen ${index + 1}" class="carousel-image">
                 `;
                 carouselTrack.appendChild(slide);
                 
                 // Crear indicadores
                 const indicator = document.createElement('div');
-                indicator.className = `indicator ${index === 0 ? 'active' : ''}`;
+                indicator.className = `indicator ${index === currentSlide ? 'active' : ''}`;
                 indicator.dataset.index = index;
                 indicator.addEventListener('click', () => goToSlide(index));
                 carouselIndicators.appendChild(indicator);
             });
             
-            // Asegurarse de que currentSlide esté dentro del rango
+            // Asegurar que currentSlide esté dentro del rango
             if (currentSlide >= images.length) {
                 currentSlide = Math.max(0, images.length - 1);
             }
             
-            // Actualizar contador
+            // Actualizar contador y posición
             imageCounter.textContent = `${currentSlide + 1} / ${images.length}`;
-            
-            // Reposicionar el carrusel
-            goToSlide(currentSlide);
-            
-            // Reiniciar el intervalo de auto-desplazamiento
-            startAutoSlide();
+            carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
         }
         
-        // Actualizar la lista de imágenes en el panel de admin
+        // Actualizar la lista de imágenes en el panel admin
         function updateImageList() {
             if (!isAdmin) return;
             
@@ -894,11 +1057,11 @@ const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_
                 return;
             }
             
-            images.forEach((image, index) => {
+            images.forEach((image) => {
                 const imageItem = document.createElement('div');
                 imageItem.className = 'image-item';
                 imageItem.innerHTML = `
-                    <img src="${image.url}" alt="${image.title || 'Imagen'}">
+                    <img src="${image.url}" alt="Imagen" loading="lazy">
                     <button class="delete-btn" data-id="${image.id}">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -911,9 +1074,8 @@ const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_
             });
         }
         
-        // Ir a un slide específico
+        // Navegación del carrusel
         function goToSlide(slideIndex) {
-            // Asegurar que el índice esté dentro del rango
             if (images.length === 0) return;
             
             if (slideIndex < 0) {
@@ -924,7 +1086,6 @@ const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_
                 currentSlide = slideIndex;
             }
             
-            // Mover el carrusel
             carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
             
             // Actualizar indicadores
@@ -936,78 +1097,279 @@ const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_
                 }
             });
             
-            // Actualizar contador
             imageCounter.textContent = `${currentSlide + 1} / ${images.length}`;
         }
         
-        // Avanzar al siguiente slide
         function nextSlide() {
             goToSlide(currentSlide + 1);
         }
         
-        // Retroceder al slide anterior
         function prevSlide() {
             goToSlide(currentSlide - 1);
         }
         
-        // Iniciar auto-desplazamiento
         function startAutoSlide() {
-            // Limpiar intervalo previo
-            clearInterval(autoSlideInterval);
+    clearInterval(autoSlideInterval);
+    
+    if (images.length > 1) {
+        console.log("Iniciando auto-desplazamiento continuo...");
+        autoSlideInterval = setInterval(() => {
+            // Verificar que haya imágenes
+            if (images.length === 0) return;
             
-            // Solo iniciar auto-desplazamiento si hay imágenes
-            if (images.length > 1) {
-                autoSlideInterval = setInterval(nextSlide, 5000);
+            // Avanzar al siguiente slide
+            let nextSlideIndex = currentSlide + 1;
+            if (nextSlideIndex >= images.length) {
+                nextSlideIndex = 0;
+            }
+            goToSlide(nextSlideIndex);
+            
+            console.log(`Auto-desplazamiento: ${currentSlide + 1}/${images.length}`);
+        }, 5000); // 5 segundos
+    } else {
+        console.log("No hay suficientes imágenes para auto-desplazamiento");
+    }
+}
+
+function stopAutoSlide() {
+    // Esta función ahora solo se llama manualmente si es necesario
+    clearInterval(autoSlideInterval);
+    console.log("Auto-desplazamiento detenido manualmente");
+}
+
+// ============================================
+// CONFIGURAR EVENTOS - SIN PAUSA POR MOUSE
+// ============================================
+
+// Configurar eventos
+function setupEventListeners() {
+    // Carrusel - solo navegación manual
+    if (prevBtn) prevBtn.addEventListener('click', () => {
+        prevSlide();
+        // NO detenemos el auto-desplazamiento
+    });
+    
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        nextSlide();
+        // NO detenemos el auto-desplazamiento
+    });
+    
+    // REMOVER LOS EVENTOS QUE PAUSAN EL AUTO-DESPLAZAMIENTO:
+    // Eliminar estos eventos completamente:
+    // - mouseenter (NO pausar)
+    // - mouseleave (NO reanudar)
+    // - touchstart (NO pausar)
+    // - touchend (NO reanudar)
+    
+    // En su lugar, solo manejamos la navegación manual:
+    if (carouselTrack) {
+        // Swipe para móviles (solo navegación, sin pausar)
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        carouselTrack.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        
+        carouselTrack.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+        
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const difference = touchStartX - touchEndX;
+            
+            if (Math.abs(difference) > swipeThreshold) {
+                if (difference > 0) {
+                    nextSlide(); // Swipe izquierda
+                } else {
+                    prevSlide(); // Swipe derecha
+                }
+                // NO detenemos el auto-desplazamiento
             }
         }
         
-        // Detener auto-desplazamiento
-        function stopAutoSlide() {
-            clearInterval(autoSlideInterval);
+        // Click en el carrusel también puede avanzar (opcional)
+        carouselTrack.addEventListener('click', (e) => {
+            // Solo si se hace click en la mitad derecha/izquierda
+            const rect = carouselTrack.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const width = rect.width;
+            
+            if (x > width * 0.66) {
+                nextSlide(); // Click en tercio derecho
+            } else if (x < width * 0.33) {
+                prevSlide(); // Click en tercio izquierdo
+            }
+            // NO detenemos el auto-desplazamiento
+        });
+    }
+    
+    // ... (el resto del código de eventos permanece igual para admin)
+}
+
+// ============================================
+// FUNCIONES DE NAVEGACIÓN - SIN DETENER AUTO
+// ============================================
+
+function nextSlide() {
+    goToSlide(currentSlide + 1);
+    // IMPORTANTE: NO llamar a stopAutoSlide() aquí
+}
+
+function prevSlide() {
+    goToSlide(currentSlide - 1);
+    // IMPORTANTE: NO llamar a stopAutoSlide() aquí
+}
+
+// Navegación del carrusel
+function goToSlide(slideIndex) {
+    if (images.length === 0) return;
+    
+    if (slideIndex < 0) {
+        currentSlide = images.length - 1;
+    } else if (slideIndex >= images.length) {
+        currentSlide = 0;
+    } else {
+        currentSlide = slideIndex;
+    }
+    
+    // Asegurar que el carrusel track exista
+    if (carouselTrack) {
+        carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+    }
+    
+    // Actualizar indicadores
+    document.querySelectorAll('.indicator').forEach((indicator, index) => {
+        if (index === currentSlide) {
+            indicator.classList.add('active');
+        } else {
+            indicator.classList.remove('active');
         }
+    });
+    
+    // Actualizar contador
+    if (imageCounter) {
+        imageCounter.textContent = `${currentSlide + 1} / ${images.length}`;
+    }
+}
+
+// ============================================
+// ACTUALIZAR CARRUSEL - MANTENER AUTO
+// ============================================
+
+// Actualizar el carrusel
+function updateCarousel() {
+    // Limpiar el carrusel
+    if (carouselTrack) carouselTrack.innerHTML = '';
+    if (carouselIndicators) carouselIndicators.innerHTML = '';
+    
+    // Si no hay imágenes
+    if (images.length === 0) {
+        if (carouselTrack) {
+            carouselTrack.innerHTML = `
+                <div class="carousel-slide" style="display: flex; align-items: center; justify-content: center; background: #000;">
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="fas fa-image" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                        <h2 style="margin-bottom: 10px; color: #666;">No hay imágenes</h2>
+                        <p style="color: #666;">Esperando que el administrador agregue imágenes...</p>
+                    </div>
+                </div>
+            `;
+        }
+        if (imageCounter) imageCounter.textContent = "0 / 0";
+        stopAutoSlide(); // Detener si no hay imágenes
+        return;
+    }
+    
+    // Crear slides para cada imagen
+    images.forEach((image, index) => {
+        const slide = document.createElement('div');
+        slide.className = 'carousel-slide';
+        slide.innerHTML = `
+            <img src="${image.url}" alt="Imagen ${index + 1}" class="carousel-image">
+        `;
+        if (carouselTrack) carouselTrack.appendChild(slide);
         
-        // Agregar una nueva imagen a Supabase
-        async function addImage(imageUrl, title = "Nueva imagen") {
+        // Crear indicadores
+        if (carouselIndicators) {
+            const indicator = document.createElement('div');
+            indicator.className = `indicator ${index === currentSlide ? 'active' : ''}`;
+            indicator.dataset.index = index;
+            indicator.addEventListener('click', () => {
+                goToSlide(index);
+                // NO detenemos el auto-desplazamiento
+            });
+            carouselIndicators.appendChild(indicator);
+        }
+    });
+    
+    // Asegurar que currentSlide esté dentro del rango
+    if (currentSlide >= images.length) {
+        currentSlide = Math.max(0, images.length - 1);
+    }
+    
+    // Actualizar contador y posición
+    if (imageCounter) imageCounter.textContent = `${currentSlide + 1} / ${images.length}`;
+    if (carouselTrack) carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+    
+    // IMPORTANTE: Siempre reiniciar el auto-desplazamiento
+    console.log("Actualizando carrusel, reiniciando auto-desplazamiento...");
+    startAutoSlide();
+}
+        
+        // Agregar imagen
+        async function addImage(imageUrl, title = "Imagen") {
             if (!isAdmin) {
                 alert("Solo el administrador puede agregar imágenes");
                 return;
             }
             
-            if (!supabaseClient) {
-                alert("No hay conexión a la base de datos");
-                return;
-            }
+            const newImage = {
+                url: imageUrl,
+                title: title,
+                created_at: new Date().toISOString()
+            };
             
-            try {
-                const newImage = {
-                    url: imageUrl,
-                    title: title,
-                    created_at: new Date().toISOString()
-                };
-                
-                const { data, error } = await supabaseClient
-                    .from('images')
-                    .insert([newImage])
-                    .select();
-                
-                if (error) throw error;
-                
-                console.log("Imagen agregada:", data);
-                
-            } catch (error) {
-                console.error("Error agregando imagen:", error);
-                alert("Error al agregar la imagen: " + error.message);
-                
-                // En caso de error, agregar localmente
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('images')
+                        .insert([newImage])
+                        .select()
+                        .single();
+                    
+                    if (error) throw error;
+                    
+                    console.log("Imagen agregada a Supabase:", data);
+                    
+                    // Forzar recarga en dispositivos en modo visualización
+                    needsRefresh = true;
+                    
+                } catch (error) {
+                    console.error("Error agregando imagen a Supabase:", error);
+                    alert("Error al agregar la imagen. Guardando localmente.");
+                    
+                    // Agregar localmente
+                    newImage.id = Date.now();
+                    images.unshift(newImage);
+                    updateCarousel();
+                    updateImageList();
+                    saveImagesToLocalStorage();
+                }
+            } else {
+                // Modo local
                 newImage.id = Date.now();
                 images.unshift(newImage);
                 updateCarousel();
                 updateImageList();
                 saveImagesToLocalStorage();
+                console.log("Imagen agregada localmente:", newImage);
             }
         }
         
-        // Eliminar una imagen de Supabase
+        // Eliminar imagen
         async function deleteImage(imageId) {
             if (!isAdmin) {
                 alert("Solo el administrador puede eliminar imágenes");
@@ -1016,32 +1378,42 @@ const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_
             
             if (!confirm("¿Estás seguro de que quieres eliminar esta imagen?")) return;
             
-            if (!supabaseClient) {
-                alert("No hay conexión a la base de datos");
-                return;
-            }
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('images')
-                    .delete()
-                    .eq('id', imageId);
-                
-                if (error) throw error;
-                
-                console.log("Imagen eliminada:", imageId);
-                
-            } catch (error) {
-                console.error("Error eliminando imagen:", error);
-                alert("Error al eliminar la imagen: " + error.message);
-                
-                // En caso de error, eliminar localmente
+            if (supabaseClient) {
+                try {
+                    const { error } = await supabaseClient
+                        .from('images')
+                        .delete()
+                        .eq('id', imageId);
+                    
+                    if (error) throw error;
+                    
+                    console.log("Imagen eliminada de Supabase:", imageId);
+                    
+                    // Forzar recarga en dispositivos en modo visualización
+                    needsRefresh = true;
+                    
+                } catch (error) {
+                    console.error("Error eliminando imagen de Supabase:", error);
+                    alert("Error al eliminar la imagen. Eliminando localmente.");
+                    
+                    // Eliminar localmente
+                    const index = images.findIndex(img => img.id === imageId);
+                    if (index !== -1) {
+                        images.splice(index, 1);
+                        updateCarousel();
+                        updateImageList();
+                        saveImagesToLocalStorage();
+                    }
+                }
+            } else {
+                // Modo local
                 const index = images.findIndex(img => img.id === imageId);
                 if (index !== -1) {
                     images.splice(index, 1);
                     updateCarousel();
                     updateImageList();
                     saveImagesToLocalStorage();
+                    console.log("Imagen eliminada localmente:", imageId);
                 }
             }
         }
@@ -1055,148 +1427,127 @@ const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_
             
             if (!confirm("¿Estás seguro de que quieres eliminar TODAS las imágenes?")) return;
             
-            if (!supabaseClient) {
-                alert("No hay conexión a la base de datos");
-                return;
-            }
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('images')
-                    .delete()
-                    .neq('id', 0); // Eliminar todas las imágenes
-                
-                if (error) throw error;
-                
-                console.log("Todas las imágenes eliminadas");
-                
-            } catch (error) {
-                console.error("Error eliminando todas las imágenes:", error);
-                alert("Error al eliminar las imágenes: " + error.message);
-                
-                // En caso de error, limpiar localmente
+            if (supabaseClient) {
+                try {
+                    const { error } = await supabaseClient
+                        .from('images')
+                        .delete()
+                        .neq('id', 0);
+                    
+                    if (error) throw error;
+                    
+                    console.log("Todas las imágenes eliminadas de Supabase");
+                    
+                    // Forzar recarga en dispositivos en modo visualización
+                    needsRefresh = true;
+                    
+                } catch (error) {
+                    console.error("Error eliminando todas las imágenes de Supabase:", error);
+                    alert("Error al eliminar las imágenes. Limpiando localmente.");
+                    
+                    // Limpiar localmente
+                    images = [];
+                    updateCarousel();
+                    updateImageList();
+                    saveImagesToLocalStorage();
+                }
+            } else {
+                // Modo local
                 images = [];
                 updateCarousel();
                 updateImageList();
                 saveImagesToLocalStorage();
+                console.log("Todas las imágenes eliminadas localmente");
             }
         }
         
-        // Agregar imágenes de ejemplo
-        async function addSampleImages() {
-            if (!isAdmin) {
-                alert("Solo el administrador puede agregar imágenes");
-                return;
-            }
-            
-            const sampleImages = [
-                {
-                    url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=900&auto=format&fit=crop',
-                    title: 'Montañas y lago'
-                },
-                {
-                    url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=900&auto=format&fit=crop',
-                    title: 'Aurora boreal'
-                },
-                {
-                    url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=900&auto=format&fit=crop',
-                    title: 'Atardecer en la playa'
-                }
-            ];
-            
-            try {
-                for (const img of sampleImages) {
-                    await addImage(img.url, img.title);
-                }
-                
-            } catch (error) {
-                console.error("Error agregando imágenes de ejemplo:", error);
-                alert("Error al agregar imágenes de ejemplo");
-            }
-        }
-        
-        // Manejar la carga de imágenes locales
+        // Manejar carga de archivos
         function handleImageUpload(e) {
             const files = e.target.files;
             
             if (files.length === 0) return;
             
-            // Limitar a 10 imágenes máximo
-            if (images.length + files.length > 10) {
-                alert("Solo puedes tener un máximo de 10 imágenes en el carrusel");
+            // Limitar a 20 imágenes
+            if (images.length + files.length > 20) {
+                alert("Máximo 20 imágenes en el carrusel");
                 return;
             }
             
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 
-                // Verificar que sea una imagen
+                // Validar tipo de archivo
                 if (!file.type.startsWith('image/')) {
                     alert(`${file.name} no es una imagen válida`);
                     continue;
                 }
                 
-                // Verificar tamaño (máximo 5MB)
+                // Validar tamaño
                 if (file.size > 5 * 1024 * 1024) {
                     alert(`${file.name} es demasiado grande (máximo 5MB)`);
                     continue;
                 }
                 
-                // Convertir la imagen a base64
+                // Convertir a base64
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    // Usar la imagen en base64
                     const base64Image = event.target.result;
-                    addImage(base64Image, file.name.replace(/\.[^/.]+$/, ""));
+                    addImage(base64Image, `Imagen ${images.length + 1}`);
                 };
                 reader.onerror = function() {
-                    alert(`Error al leer el archivo ${file.name}`);
+                    alert(`Error al leer ${file.name}`);
                 };
                 reader.readAsDataURL(file);
             }
             
-            // Limpiar el input de archivo
+            // Limpiar input
             fileInput.value = '';
         }
         
-        // Verificar si el usuario es administrador
-        function checkAdminStatus() {
-            const isAdminStored = localStorage.getItem('carousel_is_admin');
-            
-            if (isAdminStored === 'true') {
-                isAdmin = true;
-                adminPanel.classList.remove('hidden');
-            } else {
-                // Mostrar prompt de contraseña después de un breve retraso
-                setTimeout(() => {
-                    passwordPrompt.classList.remove('hidden');
-                    adminPasswordInput.focus();
-                }, 500);
-            }
-        }
-        
-        // Inicializar la aplicación
-        function initApp() {
-            // Verificar estado de administrador
-            checkAdminStatus();
-            
-            // Configurar eventos del carrusel
+        // Configurar eventos
+        function setupEventListeners() {
+            // Carrusel
             prevBtn.addEventListener('click', prevSlide);
             nextBtn.addEventListener('click', nextSlide);
             
-            // Pausar auto-desplazamiento al interactuar con el carrusel
+            // Pausar auto-desplazamiento
             carouselTrack.addEventListener('mouseenter', stopAutoSlide);
             carouselTrack.addEventListener('mouseleave', startAutoSlide);
             
-            // Configurar eventos del panel de administración (si es admin)
+            // Touch events para móviles
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            carouselTrack.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+            
+            carouselTrack.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+            
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                const difference = touchStartX - touchEndX;
+                
+                if (Math.abs(difference) > swipeThreshold) {
+                    if (difference > 0) {
+                        nextSlide(); // Swipe izquierda
+                    } else {
+                        prevSlide(); // Swipe derecha
+                    }
+                }
+            }
+            
+            // Panel de administración
             if (isAdmin) {
                 addImageBtn.addEventListener('click', () => fileInput.click());
                 uploadArea.addEventListener('click', () => fileInput.click());
                 fileInput.addEventListener('change', handleImageUpload);
                 clearAllBtn.addEventListener('click', deleteAllImages);
-                addSampleBtn.addEventListener('click', addSampleImages);
                 
-                // Permitir arrastrar y soltar
+                // Arrastrar y soltar
                 uploadArea.addEventListener('dragover', (e) => {
                     e.preventDefault();
                     uploadArea.style.backgroundColor = 'rgba(79, 172, 254, 0.2)';
@@ -1218,17 +1569,30 @@ const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_
                 });
             }
             
-            // Configurar evento de contraseña
-            passwordForm.addEventListener('submit', (e) => {
-                e.preventDefault();
+            // Modo administrador
+            adminLoginBtn.addEventListener('click', () => {
                 const password = adminPasswordInput.value;
                 
-                if (password === ADMIN_PASSWORD) {
+                if (password === ADMIN_PASSWORD || password === '') {
                     isAdmin = true;
+                    isViewerMode = false;
                     localStorage.setItem('carousel_is_admin', 'true');
-                    adminPanel.classList.remove('hidden');
-                    passwordPrompt.classList.add('hidden');
-                    updateImageList();
+                    localStorage.setItem('carousel_mode', 'admin');
+                    applyCurrentMode();
+                    
+                    // Actualizar eventos para el panel admin
+                    addImageBtn.addEventListener('click', () => fileInput.click());
+                    uploadArea.addEventListener('click', () => fileInput.click());
+                    fileInput.addEventListener('change', handleImageUpload);
+                    clearAllBtn.addEventListener('click', deleteAllImages);
+                    
+                    // Cargar imágenes y actualizar lista
+                    if (supabaseClient) {
+                        loadImagesFromSupabase();
+                    } else {
+                        loadImagesFromLocalStorage();
+                    }
+                    
                 } else {
                     passwordError.classList.remove('hidden');
                     adminPasswordInput.value = '';
@@ -1236,16 +1600,69 @@ const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co'; const SUPABASE_
                 }
             });
             
-            // Cerrar prompt al hacer clic fuera
-            passwordPrompt.addEventListener('click', (e) => {
-                if (e.target === passwordPrompt) {
-                    passwordPrompt.classList.add('hidden');
+            // Modo visualización
+            viewerModeBtn.addEventListener('click', () => {
+                isAdmin = false;
+                isViewerMode = true;
+                localStorage.setItem('carousel_mode', 'viewer');
+                localStorage.removeItem('carousel_is_admin');
+                applyCurrentMode();
+                
+                // Cargar imágenes
+                if (supabaseClient) {
+                    loadImagesFromSupabase();
+                } else {
+                    loadImagesFromLocalStorage();
                 }
             });
             
-            // Iniciar auto-desplazamiento
-            startAutoSlide();
+            // Cambiar modo de vista
+            modeToggle.addEventListener('click', toggleViewMode);
+            
+            // Permitir cerrar con ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !passwordPrompt.classList.contains('hidden')) {
+                    // Si no se ha elegido modo, forzar modo visualización
+                    isAdmin = false;
+                    isViewerMode = true;
+                    localStorage.setItem('carousel_mode', 'viewer');
+                    applyCurrentMode();
+                    
+                    if (supabaseClient) {
+                        loadImagesFromSupabase();
+                    } else {
+                        loadImagesFromLocalStorage();
+                    }
+                }
+                
+                // También permitir ESC para salir de pantalla completa si es admin
+                if (e.key === 'Escape' && isAdmin && isViewerMode) {
+                    toggleViewMode();
+                }
+            });
         }
+        
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM cargado, inicializando aplicación...");
+            initializeApp();
+            
+            // Actualizar actividad periódicamente
+            setInterval(() => {
+                if (supabaseClient && deviceId) {
+                    registerDevice();
+                }
+            }, 60000);
+            
+            // Verificar si hay cambios pendientes cada 2 segundos
+            setInterval(() => {
+                if (needsRefresh && isViewerMode) {
+                    location.reload();
+                }
+            }, 2000);
+        });
     </script>
 </body>
 </html>
