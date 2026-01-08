@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <title>Carrusel de Imágenes</title>
+    <title>Carrusel de Imágenes Sincronizado</title>
     
     <style>
         /* ESTILOS BÁSICOS */
@@ -337,6 +337,89 @@
             display: block;
         }
         
+        /* PANEL DE SINCRONIZACIÓN */
+        .sync-panel {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: white;
+            font-size: 12px;
+            z-index: 98;
+            display: none;
+        }
+        
+        .sync-panel.mostrado {
+            display: block;
+        }
+        
+        .sync-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .sync-status.conectado {
+            background: #10b981;
+            box-shadow: 0 0 10px #10b981;
+        }
+        
+        .sync-status.desconectado {
+            background: #ef4444;
+        }
+        
+        .sync-status.esperando {
+            background: #f59e0b;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        
+        /* BOTÓN DE MODO TV */
+        .tv-mode-btn {
+            position: fixed;
+            top: 15px;
+            right: 70px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            opacity: 0.2;
+        }
+        
+        .tv-mode-btn:hover {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.5);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        .tv-mode-btn.tv-activo {
+            background: rgba(59, 130, 246, 0.7);
+            color: white;
+            opacity: 1;
+            border-color: rgba(59, 130, 246, 0.9);
+        }
+        
         /* RESPONSIVE */
         @media (max-width: 768px) {
             .admin-panel {
@@ -344,9 +427,21 @@
                 left: 10px;
             }
             
-            .admin-btn {
+            .admin-btn, .tv-mode-btn {
                 top: 10px;
                 left: 10px;
+            }
+            
+            .tv-mode-btn {
+                right: 60px;
+                left: auto;
+            }
+            
+            .sync-panel {
+                top: 60px;
+                right: 10px;
+                font-size: 10px;
+                padding: 8px 12px;
             }
         }
     </style>
@@ -362,6 +457,17 @@
     <button class="admin-btn" id="admin-toggle" title="Panel de control">
         ⚙️
     </button>
+    
+    <!-- BOTÓN DE MODO TV -->
+    <button class="tv-mode-btn" id="tv-mode-toggle" title="Modo TV">
+        📺
+    </button>
+    
+    <!-- PANEL DE SINCRONIZACIÓN -->
+    <div class="sync-panel" id="sync-panel">
+        <span class="sync-status desconectado" id="sync-status"></span>
+        <span id="sync-text">Desconectado</span>
+    </div>
     
     <!-- PANEL DE ADMIN -->
     <div class="admin-panel" id="admin-panel">
@@ -386,14 +492,47 @@
             🗑️ Limpiar Todo
         </button>
         
-        <p style="margin-top: 15px; font-size: 10px; color: rgba(255,255,255,0.4);">
-            Enlace de control: <span id="control-link">Cargando...</span>
-        </p>
+        <!-- SECCIÓN DE SINCRONIZACIÓN -->
+        <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+            <h4>📡 Sincronización en Tiempo Real</h4>
+            <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 10px;">
+                <strong>ID de Sesión:</strong> <span id="session-id">Cargando...</span>
+            </p>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <button class="admin-btn-small" id="btn-copiar-url" style="flex: 1;">
+                    📋 Copiar URL TV
+                </button>
+                <button class="admin-btn-small" id="btn-generar-qr" style="flex: 1;">
+                    🔳 Generar QR
+                </button>
+            </div>
+            
+            <button class="admin-btn-small" id="btn-forzar-sync">
+                🔄 Forzar Sincronización
+            </button>
+            
+            <p style="margin-top: 10px; font-size: 10px; color: rgba(255,255,255,0.4);">
+                Los cambios se sincronizan automáticamente con la TV en la misma red.
+            </p>
+        </div>
     </div>
     
     <!-- MENSAJE FLOTANTE -->
     <div class="mensaje-flotante" id="mensaje">
         Mensaje de confirmación
+    </div>
+    
+    <!-- MODAL QR -->
+    <div id="qr-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+            <h3 style="margin-bottom: 15px;">Escanear para conectar TV</h3>
+            <div id="qr-code" style="margin: 20px auto;"></div>
+            <p id="qr-url" style="word-break: break-all; font-size: 12px; color: #666; margin: 15px 0;"></p>
+            <button onclick="document.getElementById('qr-modal').style.display='none'" style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Cerrar
+            </button>
+        </div>
     </div>
     
     <!-- CARRUSEL -->
@@ -430,6 +569,12 @@ var IMAGENES_CONFIG = [
 var currentSlide = 0;
 var autoSlideInterval;
 var images = [];
+var broadcastChannel = null;
+var sessionId = null;
+var isTVMode = false;
+var isController = false;
+var lastSyncTime = 0;
+var syncInterval = null;
 
 // ============================================
 // ELEMENTOS DOM
@@ -450,10 +595,477 @@ var btnActualizar = document.getElementById('btn-actualizar');
 var btnLimpiar = document.getElementById('btn-limpiar');
 var imagenesLista = document.getElementById('imagenes-lista');
 var mensaje = document.getElementById('mensaje');
-var controlLink = document.getElementById('control-link');
+var tvModeToggle = document.getElementById('tv-mode-toggle');
+var syncPanel = document.getElementById('sync-panel');
+var syncStatus = document.getElementById('sync-status');
+var syncText = document.getElementById('sync-text');
+var sessionIdElement = document.getElementById('session-id');
+var btnCopiarUrl = document.getElementById('btn-copiar-url');
+var btnGenerarQr = document.getElementById('btn-generar-qr');
+var btnForzarSync = document.getElementById('btn-forzar-sync');
 
 // ============================================
-// FUNCIONES DEL CARRUSEL
+// SISTEMA DE SINCRONIZACIÓN
+// ============================================
+
+// INICIALIZAR SISTEMA DE SINCRONIZACIÓN
+function inicializarSincronizacion() {
+    console.log("🔗 Inicializando sistema de sincronización...");
+    
+    // Obtener o crear ID de sesión
+    sessionId = obtenerSessionId();
+    sessionIdElement.textContent = sessionId;
+    
+    // Detectar modo
+    detectarModo();
+    
+    // Inicializar BroadcastChannel
+    inicializarBroadcastChannel();
+    
+    // Iniciar sincronización periódica
+    iniciarSincronizacionPeriodica();
+    
+    // Mostrar panel de sincronización
+    syncPanel.classList.add('mostrado');
+    actualizarEstadoSincronizacion('esperando');
+}
+
+// OBTENER ID DE SESIÓN
+function obtenerSessionId() {
+    var urlParams = new URLSearchParams(window.location.search);
+    
+    // Si hay ID en la URL, usarlo
+    if (urlParams.has('session')) {
+        var id = urlParams.get('session');
+        localStorage.setItem('carrusel_session_id', id);
+        return id;
+    }
+    
+    // Si ya hay uno guardado, usarlo
+    var guardado = localStorage.getItem('carrusel_session_id');
+    if (guardado) {
+        return guardado;
+    }
+    
+    // Crear nuevo ID
+    var nuevoId = 'sesion_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('carrusel_session_id', nuevoId);
+    return nuevoId;
+}
+
+// DETECTAR MODO
+function detectarModo() {
+    var urlParams = new URLSearchParams(window.location.search);
+    
+    // Si la URL tiene ?tv=true, es modo TV
+    if (urlParams.has('tv')) {
+        isTVMode = true;
+        isController = false;
+        tvModeToggle.classList.add('tv-activo');
+        tvModeToggle.title = "Modo TV Activado";
+        console.log("📺 Modo TV detectado");
+    } else {
+        // Por defecto es controlador
+        isTVMode = false;
+        isController = true;
+        console.log("💻 Modo Controlador detectado");
+    }
+    
+    // Toggle manual
+    tvModeToggle.addEventListener('click', function() {
+        isTVMode = !isTVMode;
+        isController = !isTVMode;
+        
+        if (isTVMode) {
+            tvModeToggle.classList.add('tv-activo');
+            tvModeToggle.title = "Modo TV Activado";
+            mostrarMensaje("📺 Modo TV activado", "info");
+        } else {
+            tvModeToggle.classList.remove('tv-activo');
+            tvModeToggle.title = "Modo Controlador";
+            mostrarMensaje("💻 Modo Controlador activado", "info");
+        }
+        
+        // Sincronizar cambio de modo
+        sincronizarEstado();
+    });
+}
+
+// INICIALIZAR BROADCAST CHANNEL
+function inicializarBroadcastChannel() {
+    try {
+        // Usar BroadcastChannel API (funciona en navegadores modernos)
+        if (typeof BroadcastChannel !== 'undefined') {
+            broadcastChannel = new BroadcastChannel('carrusel_sync_' + sessionId);
+            
+            broadcastChannel.onmessage = function(event) {
+                manejarMensajeSincronizacion(event.data);
+            };
+            
+            console.log("✅ BroadcastChannel inicializado");
+            actualizarEstadoSincronizacion('conectado');
+        } else {
+            console.log("⚠️ BroadcastChannel no soportado");
+            // Fallback a localStorage events
+            inicializarFallbackSincronizacion();
+        }
+    } catch (error) {
+        console.log("⚠️ Error inicializando BroadcastChannel:", error);
+        inicializarFallbackSincronizacion();
+    }
+}
+
+// FALLBACK PARA NAVEGADORES ANTIGUOS
+function inicializarFallbackSincronizacion() {
+    console.log("🔄 Usando fallback de sincronización (localStorage)");
+    
+    // Usar eventos de storage
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'carrusel_sync_' + sessionId) {
+            try {
+                var data = JSON.parse(event.newValue);
+                if (data) {
+                    manejarMensajeSincronizacion(data);
+                }
+            } catch (error) {
+                console.log("⚠️ Error procesando mensaje fallback:", error);
+            }
+        }
+    });
+    
+    // También usar polling
+    syncInterval = setInterval(function() {
+        verificarCambiosRemotos();
+    }, 2000);
+    
+    actualizarEstadoSincronizacion('conectado');
+}
+
+// MANEJAR MENSAJES DE SINCRONIZACIÓN
+function manejarMensajeSincronizacion(data) {
+    if (!data || data.sessionId !== sessionId) return;
+    
+    console.log("📨 Mensaje recibido:", data);
+    lastSyncTime = Date.now();
+    
+    switch (data.type) {
+        case 'sync_images':
+            if (isTVMode) {
+                // TV: Actualizar imágenes
+                if (data.images && Array.isArray(data.images)) {
+                    actualizarImagenesDesdeSync(data.images, data.currentSlide);
+                }
+            }
+            break;
+            
+        case 'change_slide':
+            if (isTVMode) {
+                // TV: Cambiar slide
+                cambiarSlideDesdeSync(data.slideIndex);
+            }
+            break;
+            
+        case 'sync_request':
+            // Responder con estado actual
+            if (isController) {
+                enviarSyncCompleto();
+            }
+            break;
+            
+        case 'ping':
+            // Responder pong
+            if (broadcastChannel) {
+                broadcastChannel.postMessage({
+                    type: 'pong',
+                    sessionId: sessionId,
+                    timestamp: Date.now()
+                });
+            }
+            break;
+            
+        case 'pong':
+            // Actualizar estado de conexión
+            actualizarEstadoSincronizacion('conectado');
+            break;
+    }
+}
+
+// ENVIAR SINCRONIZACIÓN
+function enviarSyncCompleto() {
+    if (!isController) return;
+    
+    var data = {
+        type: 'sync_images',
+        sessionId: sessionId,
+        images: images,
+        currentSlide: currentSlide,
+        timestamp: Date.now(),
+        source: 'controller'
+    };
+    
+    enviarMensajeSincronizacion(data);
+    console.log("🔄 Enviando sincronización completa");
+}
+
+// ENVIAR MENSAJE
+function enviarMensajeSincronizacion(data) {
+    if (broadcastChannel) {
+        // Usar BroadcastChannel
+        broadcastChannel.postMessage(data);
+    } else {
+        // Fallback a localStorage
+        try {
+            localStorage.setItem('carrusel_sync_' + sessionId, JSON.stringify(data));
+            // Trigger storage event
+            var event = new StorageEvent('storage', {
+                key: 'carrusel_sync_' + sessionId,
+                newValue: JSON.stringify(data)
+            });
+            window.dispatchEvent(event);
+        } catch (error) {
+            console.log("⚠️ Error enviando mensaje fallback:", error);
+        }
+    }
+}
+
+// SINCRONIZAR CAMBIOS
+function sincronizarCambios() {
+    if (!isController) return;
+    
+    console.log("🔄 Sincronizando cambios...");
+    
+    // Enviar sync completa
+    enviarSyncCompleto();
+    
+    // Actualizar estado
+    actualizarEstadoSincronizacion('conectado');
+    mostrarMensaje("✅ Cambios sincronizados", "success");
+}
+
+// ACTUALIZAR IMÁGENES DESDE SINCRONIZACIÓN
+function actualizarImagenesDesdeSync(nuevasImagenes, nuevoSlide) {
+    console.log("🔄 Actualizando desde sincronización");
+    
+    if (!Array.isArray(nuevasImagenes)) return;
+    
+    // Verificar si hay cambios reales
+    var hayCambios = JSON.stringify(images) !== JSON.stringify(nuevasImagenes);
+    
+    if (hayCambios) {
+        images = nuevasImagenes;
+        guardarImagenesEnStorage();
+        
+        // Actualizar carrusel
+        crearCarruselAlternativo();
+        
+        if (nuevoSlide !== undefined && nuevoSlide !== currentSlide) {
+            mostrarImagenAlternativo(nuevoSlide);
+        } else {
+            mostrarImagenAlternativo(currentSlide);
+        }
+        
+        // Mostrar notificación en TV
+        mostrarMensajeTV("Imágenes actualizadas remotamente");
+    }
+}
+
+// CAMBIAR SLIDE DESDE SINCRONIZACIÓN
+function cambiarSlideDesdeSync(indice) {
+    if (isTVMode && indice >= 0 && indice < images.length) {
+        mostrarImagenAlternativo(indice);
+        mostrarMensajeTV("Slide cambiado remotamente");
+    }
+}
+
+// SINCRONIZAR ESTADO
+function sincronizarEstado() {
+    var data = {
+        type: 'state_update',
+        sessionId: sessionId,
+        isTVMode: isTVMode,
+        imagesCount: images.length,
+        currentSlide: currentSlide,
+        timestamp: Date.now()
+    };
+    
+    enviarMensajeSincronizacion(data);
+}
+
+// INICIAR SINCRONIZACIÓN PERIÓDICA
+function iniciarSincronizacionPeriodica() {
+    // Enviar ping cada 10 segundos
+    setInterval(function() {
+        if (broadcastChannel) {
+            enviarMensajeSincronizacion({
+                type: 'ping',
+                sessionId: sessionId,
+                timestamp: Date.now()
+            });
+        }
+        
+        // Si es controlador y han pasado más de 30 segundos sin sync, enviar
+        if (isController && Date.now() - lastSyncTime > 30000) {
+            enviarSyncCompleto();
+        }
+    }, 10000);
+}
+
+// VERIFICAR CAMBIOS REMOTOS (fallback)
+function verificarCambiosRemotos() {
+    if (!isTVMode) return;
+    
+    try {
+        var data = localStorage.getItem('carrusel_remote_' + sessionId);
+        if (data) {
+            var parsed = JSON.parse(data);
+            if (parsed && parsed.timestamp > lastSyncTime) {
+                manejarMensajeSincronizacion(parsed);
+                localStorage.removeItem('carrusel_remote_' + sessionId);
+            }
+        }
+    } catch (error) {
+        console.log("⚠️ Error verificando cambios remotos:", error);
+    }
+}
+
+// ACTUALIZAR ESTADO DE SINCRONIZACIÓN
+function actualizarEstadoSincronizacion(estado) {
+    syncStatus.className = 'sync-status ' + estado;
+    
+    switch (estado) {
+        case 'conectado':
+            syncText.textContent = isTVMode ? 'TV Conectada' : 'Controlador Conectado';
+            break;
+        case 'desconectado':
+            syncText.textContent = 'Desconectado';
+            break;
+        case 'esperando':
+            syncText.textContent = isTVMode ? 'Esperando controlador...' : 'Esperando TV...';
+            break;
+    }
+}
+
+// MOSTRAR MENSAJE TV
+function mostrarMensajeTV(texto) {
+    var mensajeTV = document.createElement('div');
+    mensajeTV.style.cssText = `
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.9);
+        color: white;
+        padding: 20px 40px;
+        border-radius: 15px;
+        font-size: 24px;
+        z-index: 10000;
+        text-align: center;
+        border: 2px solid #3b82f6;
+        box-shadow: 0 0 30px rgba(59,130,246,0.5);
+        animation: fadeInOut 3s ease;
+        max-width: 80%;
+    `;
+    
+    // Agregar estilos de animación si no existen
+    if (!document.getElementById('tv-animation-style')) {
+        var style = document.createElement('style');
+        style.id = 'tv-animation-style';
+        style.textContent = `
+            @keyframes fadeInOut {
+                0% { opacity: 0; transform: translateX(-50%) translateY(30px); }
+                15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                100% { opacity: 0; transform: translateX(-50%) translateY(-30px); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    mensajeTV.textContent = texto;
+    document.body.appendChild(mensajeTV);
+    
+    setTimeout(function() {
+        if (mensajeTV.parentNode) {
+            mensajeTV.parentNode.removeChild(mensajeTV);
+        }
+    }, 3000);
+}
+
+// GENERAR URL TV
+function generarUrlTV() {
+    var urlBase = window.location.origin + window.location.pathname;
+    return urlBase + '?tv=true&session=' + encodeURIComponent(sessionId);
+}
+
+// COPIAR URL TV
+function copiarUrlTV() {
+    var urlTV = generarUrlTV();
+    
+    navigator.clipboard.writeText(urlTV)
+        .then(function() {
+            mostrarMensaje('✅ URL copiada al portapapeles', 'success');
+        })
+        .catch(function() {
+            // Fallback
+            var tempInput = document.createElement('input');
+            tempInput.value = urlTV;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            mostrarMensaje('✅ URL copiada', 'success');
+        });
+}
+
+// GENERAR QR
+function generarQR() {
+    var urlTV = generarUrlTV();
+    var qrModal = document.getElementById('qr-modal');
+    var qrUrl = document.getElementById('qr-url');
+    
+    qrUrl.textContent = urlTV;
+    qrModal.style.display = 'flex';
+    
+    // Generar QR simple (sin librerías)
+    var qrContainer = document.getElementById('qr-code');
+    qrContainer.innerHTML = '';
+    
+    // QR simple basado en texto
+    var canvas = document.createElement('canvas');
+    canvas.width = 200;
+    canvas.height = 200;
+    var ctx = canvas.getContext('2d');
+    
+    // Fondo blanco
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 200, 200);
+    
+    // Texto QR simple
+    ctx.fillStyle = 'black';
+    ctx.font = '8px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('URL para TV:', 100, 30);
+    ctx.fillText('Escanear con cámara', 100, 180);
+    
+    // Patrón simple de QR
+    ctx.fillStyle = 'black';
+    
+    // Esquinas
+    ctx.fillRect(20, 50, 40, 40);
+    ctx.fillRect(140, 50, 40, 40);
+    ctx.fillRect(20, 130, 40, 40);
+    
+    // Centro
+    ctx.fillRect(80, 80, 40, 40);
+    
+    qrContainer.appendChild(canvas);
+    
+    // También mostrar URL para copiar manualmente
+    console.log("📱 URL TV para QR:", urlTV);
+}
+
+// ============================================
+// FUNCIONES DEL CARRUSEL (MODIFICADAS)
 // ============================================
 
 // INICIAR APLICACIÓN
@@ -464,14 +1076,13 @@ function iniciarApp() {
     cargarImagenesDesdeStorage();
     
     if (images.length === 0) {
-        // Usar configuración inicial
         images = IMAGENES_CONFIG;
     }
     
     console.log("📸 " + images.length + " imágenes encontradas");
     
-    // Actualizar link de control
-    actualizarControlLink();
+    // Inicializar sincronización
+    inicializarSincronizacion();
     
     // Crear carrusel
     crearCarruselAlternativo();
@@ -488,6 +1099,13 @@ function iniciarApp() {
     
     // Iniciar auto-cambio
     iniciarAutoSlide();
+    
+    // Enviar sync inicial si es controlador
+    if (isController) {
+        setTimeout(function() {
+            enviarSyncCompleto();
+        }, 1000);
+    }
     
     console.log("✅ Carrusel listo");
 }
@@ -568,6 +1186,16 @@ function mostrarImagenAlternativo(indice) {
     
     // Reiniciar auto-slide
     reiniciarAutoSlide();
+    
+    // Sincronizar cambio de slide si es controlador
+    if (isController) {
+        enviarMensajeSincronizacion({
+            type: 'change_slide',
+            sessionId: sessionId,
+            slideIndex: currentSlide,
+            timestamp: Date.now()
+        });
+    }
 }
 
 // ============================================
@@ -652,6 +1280,9 @@ function agregarImagen() {
     images.push(nuevaImagen);
     guardarImagenesEnStorage();
     
+    // Sincronizar cambios
+    sincronizarCambios();
+    
     // Actualizar carrusel
     crearCarruselAlternativo();
     mostrarImagenAlternativo(currentSlide);
@@ -672,6 +1303,9 @@ function eliminarImagen(index) {
     if (confirm('¿Eliminar esta imagen?')) {
         images.splice(index, 1);
         guardarImagenesEnStorage();
+        
+        // Sincronizar cambios
+        sincronizarCambios();
         
         // Ajustar currentSlide si es necesario
         if (currentSlide >= images.length) {
@@ -697,6 +1331,9 @@ function limpiarImagenes() {
         images = [];
         guardarImagenesEnStorage();
         
+        // Sincronizar cambios
+        sincronizarCambios();
+        
         currentSlide = 0;
         crearCarruselAlternativo();
         mostrarImagenAlternativo(0);
@@ -707,7 +1344,7 @@ function limpiarImagenes() {
 
 // ACTUALIZAR DESDE JSON EXTERNO
 function actualizarDesdeJSON() {
-    var urlJSON = prompt('Ingresa la URL del archivo JSON:', 'https://tuservidor.com/imagenes.json');
+    var urlJSON = prompt('Ingresa la URL del archivo JSON:', 'https://ejemplo.com/imagenes.json');
     
     if (!urlJSON) return;
     
@@ -725,6 +1362,9 @@ function actualizarDesdeJSON() {
                 if (data && Array.isArray(data)) {
                     images = data;
                     guardarImagenesEnStorage();
+                    
+                    // Sincronizar cambios
+                    sincronizarCambios();
                     
                     currentSlide = 0;
                     crearCarruselAlternativo();
@@ -795,101 +1435,6 @@ function mostrarMensaje(texto, tipo) {
         mensaje.classList.remove('mostrado');
     }, 3000);
 }
-
-// ACTUALIZAR LINK DE CONTROL
-function actualizarControlLink() {
-    var urlActual = window.location.href;
-    controlLink.textContent = urlActual;
-    
-    // Hacer clicable
-    controlLink.style.cursor = 'pointer';
-    controlLink.style.textDecoration = 'underline';
-    controlLink.style.color = '#3b82f6';
-    
-    controlLink.onclick = function() {
-        navigator.clipboard.writeText(urlActual)
-            .then(function() {
-                mostrarMensaje('✅ Enlace copiado al portapapeles', 'success');
-            })
-            .catch(function() {
-                // Fallback para navegadores antiguos
-                var tempInput = document.createElement('input');
-                tempInput.value = urlActual;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                document.execCommand('copy');
-                document.body.removeChild(tempInput);
-                mostrarMensaje('✅ Enlace copiado', 'success');
-            });
-    };
-}
-
-// ============================================
-// CONFIGURACIÓN DE EVENTOS
-// ============================================
-
-function configurarEventosCarrusel() {
-    if (prevBtn) {
-        prevBtn.addEventListener('click', function() {
-            anteriorSlide();
-        });
-    }
-    
-    if (nextBtn) {
-        nextBtn.addEventListener('click', function() {
-            siguienteSlide();
-        });
-    }
-    
-    // Teclado
-    document.addEventListener('keydown', function(e) {
-        var key = e.key || e.keyCode;
-        
-        if (key === 'ArrowLeft' || key === 37) {
-            anteriorSlide();
-        } else if (key === 'ArrowRight' || key === 39) {
-            siguienteSlide();
-        } else if (key === 'Escape' || key === 27) {
-            // Ocultar panel admin con ESC
-            adminPanel.classList.remove('mostrado');
-            adminToggle.innerHTML = '⚙️';
-        }
-    });
-}
-
-function configurarEventosAdmin() {
-    // Toggle panel
-    adminToggle.addEventListener('click', togglePanelAdmin);
-    
-    // Agregar imagen
-    btnAgregar.addEventListener('click', agregarImagen);
-    
-    // Permitir Enter en input
-    urlInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            agregarImagen();
-        }
-    });
-    
-    // Actualizar desde JSON
-    btnActualizar.addEventListener('click', actualizarDesdeJSON);
-    
-    // Limpiar todo
-    btnLimpiar.addEventListener('click', limpiarImagenes);
-    
-    // Cerrar panel al hacer clic fuera
-    document.addEventListener('click', function(e) {
-        if (!adminPanel.contains(e.target) && 
-            !adminToggle.contains(e.target) && 
-            adminPanel.classList.contains('mostrado')) {
-            togglePanelAdmin();
-        }
-    });
-}
-
-// ============================================
-// FUNCIONES RESTANTES (igual que antes)
-// ============================================
 
 function cargarImagenConFallback(url, imgElement, index) {
     var imgTest = new Image();
@@ -962,6 +1507,76 @@ function ocultarLoading() {
             carruselContainer.style.opacity = '1';
         }, 300);
     }
+}
+
+// ============================================
+// CONFIGURACIÓN DE EVENTOS
+// ============================================
+
+function configurarEventosCarrusel() {
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function() {
+            anteriorSlide();
+        });
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function() {
+            siguienteSlide();
+        });
+    }
+    
+    // Teclado
+    document.addEventListener('keydown', function(e) {
+        var key = e.key || e.keyCode;
+        
+        if (key === 'ArrowLeft' || key === 37) {
+            anteriorSlide();
+        } else if (key === 'ArrowRight' || key === 39) {
+            siguienteSlide();
+        } else if (key === 'Escape' || key === 27) {
+            // Ocultar panel admin con ESC
+            adminPanel.classList.remove('mostrado');
+            adminToggle.innerHTML = '⚙️';
+            // Ocultar modal QR
+            document.getElementById('qr-modal').style.display = 'none';
+        }
+    });
+}
+
+function configurarEventosAdmin() {
+    // Toggle panel
+    adminToggle.addEventListener('click', togglePanelAdmin);
+    
+    // Agregar imagen
+    btnAgregar.addEventListener('click', agregarImagen);
+    
+    // Permitir Enter en input
+    urlInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            agregarImagen();
+        }
+    });
+    
+    // Actualizar desde JSON
+    btnActualizar.addEventListener('click', actualizarDesdeJSON);
+    
+    // Limpiar todo
+    btnLimpiar.addEventListener('click', limpiarImagenes);
+    
+    // Sincronización
+    btnCopiarUrl.addEventListener('click', copiarUrlTV);
+    btnGenerarQr.addEventListener('click', generarQR);
+    btnForzarSync.addEventListener('click', sincronizarCambios);
+    
+    // Cerrar panel al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        if (!adminPanel.contains(e.target) && 
+            !adminToggle.contains(e.target) && 
+            adminPanel.classList.contains('mostrado')) {
+            togglePanelAdmin();
+        }
+    });
 }
 
 // ============================================
