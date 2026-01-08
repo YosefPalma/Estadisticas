@@ -1,10 +1,8 @@
 // ============================================
 // CONFIGURACIÓN DE IMÁGENES - ARCHIVO SEPARADO
 // ============================================
-
-// Guarda este archivo como "config-imagenes.js"
 // Puedes editar solo este archivo para cambiar las imágenes
-
+//Cambia los links solamente
 var IMAGENES_CONFIG = [
     {
         url: "https://image2url.com/r2/bucket2/images/1767894053593-eb514803-25ec-427c-adf6-a66a93afda77.jpeg",
