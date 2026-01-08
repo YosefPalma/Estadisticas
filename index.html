@@ -4,18 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <title>Carrusel de Imágenes Sincronizado</title>
+    <title>Carrusel de Imágenes</title>
     
     <style>
         /* ESTILOS BÁSICOS */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { 
-            width: 100%; 
-            height: 100%; 
-            overflow: hidden; 
-            background: #000; 
-            font-family: Arial, sans-serif; 
-        }
+        html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: Arial; }
         
         /* CARRUSEL - MÉTODO ALTERNATIVO */
         .carrusel-container { 
@@ -58,7 +52,7 @@
             background: #000; 
         }
         
-        /* CONTROLES DEL CARRUSEL */
+        /* CONTROLES */
         .carrusel-controls { 
             position: absolute; 
             top: 50%; 
@@ -124,165 +118,6 @@
             z-index: 10; 
         }
         
-        /* BOTÓN DE ADMIN OCULTO */
-        .admin-btn {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: rgba(255, 255, 255, 0.5);
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            font-size: 20px;
-            cursor: pointer;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            opacity: 0.2;
-        }
-        
-        .admin-btn:hover {
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            border-color: rgba(255, 255, 255, 0.5);
-            opacity: 1;
-            transform: scale(1.1);
-        }
-        
-        /* PANEL DE ADMIN (OCULTO) */
-        .admin-panel {
-            position: fixed;
-            top: 60px;
-            left: 15px;
-            background: rgba(0, 0, 0, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            padding: 20px;
-            width: 300px;
-            z-index: 99;
-            display: none;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-        }
-        
-        .admin-panel.mostrado {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .admin-panel h3 {
-            color: white;
-            margin-bottom: 15px;
-            font-size: 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding-bottom: 8px;
-        }
-        
-        .admin-panel p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
-            margin-bottom: 15px;
-            line-height: 1.4;
-        }
-        
-        .admin-input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            color: white;
-            font-size: 14px;
-        }
-        
-        .admin-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-        
-        .admin-btn-small {
-            width: 100%;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            margin-bottom: 8px;
-            transition: all 0.2s ease;
-        }
-        
-        .admin-btn-small:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-        
-        .admin-btn-small.primary {
-            background: rgba(59, 130, 246, 0.8);
-            border-color: rgba(59, 130, 246, 0.9);
-        }
-        
-        .admin-btn-small.primary:hover {
-            background: rgba(59, 130, 246, 1);
-        }
-        
-        .admin-btn-small.danger {
-            background: rgba(239, 68, 68, 0.8);
-            border-color: rgba(239, 68, 68, 0.9);
-        }
-        
-        .admin-btn-small.danger:hover {
-            background: rgba(239, 68, 68, 1);
-        }
-        
-        .imagenes-lista {
-            max-height: 200px;
-            overflow-y: auto;
-            margin-bottom: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .imagen-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 12px;
-        }
-        
-        .imagen-item:last-child {
-            border-bottom: none;
-        }
-        
-        .imagen-item button {
-            background: rgba(239, 68, 68, 0.7);
-            border: none;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 3px;
-            font-size: 10px;
-            cursor: pointer;
-        }
-        
-        .imagen-item button:hover {
-            background: rgba(239, 68, 68, 1);
-        }
-        
         /* LOADING */
         .loading-screen { 
             position: fixed; 
@@ -312,138 +147,6 @@
         @keyframes spin { 
             to { transform: rotate(360deg); } 
         }
-        
-        /* MENSAJES */
-        .mensaje-flotante {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            z-index: 1000;
-            display: none;
-            animation: slideIn 0.3s ease;
-            border-left: 4px solid #3b82f6;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        .mensaje-flotante.mostrado {
-            display: block;
-        }
-        
-        /* PANEL DE SINCRONIZACIÓN */
-        .sync-panel {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(59, 130, 246, 0.5);
-            border-radius: 8px;
-            padding: 10px 15px;
-            color: white;
-            font-size: 12px;
-            z-index: 98;
-            display: none;
-        }
-        
-        .sync-panel.mostrado {
-            display: block;
-        }
-        
-        .sync-status {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-        
-        .sync-status.conectado {
-            background: #10b981;
-            box-shadow: 0 0 10px #10b981;
-        }
-        
-        .sync-status.desconectado {
-            background: #ef4444;
-        }
-        
-        .sync-status.esperando {
-            background: #f59e0b;
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 0.5; }
-            50% { opacity: 1; }
-            100% { opacity: 0.5; }
-        }
-        
-        /* BOTÓN DE MODO TV */
-        .tv-mode-btn {
-            position: fixed;
-            top: 15px;
-            right: 70px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: rgba(255, 255, 255, 0.5);
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            font-size: 20px;
-            cursor: pointer;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            opacity: 0.2;
-        }
-        
-        .tv-mode-btn:hover {
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            border-color: rgba(255, 255, 255, 0.5);
-            opacity: 1;
-            transform: scale(1.1);
-        }
-        
-        .tv-mode-btn.tv-activo {
-            background: rgba(59, 130, 246, 0.7);
-            color: white;
-            opacity: 1;
-            border-color: rgba(59, 130, 246, 0.9);
-        }
-        
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .admin-panel {
-                width: 250px;
-                left: 10px;
-            }
-            
-            .admin-btn, .tv-mode-btn {
-                top: 10px;
-                left: 10px;
-            }
-            
-            .tv-mode-btn {
-                right: 60px;
-                left: auto;
-            }
-            
-            .sync-panel {
-                top: 60px;
-                right: 10px;
-                font-size: 10px;
-                padding: 8px 12px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -451,88 +154,6 @@
     <div id="loading-screen" class="loading-screen">
         <div class="loading-spinner"></div>
         <p id="loading-text">Cargando...</p>
-    </div>
-    
-    <!-- BOTÓN DE ADMIN OCULTO -->
-    <button class="admin-btn" id="admin-toggle" title="Panel de control">
-        ⚙️
-    </button>
-    
-    <!-- BOTÓN DE MODO TV -->
-    <button class="tv-mode-btn" id="tv-mode-toggle" title="Modo TV">
-        📺
-    </button>
-    
-    <!-- PANEL DE SINCRONIZACIÓN -->
-    <div class="sync-panel" id="sync-panel">
-        <span class="sync-status desconectado" id="sync-status"></span>
-        <span id="sync-text">Desconectado</span>
-    </div>
-    
-    <!-- PANEL DE ADMIN -->
-    <div class="admin-panel" id="admin-panel">
-        <h3>📱 Panel de Control</h3>
-        <p>Desde aquí puedes cambiar las imágenes del carrusel desde tu celular o computadora.</p>
-        
-        <div class="imagenes-lista" id="imagenes-lista">
-            <!-- Las imágenes se listarán aquí -->
-        </div>
-        
-        <input type="text" class="admin-input" id="url-input" placeholder="https://ejemplo.com/imagen.jpg">
-        
-        <button class="admin-btn-small primary" id="btn-agregar">
-            ➕ Agregar Imagen
-        </button>
-        
-        <button class="admin-btn-small" id="btn-actualizar">
-            🔄 Actualizar desde JSON
-        </button>
-        
-        <button class="admin-btn-small danger" id="btn-limpiar">
-            🗑️ Limpiar Todo
-        </button>
-        
-        <!-- SECCIÓN DE SINCRONIZACIÓN -->
-        <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-            <h4>📡 Sincronización en Tiempo Real</h4>
-            <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 10px;">
-                <strong>ID de Sesión:</strong> <span id="session-id">Cargando...</span>
-            </p>
-            
-            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <button class="admin-btn-small" id="btn-copiar-url" style="flex: 1;">
-                    📋 Copiar URL TV
-                </button>
-                <button class="admin-btn-small" id="btn-generar-qr" style="flex: 1;">
-                    🔳 Generar QR
-                </button>
-            </div>
-            
-            <button class="admin-btn-small" id="btn-forzar-sync">
-                🔄 Forzar Sincronización
-            </button>
-            
-            <p style="margin-top: 10px; font-size: 10px; color: rgba(255,255,255,0.4);">
-                Los cambios se sincronizan automáticamente con la TV en la misma red.
-            </p>
-        </div>
-    </div>
-    
-    <!-- MENSAJE FLOTANTE -->
-    <div class="mensaje-flotante" id="mensaje">
-        Mensaje de confirmación
-    </div>
-    
-    <!-- MODAL QR -->
-    <div id="qr-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center;">
-        <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
-            <h3 style="margin-bottom: 15px;">Escanear para conectar TV</h3>
-            <div id="qr-code" style="margin: 20px auto;"></div>
-            <p id="qr-url" style="word-break: break-all; font-size: 12px; color: #666; margin: 15px 0;"></p>
-            <button onclick="document.getElementById('qr-modal').style.display='none'" style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                Cerrar
-            </button>
-        </div>
     </div>
     
     <!-- CARRUSEL -->
@@ -550,7 +171,7 @@
 
 <script>
 // ============================================
-// CONFIGURACIÓN INICIAL
+// CONFIGURACIÓN - TUS IMÁGENES
 // ============================================
 var IMAGENES_CONFIG = [
     {
@@ -569,12 +190,6 @@ var IMAGENES_CONFIG = [
 var currentSlide = 0;
 var autoSlideInterval;
 var images = [];
-var broadcastChannel = null;
-var sessionId = null;
-var isTVMode = false;
-var isController = false;
-var lastSyncTime = 0;
-var syncInterval = null;
 
 // ============================================
 // ELEMENTOS DOM
@@ -587,502 +202,24 @@ var imageCounter = document.getElementById('image-counter');
 var loadingScreen = document.getElementById('loading-screen');
 var loadingText = document.getElementById('loading-text');
 var carruselContainer = document.getElementById('carrusel-container');
-var adminToggle = document.getElementById('admin-toggle');
-var adminPanel = document.getElementById('admin-panel');
-var urlInput = document.getElementById('url-input');
-var btnAgregar = document.getElementById('btn-agregar');
-var btnActualizar = document.getElementById('btn-actualizar');
-var btnLimpiar = document.getElementById('btn-limpiar');
-var imagenesLista = document.getElementById('imagenes-lista');
-var mensaje = document.getElementById('mensaje');
-var tvModeToggle = document.getElementById('tv-mode-toggle');
-var syncPanel = document.getElementById('sync-panel');
-var syncStatus = document.getElementById('sync-status');
-var syncText = document.getElementById('sync-text');
-var sessionIdElement = document.getElementById('session-id');
-var btnCopiarUrl = document.getElementById('btn-copiar-url');
-var btnGenerarQr = document.getElementById('btn-generar-qr');
-var btnForzarSync = document.getElementById('btn-forzar-sync');
 
 // ============================================
-// SISTEMA DE SINCRONIZACIÓN
-// ============================================
-
-// INICIALIZAR SISTEMA DE SINCRONIZACIÓN
-function inicializarSincronizacion() {
-    console.log("🔗 Inicializando sistema de sincronización...");
-    
-    // Obtener o crear ID de sesión
-    sessionId = obtenerSessionId();
-    sessionIdElement.textContent = sessionId;
-    
-    // Detectar modo
-    detectarModo();
-    
-    // Inicializar BroadcastChannel
-    inicializarBroadcastChannel();
-    
-    // Iniciar sincronización periódica
-    iniciarSincronizacionPeriodica();
-    
-    // Mostrar panel de sincronización
-    syncPanel.classList.add('mostrado');
-    actualizarEstadoSincronizacion('esperando');
-}
-
-// OBTENER ID DE SESIÓN
-function obtenerSessionId() {
-    var urlParams = new URLSearchParams(window.location.search);
-    
-    // Si hay ID en la URL, usarlo
-    if (urlParams.has('session')) {
-        var id = urlParams.get('session');
-        localStorage.setItem('carrusel_session_id', id);
-        return id;
-    }
-    
-    // Si ya hay uno guardado, usarlo
-    var guardado = localStorage.getItem('carrusel_session_id');
-    if (guardado) {
-        return guardado;
-    }
-    
-    // Crear nuevo ID
-    var nuevoId = 'sesion_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('carrusel_session_id', nuevoId);
-    return nuevoId;
-}
-
-// DETECTAR MODO
-function detectarModo() {
-    var urlParams = new URLSearchParams(window.location.search);
-    
-    // Si la URL tiene ?tv=true, es modo TV
-    if (urlParams.has('tv')) {
-        isTVMode = true;
-        isController = false;
-        tvModeToggle.classList.add('tv-activo');
-        tvModeToggle.title = "Modo TV Activado";
-        console.log("📺 Modo TV detectado");
-    } else {
-        // Por defecto es controlador
-        isTVMode = false;
-        isController = true;
-        console.log("💻 Modo Controlador detectado");
-    }
-    
-    // Toggle manual
-    tvModeToggle.addEventListener('click', function() {
-        isTVMode = !isTVMode;
-        isController = !isTVMode;
-        
-        if (isTVMode) {
-            tvModeToggle.classList.add('tv-activo');
-            tvModeToggle.title = "Modo TV Activado";
-            mostrarMensaje("📺 Modo TV activado", "info");
-        } else {
-            tvModeToggle.classList.remove('tv-activo');
-            tvModeToggle.title = "Modo Controlador";
-            mostrarMensaje("💻 Modo Controlador activado", "info");
-        }
-        
-        // Sincronizar cambio de modo
-        sincronizarEstado();
-    });
-}
-
-// INICIALIZAR BROADCAST CHANNEL
-function inicializarBroadcastChannel() {
-    try {
-        // Usar BroadcastChannel API (funciona en navegadores modernos)
-        if (typeof BroadcastChannel !== 'undefined') {
-            broadcastChannel = new BroadcastChannel('carrusel_sync_' + sessionId);
-            
-            broadcastChannel.onmessage = function(event) {
-                manejarMensajeSincronizacion(event.data);
-            };
-            
-            console.log("✅ BroadcastChannel inicializado");
-            actualizarEstadoSincronizacion('conectado');
-        } else {
-            console.log("⚠️ BroadcastChannel no soportado");
-            // Fallback a localStorage events
-            inicializarFallbackSincronizacion();
-        }
-    } catch (error) {
-        console.log("⚠️ Error inicializando BroadcastChannel:", error);
-        inicializarFallbackSincronizacion();
-    }
-}
-
-// FALLBACK PARA NAVEGADORES ANTIGUOS
-function inicializarFallbackSincronizacion() {
-    console.log("🔄 Usando fallback de sincronización (localStorage)");
-    
-    // Usar eventos de storage
-    window.addEventListener('storage', function(event) {
-        if (event.key === 'carrusel_sync_' + sessionId) {
-            try {
-                var data = JSON.parse(event.newValue);
-                if (data) {
-                    manejarMensajeSincronizacion(data);
-                }
-            } catch (error) {
-                console.log("⚠️ Error procesando mensaje fallback:", error);
-            }
-        }
-    });
-    
-    // También usar polling
-    syncInterval = setInterval(function() {
-        verificarCambiosRemotos();
-    }, 2000);
-    
-    actualizarEstadoSincronizacion('conectado');
-}
-
-// MANEJAR MENSAJES DE SINCRONIZACIÓN
-function manejarMensajeSincronizacion(data) {
-    if (!data || data.sessionId !== sessionId) return;
-    
-    console.log("📨 Mensaje recibido:", data);
-    lastSyncTime = Date.now();
-    
-    switch (data.type) {
-        case 'sync_images':
-            if (isTVMode) {
-                // TV: Actualizar imágenes
-                if (data.images && Array.isArray(data.images)) {
-                    actualizarImagenesDesdeSync(data.images, data.currentSlide);
-                }
-            }
-            break;
-            
-        case 'change_slide':
-            if (isTVMode) {
-                // TV: Cambiar slide
-                cambiarSlideDesdeSync(data.slideIndex);
-            }
-            break;
-            
-        case 'sync_request':
-            // Responder con estado actual
-            if (isController) {
-                enviarSyncCompleto();
-            }
-            break;
-            
-        case 'ping':
-            // Responder pong
-            if (broadcastChannel) {
-                broadcastChannel.postMessage({
-                    type: 'pong',
-                    sessionId: sessionId,
-                    timestamp: Date.now()
-                });
-            }
-            break;
-            
-        case 'pong':
-            // Actualizar estado de conexión
-            actualizarEstadoSincronizacion('conectado');
-            break;
-    }
-}
-
-// ENVIAR SINCRONIZACIÓN
-function enviarSyncCompleto() {
-    if (!isController) return;
-    
-    var data = {
-        type: 'sync_images',
-        sessionId: sessionId,
-        images: images,
-        currentSlide: currentSlide,
-        timestamp: Date.now(),
-        source: 'controller'
-    };
-    
-    enviarMensajeSincronizacion(data);
-    console.log("🔄 Enviando sincronización completa");
-}
-
-// ENVIAR MENSAJE
-function enviarMensajeSincronizacion(data) {
-    if (broadcastChannel) {
-        // Usar BroadcastChannel
-        broadcastChannel.postMessage(data);
-    } else {
-        // Fallback a localStorage
-        try {
-            localStorage.setItem('carrusel_sync_' + sessionId, JSON.stringify(data));
-            // Trigger storage event
-            var event = new StorageEvent('storage', {
-                key: 'carrusel_sync_' + sessionId,
-                newValue: JSON.stringify(data)
-            });
-            window.dispatchEvent(event);
-        } catch (error) {
-            console.log("⚠️ Error enviando mensaje fallback:", error);
-        }
-    }
-}
-
-// SINCRONIZAR CAMBIOS
-function sincronizarCambios() {
-    if (!isController) return;
-    
-    console.log("🔄 Sincronizando cambios...");
-    
-    // Enviar sync completa
-    enviarSyncCompleto();
-    
-    // Actualizar estado
-    actualizarEstadoSincronizacion('conectado');
-    mostrarMensaje("✅ Cambios sincronizados", "success");
-}
-
-// ACTUALIZAR IMÁGENES DESDE SINCRONIZACIÓN
-function actualizarImagenesDesdeSync(nuevasImagenes, nuevoSlide) {
-    console.log("🔄 Actualizando desde sincronización");
-    
-    if (!Array.isArray(nuevasImagenes)) return;
-    
-    // Verificar si hay cambios reales
-    var hayCambios = JSON.stringify(images) !== JSON.stringify(nuevasImagenes);
-    
-    if (hayCambios) {
-        images = nuevasImagenes;
-        guardarImagenesEnStorage();
-        
-        // Actualizar carrusel
-        crearCarruselAlternativo();
-        
-        if (nuevoSlide !== undefined && nuevoSlide !== currentSlide) {
-            mostrarImagenAlternativo(nuevoSlide);
-        } else {
-            mostrarImagenAlternativo(currentSlide);
-        }
-        
-        // Mostrar notificación en TV
-        mostrarMensajeTV("Imágenes actualizadas remotamente");
-    }
-}
-
-// CAMBIAR SLIDE DESDE SINCRONIZACIÓN
-function cambiarSlideDesdeSync(indice) {
-    if (isTVMode && indice >= 0 && indice < images.length) {
-        mostrarImagenAlternativo(indice);
-        mostrarMensajeTV("Slide cambiado remotamente");
-    }
-}
-
-// SINCRONIZAR ESTADO
-function sincronizarEstado() {
-    var data = {
-        type: 'state_update',
-        sessionId: sessionId,
-        isTVMode: isTVMode,
-        imagesCount: images.length,
-        currentSlide: currentSlide,
-        timestamp: Date.now()
-    };
-    
-    enviarMensajeSincronizacion(data);
-}
-
-// INICIAR SINCRONIZACIÓN PERIÓDICA
-function iniciarSincronizacionPeriodica() {
-    // Enviar ping cada 10 segundos
-    setInterval(function() {
-        if (broadcastChannel) {
-            enviarMensajeSincronizacion({
-                type: 'ping',
-                sessionId: sessionId,
-                timestamp: Date.now()
-            });
-        }
-        
-        // Si es controlador y han pasado más de 30 segundos sin sync, enviar
-        if (isController && Date.now() - lastSyncTime > 30000) {
-            enviarSyncCompleto();
-        }
-    }, 10000);
-}
-
-// VERIFICAR CAMBIOS REMOTOS (fallback)
-function verificarCambiosRemotos() {
-    if (!isTVMode) return;
-    
-    try {
-        var data = localStorage.getItem('carrusel_remote_' + sessionId);
-        if (data) {
-            var parsed = JSON.parse(data);
-            if (parsed && parsed.timestamp > lastSyncTime) {
-                manejarMensajeSincronizacion(parsed);
-                localStorage.removeItem('carrusel_remote_' + sessionId);
-            }
-        }
-    } catch (error) {
-        console.log("⚠️ Error verificando cambios remotos:", error);
-    }
-}
-
-// ACTUALIZAR ESTADO DE SINCRONIZACIÓN
-function actualizarEstadoSincronizacion(estado) {
-    syncStatus.className = 'sync-status ' + estado;
-    
-    switch (estado) {
-        case 'conectado':
-            syncText.textContent = isTVMode ? 'TV Conectada' : 'Controlador Conectado';
-            break;
-        case 'desconectado':
-            syncText.textContent = 'Desconectado';
-            break;
-        case 'esperando':
-            syncText.textContent = isTVMode ? 'Esperando controlador...' : 'Esperando TV...';
-            break;
-    }
-}
-
-// MOSTRAR MENSAJE TV
-function mostrarMensajeTV(texto) {
-    var mensajeTV = document.createElement('div');
-    mensajeTV.style.cssText = `
-        position: fixed;
-        bottom: 100px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0,0,0,0.9);
-        color: white;
-        padding: 20px 40px;
-        border-radius: 15px;
-        font-size: 24px;
-        z-index: 10000;
-        text-align: center;
-        border: 2px solid #3b82f6;
-        box-shadow: 0 0 30px rgba(59,130,246,0.5);
-        animation: fadeInOut 3s ease;
-        max-width: 80%;
-    `;
-    
-    // Agregar estilos de animación si no existen
-    if (!document.getElementById('tv-animation-style')) {
-        var style = document.createElement('style');
-        style.id = 'tv-animation-style';
-        style.textContent = `
-            @keyframes fadeInOut {
-                0% { opacity: 0; transform: translateX(-50%) translateY(30px); }
-                15% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                85% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                100% { opacity: 0; transform: translateX(-50%) translateY(-30px); }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-    
-    mensajeTV.textContent = texto;
-    document.body.appendChild(mensajeTV);
-    
-    setTimeout(function() {
-        if (mensajeTV.parentNode) {
-            mensajeTV.parentNode.removeChild(mensajeTV);
-        }
-    }, 3000);
-}
-
-// GENERAR URL TV
-function generarUrlTV() {
-    var urlBase = window.location.origin + window.location.pathname;
-    return urlBase + '?tv=true&session=' + encodeURIComponent(sessionId);
-}
-
-// COPIAR URL TV
-function copiarUrlTV() {
-    var urlTV = generarUrlTV();
-    
-    navigator.clipboard.writeText(urlTV)
-        .then(function() {
-            mostrarMensaje('✅ URL copiada al portapapeles', 'success');
-        })
-        .catch(function() {
-            // Fallback
-            var tempInput = document.createElement('input');
-            tempInput.value = urlTV;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
-            mostrarMensaje('✅ URL copiada', 'success');
-        });
-}
-
-// GENERAR QR
-function generarQR() {
-    var urlTV = generarUrlTV();
-    var qrModal = document.getElementById('qr-modal');
-    var qrUrl = document.getElementById('qr-url');
-    
-    qrUrl.textContent = urlTV;
-    qrModal.style.display = 'flex';
-    
-    // Generar QR simple (sin librerías)
-    var qrContainer = document.getElementById('qr-code');
-    qrContainer.innerHTML = '';
-    
-    // QR simple basado en texto
-    var canvas = document.createElement('canvas');
-    canvas.width = 200;
-    canvas.height = 200;
-    var ctx = canvas.getContext('2d');
-    
-    // Fondo blanco
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, 200, 200);
-    
-    // Texto QR simple
-    ctx.fillStyle = 'black';
-    ctx.font = '8px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('URL para TV:', 100, 30);
-    ctx.fillText('Escanear con cámara', 100, 180);
-    
-    // Patrón simple de QR
-    ctx.fillStyle = 'black';
-    
-    // Esquinas
-    ctx.fillRect(20, 50, 40, 40);
-    ctx.fillRect(140, 50, 40, 40);
-    ctx.fillRect(20, 130, 40, 40);
-    
-    // Centro
-    ctx.fillRect(80, 80, 40, 40);
-    
-    qrContainer.appendChild(canvas);
-    
-    // También mostrar URL para copiar manualmente
-    console.log("📱 URL TV para QR:", urlTV);
-}
-
-// ============================================
-// FUNCIONES DEL CARRUSEL (MODIFICADAS)
+// FUNCIONES PRINCIPALES - MÉTODO ALTERNATIVO
 // ============================================
 
 // INICIAR APLICACIÓN
 function iniciarApp() {
-    console.log("🚀 Iniciando carrusel...");
+    console.log("🚀 Iniciando carrusel (método alternativo)...");
     
-    // Cargar imágenes desde localStorage si existen
-    cargarImagenesDesdeStorage();
+    // Usar imágenes configuradas
+    images = IMAGENES_CONFIG;
     
     if (images.length === 0) {
-        images = IMAGENES_CONFIG;
+        mostrarError("No hay imágenes configuradas");
+        return;
     }
     
     console.log("📸 " + images.length + " imágenes encontradas");
-    
-    // Inicializar sincronización
-    inicializarSincronizacion();
     
     // Crear carrusel
     crearCarruselAlternativo();
@@ -1091,8 +228,7 @@ function iniciarApp() {
     mostrarImagenAlternativo(0);
     
     // Configurar eventos
-    configurarEventosCarrusel();
-    configurarEventosAdmin();
+    configurarEventos();
     
     // Ocultar loading y mostrar carrusel
     ocultarLoading();
@@ -1100,17 +236,10 @@ function iniciarApp() {
     // Iniciar auto-cambio
     iniciarAutoSlide();
     
-    // Enviar sync inicial si es controlador
-    if (isController) {
-        setTimeout(function() {
-            enviarSyncCompleto();
-        }, 1000);
-    }
-    
     console.log("✅ Carrusel listo");
 }
 
-// CREAR CARRUSEL
+// CREAR CARRUSEL (MÉTODO ALTERNATIVO)
 function crearCarruselAlternativo() {
     console.log("🛠️ Creando carrusel...");
     
@@ -1120,7 +249,7 @@ function crearCarruselAlternativo() {
     for (var i = 0; i < images.length; i++) {
         var imagen = images[i];
         
-        // Crear slide
+        // Crear slide con posición absoluta
         var slide = document.createElement('div');
         slide.className = 'carrusel-slide';
         slide.id = 'slide-' + i;
@@ -1130,7 +259,7 @@ function crearCarruselAlternativo() {
         img.className = 'carrusel-image';
         img.alt = imagen.title || 'Imagen ' + (i + 1);
         
-        // Cargar imagen
+        // Cargar imagen con manejo de errores
         cargarImagenConFallback(imagen.url, img, i);
         
         slide.appendChild(img);
@@ -1141,6 +270,7 @@ function crearCarruselAlternativo() {
         indicador.className = 'indicator';
         if (i === 0) indicador.className += ' active';
         
+        // Usar closure para capturar el índice
         (function(index) {
             indicador.addEventListener('click', function() {
                 mostrarImagenAlternativo(index);
@@ -1149,21 +279,41 @@ function crearCarruselAlternativo() {
         
         carruselIndicators.appendChild(indicador);
     }
-    
-    // Actualizar lista de imágenes en panel admin
-    actualizarListaImagenes();
 }
 
-// MOSTRAR IMAGEN
+// CARGAR IMAGEN CON FALLBACK
+function cargarImagenConFallback(url, imgElement, index) {
+    var imgTest = new Image();
+    
+    imgTest.onload = function() {
+        console.log("✅ Imagen " + (index + 1) + " cargada");
+        imgElement.src = url;
+    };
+    
+    imgTest.onerror = function() {
+        console.log("⚠️  Error cargando imagen " + (index + 1));
+        // Usar placeholder
+        imgElement.src = "https://via.placeholder.com/1920x1080/333/fff?text=Imagen+" + (index + 1);
+        imgElement.style.backgroundColor = "#222";
+    };
+    
+    imgTest.src = url;
+}
+
+// MOSTRAR IMAGEN (MÉTODO ALTERNATIVO - SIN TRANSFORM)
 function mostrarImagenAlternativo(indice) {
     if (images.length === 0) return;
     
+    // Calcular nuevo índice
     if (indice < 0) indice = images.length - 1;
     if (indice >= images.length) indice = 0;
     
     console.log("🔄 Cambiando a imagen " + (indice + 1));
     
+    // Guardar slide anterior
     var slideAnterior = currentSlide;
+    
+    // Actualizar slide actual
     currentSlide = indice;
     
     // Ocultar slide anterior
@@ -1186,273 +336,9 @@ function mostrarImagenAlternativo(indice) {
     
     // Reiniciar auto-slide
     reiniciarAutoSlide();
-    
-    // Sincronizar cambio de slide si es controlador
-    if (isController) {
-        enviarMensajeSincronizacion({
-            type: 'change_slide',
-            sessionId: sessionId,
-            slideIndex: currentSlide,
-            timestamp: Date.now()
-        });
-    }
 }
 
-// ============================================
-// FUNCIONES DEL PANEL DE ADMIN
-// ============================================
-
-// MOSTRAR/OCULTAR PANEL
-function togglePanelAdmin() {
-    if (adminPanel.classList.contains('mostrado')) {
-        adminPanel.classList.remove('mostrado');
-        adminToggle.innerHTML = '⚙️';
-    } else {
-        adminPanel.classList.add('mostrado');
-        adminToggle.innerHTML = '✕';
-        urlInput.focus();
-    }
-}
-
-// ACTUALIZAR LISTA DE IMÁGENES
-function actualizarListaImagenes() {
-    imagenesLista.innerHTML = '';
-    
-    if (images.length === 0) {
-        imagenesLista.innerHTML = '<div style="color: rgba(255,255,255,0.5); text-align: center; padding: 20px;">No hay imágenes</div>';
-        return;
-    }
-    
-    for (var i = 0; i < images.length; i++) {
-        var imagen = images[i];
-        var item = document.createElement('div');
-        item.className = 'imagen-item';
-        
-        // Acortar URL para mostrar
-        var urlCorta = imagen.url.length > 30 ? 
-            imagen.url.substring(0, 30) + '...' : 
-            imagen.url;
-        
-        item.innerHTML = `
-            <span>${i + 1}. ${urlCorta}</span>
-            <button data-index="${i}">✕</button>
-        `;
-        
-        // Agregar evento para eliminar
-        var btnEliminar = item.querySelector('button');
-        btnEliminar.addEventListener('click', function() {
-            var index = parseInt(this.getAttribute('data-index'));
-            eliminarImagen(index);
-        });
-        
-        imagenesLista.appendChild(item);
-    }
-}
-
-// AGREGAR IMAGEN
-function agregarImagen() {
-    var url = urlInput.value.trim();
-    
-    if (!url) {
-        mostrarMensaje('⚠️ Ingresa una URL válida', 'warning');
-        return;
-    }
-    
-    if (!url.startsWith('http')) {
-        mostrarMensaje('⚠️ La URL debe comenzar con http:// o https://', 'warning');
-        return;
-    }
-    
-    // Verificar si ya existe
-    for (var i = 0; i < images.length; i++) {
-        if (images[i].url === url) {
-            mostrarMensaje('⚠️ Esta imagen ya está en la lista', 'warning');
-            return;
-        }
-    }
-    
-    // Agregar nueva imagen
-    var nuevaImagen = {
-        url: url,
-        title: 'Imagen ' + (images.length + 1)
-    };
-    
-    images.push(nuevaImagen);
-    guardarImagenesEnStorage();
-    
-    // Sincronizar cambios
-    sincronizarCambios();
-    
-    // Actualizar carrusel
-    crearCarruselAlternativo();
-    mostrarImagenAlternativo(currentSlide);
-    
-    // Limpiar input
-    urlInput.value = '';
-    
-    // Mostrar mensaje
-    mostrarMensaje('✅ Imagen agregada correctamente', 'success');
-    
-    console.log('➕ Imagen agregada:', url);
-}
-
-// ELIMINAR IMAGEN
-function eliminarImagen(index) {
-    if (index < 0 || index >= images.length) return;
-    
-    if (confirm('¿Eliminar esta imagen?')) {
-        images.splice(index, 1);
-        guardarImagenesEnStorage();
-        
-        // Sincronizar cambios
-        sincronizarCambios();
-        
-        // Ajustar currentSlide si es necesario
-        if (currentSlide >= images.length) {
-            currentSlide = Math.max(0, images.length - 1);
-        }
-        
-        // Actualizar carrusel
-        crearCarruselAlternativo();
-        mostrarImagenAlternativo(currentSlide);
-        
-        mostrarMensaje('🗑️ Imagen eliminada', 'info');
-    }
-}
-
-// LIMPIAR TODAS LAS IMÁGENES
-function limpiarImagenes() {
-    if (images.length === 0) {
-        mostrarMensaje('ℹ️ No hay imágenes para limpiar', 'info');
-        return;
-    }
-    
-    if (confirm('¿Eliminar TODAS las imágenes?')) {
-        images = [];
-        guardarImagenesEnStorage();
-        
-        // Sincronizar cambios
-        sincronizarCambios();
-        
-        currentSlide = 0;
-        crearCarruselAlternativo();
-        mostrarImagenAlternativo(0);
-        
-        mostrarMensaje('🗑️ Todas las imágenes eliminadas', 'info');
-    }
-}
-
-// ACTUALIZAR DESDE JSON EXTERNO
-function actualizarDesdeJSON() {
-    var urlJSON = prompt('Ingresa la URL del archivo JSON:', 'https://ejemplo.com/imagenes.json');
-    
-    if (!urlJSON) return;
-    
-    mostrarMensaje('⏳ Cargando imágenes desde JSON...', 'info');
-    
-    // Usar XMLHttpRequest para cargar JSON
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', urlJSON, true);
-    
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            try {
-                var data = JSON.parse(xhr.responseText);
-                
-                if (data && Array.isArray(data)) {
-                    images = data;
-                    guardarImagenesEnStorage();
-                    
-                    // Sincronizar cambios
-                    sincronizarCambios();
-                    
-                    currentSlide = 0;
-                    crearCarruselAlternativo();
-                    mostrarImagenAlternativo(0);
-                    
-                    mostrarMensaje('✅ Imágenes actualizadas desde JSON', 'success');
-                } else {
-                    mostrarMensaje('❌ El JSON no contiene un array válido', 'error');
-                }
-            } catch (e) {
-                mostrarMensaje('❌ Error al procesar el JSON: ' + e.message, 'error');
-            }
-        } else {
-            mostrarMensaje('❌ Error al cargar el JSON: ' + xhr.status, 'error');
-        }
-    };
-    
-    xhr.onerror = function() {
-        mostrarMensaje('❌ Error de red al cargar el JSON', 'error');
-    };
-    
-    xhr.send();
-}
-
-// ============================================
-// FUNCIONES AUXILIARES
-// ============================================
-
-// GUARDAR/CARGAR EN LOCALSTORAGE
-function guardarImagenesEnStorage() {
-    try {
-        localStorage.setItem('carrusel_imagenes', JSON.stringify(images));
-        localStorage.setItem('carrusel_ultima_actualizacion', new Date().toISOString());
-    } catch (e) {
-        console.log('⚠️ No se pudo guardar en localStorage');
-    }
-}
-
-function cargarImagenesDesdeStorage() {
-    try {
-        var guardadas = localStorage.getItem('carrusel_imagenes');
-        if (guardadas) {
-            images = JSON.parse(guardadas);
-            return true;
-        }
-    } catch (e) {
-        console.log('⚠️ Error cargando desde localStorage');
-    }
-    return false;
-}
-
-// MOSTRAR MENSAJE
-function mostrarMensaje(texto, tipo) {
-    mensaje.textContent = texto;
-    mensaje.className = 'mensaje-flotante mostrado';
-    
-    // Color según tipo
-    var borderColor = '#3b82f6'; // azul por defecto
-    if (tipo === 'success') borderColor = '#10b981';
-    if (tipo === 'error') borderColor = '#ef4444';
-    if (tipo === 'warning') borderColor = '#f59e0b';
-    if (tipo === 'info') borderColor = '#3b82f6';
-    
-    mensaje.style.borderLeftColor = borderColor;
-    
-    // Ocultar después de 3 segundos
-    setTimeout(function() {
-        mensaje.classList.remove('mostrado');
-    }, 3000);
-}
-
-function cargarImagenConFallback(url, imgElement, index) {
-    var imgTest = new Image();
-    
-    imgTest.onload = function() {
-        console.log("✅ Imagen " + (index + 1) + " cargada");
-        imgElement.src = url;
-    };
-    
-    imgTest.onerror = function() {
-        console.log("⚠️ Error cargando imagen " + (index + 1));
-        imgElement.src = "https://via.placeholder.com/1920x1080/333/fff?text=Imagen+" + (index + 1);
-        imgElement.style.backgroundColor = "#222";
-    };
-    
-    imgTest.src = url;
-}
-
+// ACTUALIZAR INDICADORES
 function actualizarIndicadores() {
     var indicadores = document.querySelectorAll('.indicator');
     for (var i = 0; i < indicadores.length; i++) {
@@ -1464,15 +350,18 @@ function actualizarIndicadores() {
     }
 }
 
+// ACTUALIZAR CONTADOR
 function actualizarContador() {
     if (imageCounter) {
         imageCounter.textContent = (currentSlide + 1) + ' / ' + images.length;
     }
 }
 
+// AUTO-SLIDE
 function iniciarAutoSlide() {
     clearInterval(autoSlideInterval);
     if (images.length > 1) {
+        console.log("⏰ Auto-cambio cada 5 segundos");
         autoSlideInterval = setInterval(function() {
             siguienteSlide();
         }, 5000);
@@ -1496,9 +385,71 @@ function anteriorSlide() {
     mostrarImagenAlternativo(currentSlide - 1);
 }
 
+// CONFIGURAR EVENTOS
+function configurarEventos() {
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function() {
+            console.log("⬅️  Botón anterior presionado");
+            anteriorSlide();
+        });
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function() {
+            console.log("➡️  Botón siguiente presionado");
+            siguienteSlide();
+        });
+    }
+    
+    // Teclado
+    document.addEventListener('keydown', function(e) {
+        var key = e.key || e.keyCode;
+        
+        if (key === 'ArrowLeft' || key === 37 || key === 'Left') {
+            console.log("⬅️  Tecla izquierda presionada");
+            anteriorSlide();
+        } else if (key === 'ArrowRight' || key === 39 || key === 'Right') {
+            console.log("➡️  Tecla derecha presionada");
+            siguienteSlide();
+        }
+    });
+    
+    // Swipe para pantallas táctiles
+    var startX = 0;
+    if (carruselTrack) {
+        carruselTrack.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            detenerAutoSlide();
+        });
+        
+        carruselTrack.addEventListener('touchend', function(e) {
+            var endX = e.changedTouches[0].clientX;
+            var diff = startX - endX;
+            
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    console.log("👆 Swipe izquierda detectado");
+                    siguienteSlide();
+                } else {
+                    console.log("👆 Swipe derecha detectado");
+                    anteriorSlide();
+                }
+            }
+            
+            reiniciarAutoSlide();
+        });
+    }
+}
+
+// OCULTAR LOADING
 function ocultarLoading() {
     if (loadingScreen && carruselContainer) {
+        console.log("👁️  Mostrando carrusel...");
+        
+        // Ocultar loading
         loadingScreen.style.opacity = '0';
+        
+        // Mostrar carrusel
         carruselContainer.style.display = 'block';
         carruselContainer.style.opacity = '0';
         
@@ -1509,74 +460,13 @@ function ocultarLoading() {
     }
 }
 
-// ============================================
-// CONFIGURACIÓN DE EVENTOS
-// ============================================
-
-function configurarEventosCarrusel() {
-    if (prevBtn) {
-        prevBtn.addEventListener('click', function() {
-            anteriorSlide();
-        });
+// MOSTRAR ERROR
+function mostrarError(mensaje) {
+    console.error("❌ " + mensaje);
+    if (loadingText) {
+        loadingText.textContent = mensaje;
+        loadingText.style.color = '#ff4444';
     }
-    
-    if (nextBtn) {
-        nextBtn.addEventListener('click', function() {
-            siguienteSlide();
-        });
-    }
-    
-    // Teclado
-    document.addEventListener('keydown', function(e) {
-        var key = e.key || e.keyCode;
-        
-        if (key === 'ArrowLeft' || key === 37) {
-            anteriorSlide();
-        } else if (key === 'ArrowRight' || key === 39) {
-            siguienteSlide();
-        } else if (key === 'Escape' || key === 27) {
-            // Ocultar panel admin con ESC
-            adminPanel.classList.remove('mostrado');
-            adminToggle.innerHTML = '⚙️';
-            // Ocultar modal QR
-            document.getElementById('qr-modal').style.display = 'none';
-        }
-    });
-}
-
-function configurarEventosAdmin() {
-    // Toggle panel
-    adminToggle.addEventListener('click', togglePanelAdmin);
-    
-    // Agregar imagen
-    btnAgregar.addEventListener('click', agregarImagen);
-    
-    // Permitir Enter en input
-    urlInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            agregarImagen();
-        }
-    });
-    
-    // Actualizar desde JSON
-    btnActualizar.addEventListener('click', actualizarDesdeJSON);
-    
-    // Limpiar todo
-    btnLimpiar.addEventListener('click', limpiarImagenes);
-    
-    // Sincronización
-    btnCopiarUrl.addEventListener('click', copiarUrlTV);
-    btnGenerarQr.addEventListener('click', generarQR);
-    btnForzarSync.addEventListener('click', sincronizarCambios);
-    
-    // Cerrar panel al hacer clic fuera
-    document.addEventListener('click', function(e) {
-        if (!adminPanel.contains(e.target) && 
-            !adminToggle.contains(e.target) && 
-            adminPanel.classList.contains('mostrado')) {
-            togglePanelAdmin();
-        }
-    });
 }
 
 // ============================================
@@ -1585,16 +475,20 @@ function configurarEventosAdmin() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("📄 DOM cargado");
     
+    // Iniciar después de un pequeño delay
     setTimeout(function() {
         iniciarApp();
     }, 100);
 });
 
+// Manejar visibilidad para optimizar TV
 document.addEventListener('visibilitychange', function() {
     if (document.hidden) {
+        console.log("👻 Página oculta, pausando auto-slide");
         detenerAutoSlide();
     } else {
-        reiniciarAutoSlide();
+        console.log("👀 Página visible, reanudando auto-slide");
+        iniciarAutoSlide();
     }
 });
 </script>
