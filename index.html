@@ -3,144 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Forzar HTTPS para compatibilidad con TV -->
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <title>Carrusel de Imágenes</title>
+    <title>Carrusel TV</title>
     
     <style>
-        /* RESET Y ESTILOS BÁSICOS */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* ESTILOS MUY SIMPLES - TV compatible */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        html, body {
-            width: 100%;
-            height: 100%;
+        body {
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
-            background-color: #000;
+            background: #000;
             font-family: Arial, sans-serif;
         }
         
-        /* CONTENEDOR PRINCIPAL */
-        .carrusel-container {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-            background-color: #000;
-        }
-        
-        /* PISTA DEL CARRUSEL */
-        .carrusel-track {
-            display: flex;
-            height: 100%;
-            transition: transform 0.5s ease-in-out;
-            will-change: transform; /* Optimización para TV */
-        }
-        
-        /* CADA SLIDE */
-        .carrusel-slide {
-            min-width: 100vw;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        
-        /* IMAGEN DENTRO DEL SLIDE */
-        .carrusel-image {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* Muestra toda la imagen sin recortar */
-            display: block;
-            background-color: #000;
-        }
-        
-        /* CONTROLES DE NAVEGACIÓN */
-        .carrusel-controls {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            pointer-events: none; /* Permite hacer clic a través de él */
-            z-index: 10;
-        }
-        
-        .carrusel-btn {
-            pointer-events: auto; /* Habilita clic en los botones */
-            background-color: rgba(0, 0, 0, 0.5);
-            border: none;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            margin: 0 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-        
-        .carrusel-btn:hover {
-            background-color: rgba(0, 0, 0, 0.8);
-            transform: scale(1.1);
-        }
-        
-        /* INDICADORES (PUNTOS INFERIORES) */
-        .carrusel-indicators {
-            position: absolute;
-            bottom: 20px;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            z-index: 10;
-        }
-        
-        .indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .indicator.active {
-            background-color: #ffffff;
-            transform: scale(1.2);
-        }
-        
-        /* CONTADOR DE IMÁGENES */
-        .image-counter {
-            position: absolute;
-            bottom: 50px;
-            right: 20px;
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            z-index: 10;
-        }
-        
-        /* MENSAJE DE CARGA */
-        .loading-screen {
+        /* PANTALLA DE CARGA MEJORADA */
+        .loading {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #000;
+            background: #000;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -149,537 +33,536 @@
             z-index: 1000;
         }
         
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255, 255, 255, 0.3);
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #333;
+            border-top: 6px solid #fff;
             border-radius: 50%;
-            border-top-color: #ffffff;
-            animation: spin 1s linear infinite;
+            animation: girar 1s linear infinite;
             margin-bottom: 20px;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        @keyframes girar {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
-        /* MENSAJE DE ERROR */
-        .error-message {
+        /* CARRUSEL */
+        .carrusel {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: none; /* Oculto hasta cargar */
+        }
+        
+        .imagen-container {
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .imagen-container.activa {
+            display: flex;
+        }
+        
+        .imagen-carrusel {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        /* CONTROLES */
+        .controles {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            z-index: 10;
+        }
+        
+        .puntos {
+            display: inline-flex;
+            gap: 15px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 30px;
+        }
+        
+        .punto {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+        }
+        
+        .punto.activo {
+            background: white;
+        }
+        
+        .contador {
+            position: absolute;
+            bottom: 100px;
+            right: 30px;
+            color: white;
+            background: rgba(0,0,0,0.7);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 18px;
+        }
+        
+        /* BOTONES DE FLECHA */
+        .flecha {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            font-size: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .flecha.izquierda {
+            left: 20px;
+        }
+        
+        .flecha.derecha {
+            right: 20px;
+        }
+        
+        /* ERROR */
+        .error {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: rgba(255, 0, 0, 0.8);
+            background: rgba(255,0,0,0.9);
             color: white;
-            padding: 20px 30px;
-            border-radius: 10px;
-            text-align: center;
-            z-index: 1000;
-            max-width: 80%;
-        }
-        
-        /* MENSAJE SIN IMÁGENES */
-        .no-images {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            text-align: center;
-            background-color: rgba(0, 0, 0, 0.7);
             padding: 30px;
             border-radius: 10px;
-            z-index: 1000;
-        }
-        
-        /* ESTILOS ESPECÍFICOS PARA TV LG */
-        @media (hover: none) and (pointer: coarse) {
-            /* Optimización para pantallas táctiles/control remoto */
-            .carrusel-btn {
-                width: 70px;
-                height: 70px;
-                font-size: 30px;
-                margin: 0 30px;
-            }
-            
-            .indicator {
-                width: 16px;
-                height: 16px;
-            }
-            
-            .image-counter {
-                font-size: 18px;
-                padding: 10px 20px;
-                bottom: 60px;
-            }
-        }
-        
-        /* ANIMACIÓN DE TRANSICIÓN SUAVE */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .carrusel-slide {
-            animation: fadeIn 0.5s ease-out;
+            text-align: center;
+            max-width: 80%;
+            display: none;
+            z-index: 1001;
         }
     </style>
 </head>
 <body>
     <!-- PANTALLA DE CARGA -->
-    <div id="loading-screen" class="loading-screen">
-        <div class="loading-spinner"></div>
-        <p>Cargando carrusel...</p>
+    <div id="cargando" class="loading">
+        <div class="spinner"></div>
+        <h2 style="margin-bottom: 10px;">Cargando Carrusel</h2>
+        <p id="estado-carga">Conectando...</p>
     </div>
     
-    <!-- MENSAJE DE ERROR (oculto por defecto) -->
-    <div id="error-message" class="error-message" style="display: none;">
-        <h3>Error de conexión</h3>
-        <p>No se pueden cargar las imágenes. Verifica tu conexión a internet.</p>
-        <button onclick="location.reload()" style="margin-top: 15px; padding: 10px 20px; background: white; border: none; border-radius: 5px; cursor: pointer;">
+    <!-- MENSAJE DE ERROR -->
+    <div id="error" class="error">
+        <h3>Error de Conexión</h3>
+        <p id="mensaje-error"></p>
+        <button onclick="recargar()" style="margin-top: 20px; padding: 10px 20px; background: white; border: none; border-radius: 5px; cursor: pointer;">
             Reintentar
         </button>
     </div>
     
-    <!-- MENSAJE SIN IMÁGENES (oculto por defecto) -->
-    <div id="no-images" class="no-images" style="display: none;">
-        <h2>No hay imágenes disponibles</h2>
-        <p>El carrusel está vacío. Agrega imágenes desde el panel de administración.</p>
+    <!-- CARRUSEL -->
+    <div id="carrusel" class="carrusel">
+        <!-- Imágenes se insertan aquí -->
     </div>
     
-    <!-- CONTENEDOR DEL CARRUSEL -->
-    <div class="carrusel-container" id="carrusel-container">
-        <div class="carrusel-track" id="carrusel-track">
-            <!-- Las imágenes se insertarán aquí dinámicamente -->
-        </div>
-        
-        <!-- CONTROLES DE NAVEGACIÓN -->
-        <div class="carrusel-controls">
-            <button class="carrusel-btn" id="prev-btn" aria-label="Imagen anterior">
-                ◀
-            </button>
-            <button class="carrusel-btn" id="next-btn" aria-label="Siguiente imagen">
-                ▶
-            </button>
-        </div>
-        
-        <!-- CONTADOR DE IMÁGENES -->
-        <div class="image-counter" id="image-counter">0 / 0</div>
-        
-        <!-- INDICADORES -->
-        <div class="carrusel-indicators" id="carrusel-indicators">
-            <!-- Los puntos se insertarán aquí dinámicamente -->
+    <!-- CONTROLES -->
+    <div class="controles" id="controles" style="display: none;">
+        <div class="puntos" id="puntos">
+            <!-- Puntos se insertan aquí -->
         </div>
     </div>
+    
+    <div class="contador" id="contador" style="display: none;">0/0</div>
+    
+    <button class="flecha izquierda" id="btnAnterior" style="display: none;">◀</button>
+    <button class="flecha derecha" id="btnSiguiente" style="display: none;">▶</button>
 
-    <!-- SCRIPT DE SUPABASE -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ============================================
+// CONFIGURACIÓN SIMPLIFICADA
+// ============================================
+const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_UJiY23LT_8zNLtLUx0guWw_l760sXI7';
+
+// ============================================
+// VARIABLES
+// ============================================
+let imagenes = [];
+let imagenActual = 0;
+let intervalo;
+let carruselElement;
+let cargandoElement;
+let errorElement;
+
+// ============================================
+// FUNCIONES PRINCIPALES - TV COMPATIBLE
+// ============================================
+
+// INICIALIZAR TODO CUANDO SE CARGA LA PÁGINA
+window.onload = function() {
+    console.log("Página cargada - TV LG");
     
-    <script>
-        // ============================================
-        // CONFIGURACIÓN DE SUPABASE
-        // ============================================
-        const SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_UJiY23LT_8zNLtLUx0guWw_l760sXI7';
-        
-        // ============================================
-        // VARIABLES GLOBALES
-        // ============================================
-        let currentSlide = 0;
-        let autoSlideInterval;
-        let images = [];
-        let supabaseClient = null;
-        
-        // ============================================
-        // ELEMENTOS DEL DOM
-        // ============================================
-        const carruselTrack = document.getElementById('carrusel-track');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const carruselIndicators = document.getElementById('carrusel-indicators');
-        const imageCounter = document.getElementById('image-counter');
-        const loadingScreen = document.getElementById('loading-screen');
-        const errorMessage = document.getElementById('error-message');
-        const noImagesMessage = document.getElementById('no-images');
-        
-        // ============================================
-        // FUNCIONES PRINCIPALES
-        // ============================================
-        
-        // INICIALIZAR LA APLICACIÓN
-        async function inicializarApp() {
-            console.log("Iniciando carrusel para TV LG...");
-            
-            try {
-                // 1. Inicializar Supabase
-                await inicializarSupabase();
-                
-                // 2. Cargar imágenes
-                await cargarImagenes();
-                
-                // 3. Configurar eventos
-                configurarEventos();
-                
-                // 4. Ocultar pantalla de carga
-                ocultarPantallaCarga();
-                
-                // 5. Iniciar auto-desplazamiento
-                iniciarAutoDesplazamiento();
-                
-                console.log("Carrusel inicializado correctamente");
-                
-            } catch (error) {
-                console.error("Error inicializando la aplicación:", error);
-                mostrarError();
-            }
+    // Obtener elementos
+    carruselElement = document.getElementById('carrusel');
+    cargandoElement = document.getElementById('cargando');
+    errorElement = document.getElementById('error');
+    
+    // Iniciar secuencia de carga
+    setTimeout(iniciarCarrusel, 100);
+};
+
+// INICIAR CARRUSEL
+function iniciarCarrusel() {
+    actualizarEstado('Cargando imágenes...');
+    
+    // 1. Primero cargar imágenes desde localStorage si existen
+    cargarDesdeLocalStorage();
+    
+    // 2. Intentar conectar a Supabase
+    setTimeout(conectarSupabase, 500);
+    
+    // 3. Mostrar algo aunque falle todo
+    setTimeout(function() {
+        if (imagenes.length === 0) {
+            usarImagenesDemo();
         }
-        
-        // INICIALIZAR SUPABASE
-        async function inicializarSupabase() {
-            console.log("Conectando a Supabase...");
-            
-            try {
-                // Crear cliente Supabase
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-                    auth: { persistSession: false },
-                    db: { schema: 'public' }
-                });
-                
-                // Verificar conexión
-                const { data, error } = await supabaseClient
-                    .from('images')
-                    .select('id')
-                    .limit(1)
-                    .maybeSingle();
-                
-                if (error) {
-                    throw new Error(`Error de conexión: ${error.message}`);
-                }
-                
-                console.log("Conexión a Supabase establecida");
-                
-            } catch (error) {
-                console.error("Error conectando a Supabase:", error);
-                throw error;
-            }
+    }, 3000);
+}
+
+// ACTUALIZAR ESTADO EN PANTALLA DE CARGA
+function actualizarEstado(mensaje) {
+    const elemento = document.getElementById('estado-carga');
+    if (elemento) elemento.textContent = mensaje;
+    console.log(mensaje);
+}
+
+// CONECTAR A SUPABASE (versión simplificada)
+function conectarSupabase() {
+    actualizarEstado('Conectando a servidor...');
+    
+    // Usar fetch directo en lugar de SDK (más compatible)
+    fetch(`${SUPABASE_URL}/rest/v1/images?select=*`, {
+        method: 'GET',
+        headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json'
         }
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Error HTTP: ' + response.status);
+        return response.json();
+    })
+    .then(datos => {
+        console.log('Imágenes cargadas:', datos.length);
         
-        // CARGAR IMÁGENES DESDE SUPABASE
-        async function cargarImagenes() {
-            console.log("Cargando imágenes...");
+        if (datos && datos.length > 0) {
+            // Filtrar solo imágenes con URL válida
+            imagenes = datos.filter(img => img.url && img.url.startsWith('http'));
             
-            try {
-                const { data, error } = await supabaseClient
-                    .from('images')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-                
-                if (error) throw error;
-                
-                images = data || [];
-                console.log(`${images.length} imágenes cargadas`);
-                
-                if (images.length === 0) {
-                    mostrarMensajeSinImagenes();
-                    return;
-                }
-                
-                // Actualizar el carrusel
-                actualizarCarrusel();
-                
-            } catch (error) {
-                console.error("Error cargando imágenes:", error);
-                throw error;
-            }
-        }
-        
-        // ACTUALIZAR EL CARRUSEL
-        function actualizarCarrusel() {
-            // Limpiar el carrusel
-            carruselTrack.innerHTML = '';
-            carruselIndicators.innerHTML = '';
-            
-            // Crear slides para cada imagen
-            images.forEach((imagen, index) => {
-                // Crear slide
-                const slide = document.createElement('div');
-                slide.className = 'carrusel-slide';
-                
-                // Crear elemento de imagen con atributos para optimización
-                const img = document.createElement('img');
-                img.className = 'carrusel-image';
-                img.src = imagen.url;
-                img.alt = imagen.title || `Imagen ${index + 1}`;
-                img.loading = 'lazy'; // Carga diferida
-                img.decoding = 'async'; // Decodificación asíncrona
-                
-                // Añadir a slide
-                slide.appendChild(img);
-                carruselTrack.appendChild(slide);
-                
-                // Crear indicador
-                const indicador = document.createElement('div');
-                indicador.className = `indicator ${index === currentSlide ? 'active' : ''}`;
-                indicador.dataset.index = index;
-                indicador.addEventListener('click', () => irASlide(index));
-                carruselIndicators.appendChild(indicador);
-            });
-            
-            // Asegurar que currentSlide esté dentro del rango
-            if (currentSlide >= images.length) {
-                currentSlide = Math.max(0, images.length - 1);
-            }
-            
-            // Actualizar posición y contador
-            actualizarPosicion();
-            actualizarContador();
-        }
-        
-        // ACTUALIZAR POSICIÓN DEL CARRUSEL
-        function actualizarPosicion() {
-            if (carruselTrack) {
-                carruselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
-            }
-        }
-        
-        // ACTUALIZAR CONTADOR
-        function actualizarContador() {
-            if (imageCounter) {
-                imageCounter.textContent = `${currentSlide + 1} / ${images.length}`;
-            }
-            
-            // Actualizar indicadores activos
-            document.querySelectorAll('.indicator').forEach((indicador, index) => {
-                if (index === currentSlide) {
-                    indicador.classList.add('active');
-                } else {
-                    indicador.classList.remove('active');
-                }
-            });
-        }
-        
-        // INICIAR AUTO-DESPLAZAMIENTO
-        function iniciarAutoDesplazamiento() {
-            // Limpiar intervalo anterior
-            clearInterval(autoSlideInterval);
-            
-            // Solo iniciar si hay más de una imagen
-            if (images.length > 1) {
-                console.log("Iniciando auto-desplazamiento (10 segundos)");
-                
-                autoSlideInterval = setInterval(() => {
-                    siguienteSlide();
-                }, 10000); // 10 segundos
-            }
-        }
-        
-        // DETENER AUTO-DESPLAZAMIENTO
-        function detenerAutoDesplazamiento() {
-            clearInterval(autoSlideInterval);
-        }
-        
-        // IR A SLIDE ESPECÍFICO
-        function irASlide(indice) {
-            if (images.length === 0) return;
-            
-            // Calcular nuevo índice
-            let nuevoIndice;
-            if (indice < 0) {
-                nuevoIndice = images.length - 1;
-            } else if (indice >= images.length) {
-                nuevoIndice = 0;
+            if (imagenes.length > 0) {
+                // Guardar en localStorage
+                guardarEnLocalStorage();
+                // Mostrar carrusel
+                mostrarCarrusel();
             } else {
-                nuevoIndice = indice;
+                throw new Error('No hay imágenes válidas');
             }
-            
-            // Actualizar slide actual
-            currentSlide = nuevoIndice;
-            
-            // Actualizar interfaz
-            actualizarPosicion();
-            actualizarContador();
-            
-            // Reiniciar auto-desplazamiento
-            reiniciarAutoDesplazamiento();
+        } else {
+            throw new Error('No hay imágenes');
+        }
+    })
+    .catch(error => {
+        console.error('Error cargando imágenes:', error);
+        
+        // Intentar con localStorage
+        if (imagenes.length === 0) {
+            cargarDesdeLocalStorage();
         }
         
-        // SLIDE SIGUIENTE
-        function siguienteSlide() {
-            irASlide(currentSlide + 1);
+        // Si aún no hay imágenes, usar demo
+        if (imagenes.length === 0) {
+            usarImagenesDemo();
+        } else {
+            mostrarCarrusel();
         }
-        
-        // SLIDE ANTERIOR
-        function slideAnterior() {
-            irASlide(currentSlide - 1);
+    });
+}
+
+// USAR IMÁGENES DE DEMOSTRACIÓN
+function usarImagenesDemo() {
+    actualizarEstado('Usando imágenes de demostración...');
+    
+    imagenes = [
+        { 
+            id: 1, 
+            url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920', 
+            title: 'Montañas' 
+        },
+        { 
+            id: 2, 
+            url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920', 
+            title: 'Paisaje' 
+        },
+        { 
+            id: 3, 
+            url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1920', 
+            title: 'Cielo' 
         }
+    ];
+    
+    guardarEnLocalStorage();
+    mostrarCarrusel();
+}
+
+// MOSTRAR CARRUSEL
+function mostrarCarrusel() {
+    console.log('Mostrando carrusel con', imagenes.length, 'imágenes');
+    
+    // Ocultar pantalla de carga
+    if (cargandoElement) {
+        cargandoElement.style.display = 'none';
+    }
+    
+    // Limpiar carrusel
+    carruselElement.innerHTML = '';
+    
+    // Crear contenedores para cada imagen
+    imagenes.forEach((imagen, index) => {
+        const contenedor = document.createElement('div');
+        contenedor.className = 'imagen-container';
+        contenedor.id = 'imagen-' + index;
         
-        // REINICIAR AUTO-DESPLAZAMIENTO
-        function reiniciarAutoDesplazamiento() {
-            detenerAutoDesplazamiento();
-            iniciarAutoDesplazamiento();
+        const img = document.createElement('img');
+        img.className = 'imagen-carrusel';
+        img.alt = imagen.title || 'Imagen ' + (index + 1);
+        img.loading = 'eager'; // Forzar carga inmediata
+        
+        // Cargar imagen con callback
+        cargarImagenConTimeout(img, imagen.url, index);
+        
+        contenedor.appendChild(img);
+        carruselElement.appendChild(contenedor);
+    });
+    
+    // Mostrar primera imagen
+    mostrarImagen(0);
+    
+    // Mostrar controles
+    mostrarControles();
+    
+    // Iniciar auto-cambio
+    iniciarAutoCambio();
+}
+
+// CARGAR IMAGEN CON TIMEOUT
+function cargarImagenConTimeout(elementoImg, url, indice) {
+    let cargada = false;
+    
+    // Configurar eventos
+    elementoImg.onload = function() {
+        cargada = true;
+        console.log('Imagen', indice, 'cargada:', url.substring(0, 50));
+    };
+    
+    elementoImg.onerror = function() {
+        console.error('Error cargando imagen', indice);
+    };
+    
+    // Intentar cargar
+    elementoImg.src = url;
+    
+    // Timeout: si no carga en 10 segundos, usar placeholder
+    setTimeout(function() {
+        if (!cargada) {
+            console.log('Timeout imagen', indice);
+            elementoImg.src = 'https://via.placeholder.com/1920x1080/333/fff?text=Imagen+' + (indice+1);
         }
+    }, 10000);
+}
+
+// MOSTRAR IMAGEN ESPECÍFICA
+function mostrarImagen(indice) {
+    // Validar índice
+    if (indice < 0) indice = imagenes.length - 1;
+    if (indice >= imagenes.length) indice = 0;
+    
+    imagenActual = indice;
+    
+    // Ocultar todas las imágenes
+    document.querySelectorAll('.imagen-container').forEach(container => {
+        container.classList.remove('activa');
+    });
+    
+    // Mostrar imagen actual
+    const imagenActualElement = document.getElementById('imagen-' + indice);
+    if (imagenActualElement) {
+        imagenActualElement.classList.add('activa');
+    }
+    
+    // Actualizar puntos
+    actualizarPuntos();
+    
+    // Actualizar contador
+    actualizarContador();
+}
+
+// MOSTRAR CONTROLES
+function mostrarControles() {
+    // Mostrar carrusel
+    carruselElement.style.display = 'block';
+    
+    // Crear puntos
+    const puntosElement = document.getElementById('puntos');
+    if (puntosElement) {
+        puntosElement.innerHTML = '';
         
-        // CONFIGURAR EVENTOS
-        function configurarEventos() {
-            // Botones de navegación
-            if (prevBtn) prevBtn.addEventListener('click', () => {
-                slideAnterior();
-            });
-            
-            if (nextBtn) nextBtn.addEventListener('click', () => {
-                siguienteSlide();
-            });
-            
-            // Teclado (para control remoto si el TV lo soporta)
-            document.addEventListener('keydown', (e) => {
-                switch(e.key) {
-                    case 'ArrowLeft':
-                    case 'Left':
-                        slideAnterior();
-                        break;
-                    case 'ArrowRight':
-                    case 'Right':
-                        siguienteSlide();
-                        break;
-                    case ' ':
-                    case 'Enter':
-                        // Pausar/reanudar auto-desplazamiento
-                        if (autoSlideInterval) {
-                            detenerAutoDesplazamiento();
-                            console.log("Auto-desplazamiento pausado");
-                        } else {
-                            iniciarAutoDesplazamiento();
-                            console.log("Auto-desplazamiento reanudado");
-                        }
-                        break;
-                }
-            });
-            
-            // Swipe para pantallas táctiles
-            let inicioX = 0;
-            
-            carruselTrack.addEventListener('touchstart', (e) => {
-                inicioX = e.touches[0].clientX;
-                detenerAutoDesplazamiento();
-            }, { passive: true });
-            
-            carruselTrack.addEventListener('touchend', (e) => {
-                const finX = e.changedTouches[0].clientX;
-                const diferencia = inicioX - finX;
-                const umbral = 50; // Mínimo desplazamiento
-                
-                if (Math.abs(diferencia) > umbral) {
-                    if (diferencia > 0) {
-                        siguienteSlide();
-                    } else {
-                        slideAnterior();
-                    }
-                }
-                
-                // Reanudar auto-desplazamiento después de 5 segundos
-                setTimeout(() => {
-                    iniciarAutoDesplazamiento();
-                }, 5000);
-            }, { passive: true });
-            
-            // Pausar auto-desplazamiento al interactuar
-            carruselTrack.addEventListener('mouseenter', detenerAutoDesplazamiento);
-            carruselTrack.addEventListener('mouseleave', iniciarAutoDesplazamiento);
-            
-            // Pausar al hacer clic en indicadores
-            carruselIndicators.addEventListener('click', detenerAutoDesplazamiento);
-        }
-        
-        // OCULTAR PANTALLA DE CARGA
-        function ocultarPantallaCarga() {
-            if (loadingScreen) {
-                setTimeout(() => {
-                    loadingScreen.style.opacity = '0';
-                    setTimeout(() => {
-                        loadingScreen.style.display = 'none';
-                    }, 500);
-                }, 500);
-            }
-        }
-        
-        // MOSTRAR ERROR
-        function mostrarError() {
-            if (loadingScreen) loadingScreen.style.display = 'none';
-            if (errorMessage) errorMessage.style.display = 'block';
-        }
-        
-        // MOSTRAR MENSAJE SIN IMÁGENES
-        function mostrarMensajeSinImagenes() {
-            if (loadingScreen) loadingScreen.style.display = 'none';
-            if (noImagesMessage) noImagesMessage.style.display = 'block';
-        }
-        
-        // ============================================
-        // SUSCRIPCIÓN EN TIEMPO REAL
-        // ============================================
-        async function suscribirCambios() {
-            if (!supabaseClient) return;
-            
-            try {
-                // Suscribirse a cambios en la tabla de imágenes
-                supabaseClient
-                    .channel('carrusel-cambios')
-                    .on('postgres_changes', 
-                        { 
-                            event: '*', 
-                            schema: 'public', 
-                            table: 'images' 
-                        }, 
-                        async () => {
-                            console.log("Cambio detectado, recargando imágenes...");
-                            await cargarImagenes();
-                        }
-                    )
-                    .subscribe();
-                
-                console.log("Suscrito a cambios en tiempo real");
-                
-            } catch (error) {
-                console.error("Error en suscripción:", error);
-            }
-        }
-        
-        // ============================================
-        // INICIALIZAR AL CARGAR LA PÁGINA
-        // ============================================
-        document.addEventListener('DOMContentLoaded', async () => {
-            console.log("DOM cargado, iniciando aplicación...");
-            
-            // Configurar manejo de errores global
-            window.onerror = function(msg, url, lineNo, columnNo, error) {
-                console.error('Error global:', msg);
-                return false;
-            };
-            
-            // Iniciar la aplicación
-            await inicializarApp();
-            
-            // Suscribirse a cambios en tiempo real
-            await suscribirCambios();
-            
-            // Mantener activa la conexión
-            setInterval(async () => {
-                if (supabaseClient && images.length === 0) {
-                    await cargarImagenes();
-                }
-            }, 30000); // Verificar cada 30 segundos
+        imagenes.forEach((_, index) => {
+            const punto = document.createElement('div');
+            punto.className = 'punto' + (index === 0 ? ' activo' : '');
+            punto.onclick = function() { mostrarImagen(index); };
+            puntosElement.appendChild(punto);
         });
         
-        // Manejar visibilidad de la página (para optimización en TV)
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                console.log("Página oculta, pausando auto-desplazamiento");
-                detenerAutoDesplazamiento();
-            } else {
-                console.log("Página visible, reanudando auto-desplazamiento");
-                iniciarAutoDesplazamiento();
+        document.getElementById('controles').style.display = 'block';
+    }
+    
+    // Configurar botones
+    const btnAnterior = document.getElementById('btnAnterior');
+    const btnSiguiente = document.getElementById('btnSiguiente');
+    
+    if (btnAnterior) {
+        btnAnterior.style.display = 'block';
+        btnAnterior.onclick = function() {
+            mostrarImagen(imagenActual - 1);
+            reiniciarIntervalo();
+        };
+    }
+    
+    if (btnSiguiente) {
+        btnSiguiente.style.display = 'block';
+        btnSiguiente.onclick = function() {
+            mostrarImagen(imagenActual + 1);
+            reiniciarIntervalo();
+        };
+    }
+    
+    // Mostrar contador
+    document.getElementById('contador').style.display = 'block';
+}
+
+// ACTUALIZAR PUNTOS
+function actualizarPuntos() {
+    document.querySelectorAll('.punto').forEach((punto, index) => {
+        if (index === imagenActual) {
+            punto.classList.add('activo');
+        } else {
+            punto.classList.remove('activo');
+        }
+    });
+}
+
+// ACTUALIZAR CONTADOR
+function actualizarContador() {
+    const contador = document.getElementById('contador');
+    if (contador) {
+        contador.textContent = (imagenActual + 1) + '/' + imagenes.length;
+    }
+}
+
+// INICIAR AUTO-CAMBIO
+function iniciarAutoCambio() {
+    // Limpiar intervalo anterior
+    if (intervalo) clearInterval(intervalo);
+    
+    // Solo si hay más de una imagen
+    if (imagenes.length > 1) {
+        intervalo = setInterval(function() {
+            mostrarImagen(imagenActual + 1);
+        }, 10000); // 10 segundos
+    }
+}
+
+// REINICIAR INTERVALO
+function reiniciarIntervalo() {
+    iniciarAutoCambio();
+}
+
+// LOCALSTORAGE
+function guardarEnLocalStorage() {
+    try {
+        localStorage.setItem('carrusel_imagenes', JSON.stringify(imagenes));
+        localStorage.setItem('carrusel_ultima_actualizacion', new Date().toISOString());
+    } catch (e) {
+        console.log('No se pudo guardar en localStorage');
+    }
+}
+
+function cargarDesdeLocalStorage() {
+    try {
+        const guardadas = localStorage.getItem('carrusel_imagenes');
+        const ultimaActualizacion = localStorage.getItem('carrusel_ultima_actualizacion');
+        
+        if (guardadas && ultimaActualizacion) {
+            const fechaGuardada = new Date(ultimaActualizacion);
+            const ahora = new Date();
+            const diferenciaHoras = (ahora - fechaGuardada) / (1000 * 60 * 60);
+            
+            // Usar cache si tiene menos de 1 hora
+            if (diferenciaHoras < 1) {
+                imagenes = JSON.parse(guardadas);
+                actualizarEstado('Cargando desde caché...');
+                return true;
             }
-        });
-    </script>
+        }
+    } catch (e) {
+        console.log('Error cargando desde localStorage');
+    }
+    return false;
+}
+
+// MANEJO DE ERRORES
+function mostrarError(mensaje) {
+    console.error('Error:', mensaje);
+    
+    if (cargandoElement) cargandoElement.style.display = 'none';
+    if (errorElement) {
+        document.getElementById('mensaje-error').textContent = mensaje;
+        errorElement.style.display = 'block';
+    }
+}
+
+function recargar() {
+    location.reload();
+}
+
+// TECLADO (para control remoto)
+document.onkeydown = function(e) {
+    switch(e.key) {
+        case 'ArrowLeft':
+            mostrarImagen(imagenActual - 1);
+            reiniciarIntervalo();
+            break;
+        case 'ArrowRight':
+        case ' ':
+            mostrarImagen(imagenActual + 1);
+            reiniciarIntervalo();
+            break;
+    }
+};
+</script>
 </body>
 </html>
