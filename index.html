@@ -7,299 +7,278 @@
     <title>Carrusel de Imágenes</title>
     
     <style>
-        /* ESTILOS BÁSICOS */
+        /* MANTÉN TODO EL CSS IGUAL */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #000; }
-        
-        /* CARRUSEL */
-        .carrusel { width: 100vw; height: 100vh; position: relative; }
-        .track { display: flex; height: 100%; transition: transform 0.5s ease; }
-        .slide { min-width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .slide img { max-width: 100%; max-height: 100%; object-fit: contain; background: #000; }
-        
-        /* CONTROLES */
-        .controles { position: absolute; top: 50%; width: 100%; transform: translateY(-50%); display: flex; justify-content: space-between; padding: 0 20px; pointer-events: none; }
-        .boton { pointer-events: auto; background: rgba(0,0,0,0.6); color: white; border: none; width: 60px; height: 60px; border-radius: 50%; font-size: 24px; cursor: pointer; }
-        
-        /* INDICADORES */
-        .puntos { position: absolute; bottom: 30px; left: 0; width: 100%; display: flex; justify-content: center; gap: 12px; }
-        .punto { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; }
-        .punto.activo { background: #fff; transform: scale(1.3); }
-        
-        /* CONTADOR */
-        .contador { position: absolute; bottom: 70px; right: 30px; background: rgba(0,0,0,0.7); color: white; padding: 10px 20px; border-radius: 20px; font-size: 16px; }
-        
-        /* LOADING */
-        .loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 1000; }
-        .spinner { width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: girar 1s linear infinite; margin-bottom: 20px; }
-        @keyframes girar { to { transform: rotate(360deg); } }
+        html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: Arial; }
+        .carrusel-container { width: 100vw; height: 100vh; position: relative; background: #000; }
+        .carrusel-track { display: flex; height: 100%; transition: transform 0.5s ease-in-out; }
+        .carrusel-slide { min-width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .carrusel-image { width: 100%; height: 100%; object-fit: contain; display: block; background: #000; }
+        .carrusel-controls { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: space-between; align-items: center; pointer-events: none; z-index: 10; }
+        .carrusel-btn { pointer-events: auto; background: rgba(0,0,0,0.5); border: none; width: 60px; height: 60px; border-radius: 50%; color: white; font-size: 24px; cursor: pointer; margin: 0 20px; display: flex; align-items: center; justify-content: center; }
+        .carrusel-indicators { position: absolute; bottom: 20px; left: 0; width: 100%; display: flex; justify-content: center; gap: 10px; z-index: 10; }
+        .indicator { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; }
+        .indicator.active { background: #fff; transform: scale(1.2); }
+        .image-counter { position: absolute; bottom: 50px; right: 20px; background: rgba(0,0,0,0.7); color: white; padding: 8px 15px; border-radius: 20px; font-size: 14px; z-index: 10; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 1000; }
+        .loading-spinner { width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error-message { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,0,0,0.8); color: white; padding: 20px 30px; border-radius: 10px; text-align: center; max-width: 80%; z-index: 1000; display: none; }
     </style>
 </head>
 <body>
-    <!-- PANTALLA DE CARGA -->
-    <div id="loading" class="loading">
-        <div class="spinner"></div>
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner"></div>
         <p id="loading-text">Cargando...</p>
     </div>
     
-    <!-- CARRUSEL -->
-    <div id="carrusel" class="carrusel" style="display: none;">
-        <div class="track" id="track"></div>
-        
-        <div class="controles">
-            <button class="boton" id="btn-prev">◀</button>
-            <button class="boton" id="btn-next">▶</button>
+    <div class="carrusel-container" id="carrusel-container">
+        <div class="carrusel-track" id="carrusel-track"></div>
+        <div class="carrusel-controls">
+            <button class="carrusel-btn" id="prev-btn">◀</button>
+            <button class="carrusel-btn" id="next-btn">▶</button>
         </div>
-        
-        <div class="puntos" id="puntos"></div>
-        <div class="contador" id="contador">0/0</div>
+        <div class="image-counter" id="image-counter">0 / 0</div>
+        <div class="carrusel-indicators" id="carrusel-indicators"></div>
     </div>
 
 <script>
 // ============================================
-// AQUÍ PEGAS TUS URLs DIRECTAS
+// CONFIGURACIÓN - AQUÍ PONES TUS IMÁGENES
 // ============================================
-var MIS_IMAGENES = [
-    // PRIMERO: Prueba con estas URLs que SÍ funcionan
-    "https://image2url.com/r2/bucket2/images/1767894053593-eb514803-25ec-427c-adf6-a66a93afda77.jpeg",
-    
-    "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&auto=format&fit=crop",
-    
-    "https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1920&auto=format&fit=crop"
+var IMAGENES_CONFIG = [
+    {
+        url: "https://image2url.com/r2/bucket2/images/1767894053593-eb514803-25ec-427c-adf6-a66a93afda77.jpeg",
+        title: "Paisaje Montañoso"
+    },
+    {
+        url: "https://image2url.com/r2/bucket2/images/1767894468955-ef377145-5241-462c-b06f-f31091dccad3.jpeg",
+        title: "Aurora Boreal"
+    },
+    {
+        url: "https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1920&auto=format&fit=crop",
+        title: "Atardecer"
+    }
 ];
 
 // ============================================
-// VARIABLES
+// VARIABLES GLOBALES
 // ============================================
-var slideActual = 0;
-var intervalo;
-var imagenesCargadas = 0;
+var currentSlide = 0;
+var autoSlideInterval;
+var images = [];
 
 // ============================================
-// ELEMENTOS
+// ELEMENTOS DOM
 // ============================================
-var track = document.getElementById('track');
-var btnPrev = document.getElementById('btn-prev');
-var btnNext = document.getElementById('btn-next');
-var puntos = document.getElementById('puntos');
-var contador = document.getElementById('contador');
-var loading = document.getElementById('loading');
+var carruselTrack = document.getElementById('carrusel-track');
+var prevBtn = document.getElementById('prev-btn');
+var nextBtn = document.getElementById('next-btn');
+var carruselIndicators = document.getElementById('carrusel-indicators');
+var imageCounter = document.getElementById('image-counter');
+var loadingScreen = document.getElementById('loading-screen');
 var loadingText = document.getElementById('loading-text');
-var carrusel = document.getElementById('carrusel');
 
 // ============================================
-// ACTUALIZAR TEXTO DE CARGA
+// FUNCIONES PRINCIPALES
 // ============================================
-function actualizarLoading(texto) {
-    if (loadingText) {
-        loadingText.textContent = texto;
-    }
-    console.log(texto);
-}
 
-// ============================================
-// INICIAR TODO
-// ============================================
-function iniciar() {
-    console.log("Iniciando carrusel...");
-    actualizarLoading("Preparando imágenes...");
+// INICIAR APLICACIÓN
+function iniciarApp() {
+    console.log("Iniciando carrusel para TV...");
     
-    if (MIS_IMAGENES.length === 0) {
-        actualizarLoading("No hay imágenes configuradas");
+    // Usar imágenes configuradas
+    images = IMAGENES_CONFIG;
+    
+    if (images.length === 0) {
+        mostrarError("No hay imágenes configuradas");
         return;
     }
     
-    console.log(MIS_IMAGENES.length + " imágenes configuradas");
+    console.log("Cargando " + images.length + " imágenes...");
     
-    // Limpiar track y puntos
-    track.innerHTML = '';
-    puntos.innerHTML = '';
+    // Crear carrusel
+    crearCarrusel();
     
-    // Crear slides
-    for (var i = 0; i < MIS_IMAGENES.length; i++) {
-        crearSlide(i);
+    // Mostrar primera imagen
+    mostrarImagen(0);
+    
+    // Configurar eventos
+    configurarEventos();
+    
+    // Ocultar loading
+    ocultarLoading();
+    
+    // Iniciar auto-cambio
+    iniciarAutoSlide();
+    
+    console.log("Carrusel listo ✓");
+}
+
+// CREAR CARRUSEL
+function crearCarrusel() {
+    carruselTrack.innerHTML = '';
+    carruselIndicators.innerHTML = '';
+    
+    for (var i = 0; i < images.length; i++) {
+        var imagen = images[i];
+        
+        // Crear slide
+        var slide = document.createElement('div');
+        slide.className = 'carrusel-slide';
+        slide.id = 'slide-' + i;
+        
+        var img = document.createElement('img');
+        img.className = 'carrusel-image';
+        img.src = imagen.url;
+        img.alt = imagen.title || 'Imagen ' + (i + 1);
+        
+        // Precargar imagen
+        precargarImagen(imagen.url);
+        
+        slide.appendChild(img);
+        carruselTrack.appendChild(slide);
+        
+        // Crear indicador
+        var indicador = document.createElement('div');
+        indicador.className = 'indicator';
+        if (i === 0) indicador.className += ' active';
+        
+        (function(index) {
+            indicador.addEventListener('click', function() {
+                mostrarImagen(index);
+            });
+        })(i);
+        
+        carruselIndicators.appendChild(indicador);
+    }
+}
+
+// PRECARGAR IMAGEN
+function precargarImagen(url) {
+    var img = new Image();
+    img.src = url;
+}
+
+// MOSTRAR IMAGEN ESPECÍFICA
+function mostrarImagen(indice) {
+    if (indice < 0) indice = images.length - 1;
+    if (indice >= images.length) indice = 0;
+    
+    currentSlide = indice;
+    
+    // Mover track
+    carruselTrack.style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
+    
+    // Actualizar indicadores
+    var indicadores = document.querySelectorAll('.indicator');
+    for (var i = 0; i < indicadores.length; i++) {
+        if (i === currentSlide) {
+            indicadores[i].className = 'indicator active';
+        } else {
+            indicadores[i].className = 'indicator';
+        }
     }
     
-    // Eventos
-    if (btnPrev) btnPrev.onclick = function() { anterior(); };
-    if (btnNext) btnNext.onclick = function() { siguiente(); };
+    // Actualizar contador
+    actualizarContador();
+    
+    // Reiniciar auto-slide
+    reiniciarAutoSlide();
+}
+
+// ACTUALIZAR CONTADOR
+function actualizarContador() {
+    if (imageCounter) {
+        imageCounter.textContent = (currentSlide + 1) + ' / ' + images.length;
+    }
+}
+
+// AUTO-SLIDE
+function iniciarAutoSlide() {
+    clearInterval(autoSlideInterval);
+    if (images.length > 1) {
+        autoSlideInterval = setInterval(function() {
+            siguienteSlide();
+        }, 5000);
+    }
+}
+
+function detenerAutoSlide() {
+    clearInterval(autoSlideInterval);
+}
+
+function reiniciarAutoSlide() {
+    detenerAutoSlide();
+    iniciarAutoSlide();
+}
+
+function siguienteSlide() {
+    mostrarImagen(currentSlide + 1);
+}
+
+function anteriorSlide() {
+    mostrarImagen(currentSlide - 1);
+}
+
+// CONFIGURAR EVENTOS
+function configurarEventos() {
+    if (prevBtn) prevBtn.addEventListener('click', anteriorSlide);
+    if (nextBtn) nextBtn.addEventListener('click', siguienteSlide);
     
     // Teclado
-    document.onkeydown = function(e) {
-        if (e.key === 'ArrowLeft' || e.keyCode === 37) anterior();
-        if (e.key === 'ArrowRight' || e.keyCode === 39) siguiente();
-    };
+    document.addEventListener('keydown', function(e) {
+        var key = e.key || e.keyCode;
+        if (key === 'ArrowLeft' || key === 37) anteriorSlide();
+        if (key === 'ArrowRight' || key === 39) siguienteSlide();
+    });
     
-    // Actualizar contador inicial
-    actualizarContador();
+    // Swipe
+    var startX = 0;
+    carruselTrack.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+        detenerAutoSlide();
+    });
     
-    // Esperar a que carguen las imágenes
-    setTimeout(function() {
-        if (imagenesCargadas > 0) {
-            ocultarLoading();
-            iniciarAuto();
-        } else {
-            mostrarErrorCarga();
+    carruselTrack.addEventListener('touchend', function(e) {
+        var endX = e.changedTouches[0].clientX;
+        var diff = startX - endX;
+        if (Math.abs(diff) > 50) {
+            if (diff > 0) siguienteSlide();
+            else anteriorSlide();
         }
-    }, 2000);
+        reiniciarAutoSlide();
+    });
 }
 
-// ============================================
-// CREAR SLIDE CON MANEJO DE ERRORES
-// ============================================
-function crearSlide(indice) {
-    // Crear slide
-    var slide = document.createElement('div');
-    slide.className = 'slide';
-    
-    // Crear imagen
-    var img = document.createElement('img');
-    img.alt = "Imagen " + (indice + 1);
-    
-    // Configurar eventos de carga
-    img.onload = function() {
-        console.log("✅ Imagen " + (indice + 1) + " cargada");
-        imagenesCargadas++;
-        
-        // Verificar si es la primera imagen
-        if (indice === 0) {
-            actualizarLoading("Cargando " + (MIS_IMAGENES.length - imagenesCargadas) + " imágenes más...");
-        }
-    };
-    
-    img.onerror = function() {
-        console.log("❌ Error cargando imagen " + (indice + 1));
-        // Usar imagen de placeholder
-        this.src = "https://via.placeholder.com/1920x1080/333/fff?text=Imagen+" + (indice + 1);
-        this.style.backgroundColor = "#222";
-        imagenesCargadas++; // Contar igual para seguir
-    };
-    
-    // Intentar cargar la imagen
-    img.src = MIS_IMAGENES[indice];
-    
-    slide.appendChild(img);
-    track.appendChild(slide);
-    
-    // Crear punto indicador
-    var punto = document.createElement('div');
-    punto.className = 'punto';
-    if (indice === 0) punto.className += ' activo';
-    
-    // Usar closure para capturar el índice
-    (function(index) {
-        punto.onclick = function() {
-            irASlide(index);
-        };
-    })(indice);
-    
-    puntos.appendChild(punto);
-}
-
-// ============================================
-// FUNCIONES DE NAVEGACIÓN
-// ============================================
-function irASlide(indice) {
-    if (MIS_IMAGENES.length === 0) return;
-    
-    if (indice < 0) indice = MIS_IMAGENES.length - 1;
-    if (indice >= MIS_IMAGENES.length) indice = 0;
-    
-    slideActual = indice;
-    track.style.transform = 'translateX(-' + (slideActual * 100) + '%)';
-    actualizarPuntos();
-    actualizarContador();
-    reiniciarAuto();
-}
-
-function siguiente() {
-    irASlide(slideActual + 1);
-}
-
-function anterior() {
-    irASlide(slideActual - 1);
-}
-
-function actualizarPuntos() {
-    var todosPuntos = document.querySelectorAll('.punto');
-    for (var i = 0; i < todosPuntos.length; i++) {
-        if (i === slideActual) {
-            todosPuntos[i].className = 'punto activo';
-        } else {
-            todosPuntos[i].className = 'punto';
-        }
-    }
-}
-
-function actualizarContador() {
-    if (contador) {
-        contador.textContent = (slideActual + 1) + '/' + MIS_IMAGENES.length;
-    }
-}
-
-// ============================================
-// AUTO-CAMBIO
-// ============================================
-function iniciarAuto() {
-    if (MIS_IMAGENES.length > 1) {
-        console.log("🔄 Auto-cambio cada 5 segundos");
-        intervalo = setInterval(siguiente, 5000);
-    }
-}
-
-function detenerAuto() {
-    clearInterval(intervalo);
-}
-
-function reiniciarAuto() {
-    detenerAuto();
-    iniciarAuto();
-}
-
-// ============================================
 // OCULTAR LOADING
-// ============================================
 function ocultarLoading() {
-    if (loading && carrusel) {
-        loading.style.opacity = '0';
-        carrusel.style.display = 'block';
-        carrusel.style.opacity = '0';
-        
+    if (loadingScreen) {
         setTimeout(function() {
-            loading.style.display = 'none';
-            carrusel.style.opacity = '1';
-            console.log("✅ Carrusel visible");
-        }, 300);
+            loadingScreen.style.opacity = '0';
+            setTimeout(function() {
+                loadingScreen.style.display = 'none';
+            }, 300);
+        }, 500);
     }
 }
 
-// ============================================
-// MOSTRAR ERROR DE CARGA
-// ============================================
-function mostrarErrorCarga() {
-    console.log("⚠️  Mostrando error de carga");
-    if (loadingText) {
-        loadingText.innerHTML = "Error cargando imágenes<br>" +
-            '<button onclick="location.reload()" style="margin-top:20px;padding:10px 20px;background:#fff;color:#000;border:none;border-radius:5px;cursor:pointer;">' +
-            'Reintentar</button>';
-    }
+// MOSTRAR ERROR
+function mostrarError(mensaje) {
+    console.error(mensaje);
+    if (loadingText) loadingText.textContent = mensaje;
 }
 
 // ============================================
-// INICIAR AL CARGAR LA PÁGINA
+// INICIALIZAR
 // ============================================
-window.onload = function() {
-    console.log("📄 DOM cargado");
-    setTimeout(iniciar, 500);
-};
-
-// Manejar visibilidad
-document.addEventListener('visibilitychange', function() {
-    if (document.hidden) {
-        detenerAuto();
-    } else {
-        reiniciarAuto();
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM cargado");
+    
+    // Iniciar después de un pequeño delay
+    setTimeout(function() {
+        iniciarApp();
+    }, 100);
 });
 </script>
 </body>
