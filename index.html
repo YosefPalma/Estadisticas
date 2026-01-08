@@ -1,78 +1,708 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Carrusel Simple</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Forzar HTTPS para compatibilidad con TV -->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <title>Carrusel de Imágenes</title>
+    
     <style>
-        * { margin: 0; padding: 0; }
-        body { 
-            background: black; 
-            overflow: hidden;
-            width: 100vw;
-            height: 100vh;
+        /* RESET Y ESTILOS BÁSICOS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
-        .imagen {
+        html, body {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            overflow: hidden;
+            background-color: #000;
+            font-family: Arial, sans-serif;
+        }
+        
+        /* CONTENEDOR PRINCIPAL */
+        .carrusel-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background-color: #000;
+        }
+        
+        /* PISTA DEL CARRUSEL */
+        .carrusel-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.5s ease-in-out;
+            will-change: transform; /* Optimización para TV */
+        }
+        
+        /* CADA SLIDE */
+        .carrusel-slide {
+            min-width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* IMAGEN DENTRO DEL SLIDE */
+        .carrusel-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Muestra toda la imagen sin recortar */
+            display: block;
+            background-color: #000;
+        }
+        
+        /* CONTROLES DE NAVEGACIÓN */
+        .carrusel-controls {
             position: absolute;
             top: 0;
             left: 0;
-            opacity: 0;
-            transition: opacity 1s;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none; /* Permite hacer clic a través de él */
+            z-index: 10;
         }
         
-        .imagen.activa {
-            opacity: 1;
-        }
-        
-        .contador {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.7);
+        .carrusel-btn {
+            pointer-events: auto; /* Habilita clic en los botones */
+            background-color: rgba(0, 0, 0, 0.5);
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
             color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
             font-size: 24px;
+            cursor: pointer;
+            margin: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .carrusel-btn:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+            transform: scale(1.1);
+        }
+        
+        /* INDICADORES (PUNTOS INFERIORES) */
+        .carrusel-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .indicator.active {
+            background-color: #ffffff;
+            transform: scale(1.2);
+        }
+        
+        /* CONTADOR DE IMÁGENES */
+        .image-counter {
+            position: absolute;
+            bottom: 50px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 10;
+        }
+        
+        /* MENSAJE DE CARGA */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 1000;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* MENSAJE DE ERROR */
+        .error-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+            max-width: 80%;
+        }
+        
+        /* MENSAJE SIN IMÁGENES */
+        .no-images {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+        
+        /* ESTILOS ESPECÍFICOS PARA TV LG */
+        @media (hover: none) and (pointer: coarse) {
+            /* Optimización para pantallas táctiles/control remoto */
+            .carrusel-btn {
+                width: 70px;
+                height: 70px;
+                font-size: 30px;
+                margin: 0 30px;
+            }
+            
+            .indicator {
+                width: 16px;
+                height: 16px;
+            }
+            
+            .image-counter {
+                font-size: 18px;
+                padding: 10px 20px;
+                bottom: 60px;
+            }
+        }
+        
+        /* ANIMACIÓN DE TRANSICIÓN SUAVE */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .carrusel-slide {
+            animation: fadeIn 0.5s ease-out;
         }
     </style>
 </head>
 <body>
-    <!-- IMÁGENES DIRECTAS (sin Supabase) -->
-    <img class="imagen activa" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920" alt="1">
-    <img class="imagen" src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920" alt="2">
-    <img class="imagen" src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1920" alt="3">
+    <!-- PANTALLA DE CARGA -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <p>Cargando carrusel...</p>
+    </div>
     
-    <div class="contador" id="contador">1/3</div>
+    <!-- MENSAJE DE ERROR (oculto por defecto) -->
+    <div id="error-message" class="error-message" style="display: none;">
+        <h3>Error de conexión</h3>
+        <p>No se pueden cargar las imágenes. Verifica tu conexión a internet.</p>
+        <button onclick="location.reload()" style="margin-top: 15px; padding: 10px 20px; background: white; border: none; border-radius: 5px; cursor: pointer;">
+            Reintentar
+        </button>
+    </div>
+    
+    <!-- MENSAJE SIN IMÁGENES (oculto por defecto) -->
+    <div id="no-images" class="no-images" style="display: none;">
+        <h2>No hay imágenes disponibles</h2>
+        <p>El carrusel está vacío. Agrega imágenes desde el panel de administración.</p>
+    </div>
+    
+    <!-- CONTENEDOR DEL CARRUSEL -->
+    <div class="carrusel-container" id="carrusel-container">
+        <div class="carrusel-track" id="carrusel-track">
+            <!-- Las imágenes se insertarán aquí dinámicamente -->
+        </div>
+        
+        <!-- CONTROLES DE NAVEGACIÓN -->
+        <div class="carrusel-controls">
+            <button class="carrusel-btn" id="prev-btn" aria-label="Imagen anterior">
+                ◀
+            </button>
+            <button class="carrusel-btn" id="next-btn" aria-label="Siguiente imagen">
+                ▶
+            </button>
+        </div>
+        
+        <!-- CONTADOR DE IMÁGENES -->
+        <div class="image-counter" id="image-counter">0 / 0</div>
+        
+        <!-- INDICADORES -->
+        <div class="carrusel-indicators" id="carrusel-indicators">
+            <!-- Los puntos se insertarán aquí dinámicamente -->
+        </div>
+    </div>
+
+    <!-- SCRIPT DE SUPABASE (versión ES5 compatible) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
     
     <script>
-        // CÓDIGO SUPER SIMPLE
-        var imagenes = document.querySelectorAll('.imagen');
-        var contador = document.getElementById('contador');
-        var indice = 0;
-        var total = imagenes.length;
+        // ============================================
+        // CONFIGURACIÓN DE SUPABASE (ES5)
+        // ============================================
+        var SUPABASE_URL = 'https://bgavgiajuycoenjjdlhg.supabase.co';
+        var SUPABASE_ANON_KEY = 'sb_publishable_UJiY23LT_8zNLtLUx0guWw_l760sXI7';
         
-        function cambiarImagen() {
-            // Ocultar todas
-            imagenes.forEach(img => img.classList.remove('activa'));
+        // ============================================
+        // VARIABLES GLOBALES (ES5)
+        // ============================================
+        var currentSlide = 0;
+        var autoSlideInterval;
+        var images = [];
+        var supabaseClient = null;
+        
+        // ============================================
+        // ELEMENTOS DEL DOM (ES5)
+        // ============================================
+        var carruselTrack = document.getElementById('carrusel-track');
+        var prevBtn = document.getElementById('prev-btn');
+        var nextBtn = document.getElementById('next-btn');
+        var carruselIndicators = document.getElementById('carrusel-indicators');
+        var imageCounter = document.getElementById('image-counter');
+        var loadingScreen = document.getElementById('loading-screen');
+        var errorMessage = document.getElementById('error-message');
+        var noImagesMessage = document.getElementById('no-images');
+        
+        // ============================================
+        // FUNCIONES PRINCIPALES (ES5)
+        // ============================================
+        
+        // INICIALIZAR LA APLICACIÓN
+        function inicializarApp() {
+            console.log("Iniciando carrusel para TV LG...");
             
-            // Mostrar actual
-            imagenes[indice].classList.add('activa');
-            
-            // Actualizar contador
-            contador.textContent = (indice + 1) + '/' + total;
-            
-            // Siguiente
-            indice++;
-            if (indice >= total) indice = 0;
+            // Usar callbacks en lugar de async/await
+            inicializarSupabase(function(supabaseError) {
+                if (supabaseError) {
+                    console.error("Error conectando a Supabase:", supabaseError);
+                    mostrarError();
+                    return;
+                }
+                
+                cargarImagenes(function(imagesError) {
+                    if (imagesError) {
+                        console.error("Error cargando imágenes:", imagesError);
+                        mostrarError();
+                        return;
+                    }
+                    
+                    // Configurar eventos
+                    configurarEventos();
+                    
+                    // Ocultar pantalla de carga
+                    ocultarPantallaCarga();
+                    
+                    // Iniciar auto-desplazamiento
+                    iniciarAutoDesplazamiento();
+                    
+                    console.log("Carrusel inicializado correctamente");
+                    
+                    // Suscribirse a cambios en tiempo real
+                    suscribirCambios();
+                });
+            });
         }
         
-        // Cambiar cada 5 segundos
-        setInterval(cambiarImagen, 5000);
+        // INICIALIZAR SUPABASE (con callback)
+        function inicializarSupabase(callback) {
+            console.log("Conectando a Supabase...");
+            
+            try {
+                // Crear cliente Supabase (ES5 compatible)
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                // Verificar conexión
+                supabaseClient
+                    .from('images')
+                    .select('id')
+                    .limit(1)
+                    .then(function(response) {
+                        if (response.error) {
+                            callback(new Error("Error de conexión: " + response.error.message));
+                            return;
+                        }
+                        
+                        console.log("Conexión a Supabase establecida");
+                        callback(null);
+                    })
+                    .catch(function(error) {
+                        callback(error);
+                    });
+                    
+            } catch (error) {
+                callback(error);
+            }
+        }
         
-        // Mostrar contador inicial
-        contador.textContent = '1/' + total;
+        // CARGAR IMÁGENES DESDE SUPABASE (con callback)
+        function cargarImagenes(callback) {
+            console.log("Cargando imágenes...");
+            
+            supabaseClient
+                .from('images')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .then(function(response) {
+                    if (response.error) {
+                        callback(new Error(response.error.message));
+                        return;
+                    }
+                    
+                    images = response.data || [];
+                    console.log(images.length + " imágenes cargadas");
+                    
+                    if (images.length === 0) {
+                        mostrarMensajeSinImagenes();
+                        callback(null);
+                        return;
+                    }
+                    
+                    // Actualizar el carrusel
+                    actualizarCarrusel();
+                    callback(null);
+                })
+                .catch(function(error) {
+                    callback(error);
+                });
+        }
+        
+        // ACTUALIZAR EL CARRUSEL
+        function actualizarCarrusel() {
+            // Limpiar el carrusel
+            carruselTrack.innerHTML = '';
+            carruselIndicators.innerHTML = '';
+            
+            // Crear slides para cada imagen
+            for (var i = 0; i < images.length; i++) {
+                var imagen = images[i];
+                
+                // Crear slide
+                var slide = document.createElement('div');
+                slide.className = 'carrusel-slide';
+                
+                // Crear elemento de imagen
+                var img = document.createElement('img');
+                img.className = 'carrusel-image';
+                img.src = imagen.url;
+                img.alt = imagen.title || 'Imagen ' + (i + 1);
+                
+                // Añadir a slide
+                slide.appendChild(img);
+                carruselTrack.appendChild(slide);
+                
+                // Crear indicador
+                var indicador = document.createElement('div');
+                indicador.className = 'indicator ' + (i === currentSlide ? 'active' : '');
+                indicador.setAttribute('data-index', i);
+                
+                // Usar closure para capturar el índice
+                (function(index) {
+                    indicador.addEventListener('click', function() {
+                        irASlide(index);
+                    });
+                })(i);
+                
+                carruselIndicators.appendChild(indicador);
+            }
+            
+            // Asegurar que currentSlide esté dentro del rango
+            if (currentSlide >= images.length) {
+                currentSlide = Math.max(0, images.length - 1);
+            }
+            
+            // Actualizar posición y contador
+            actualizarPosicion();
+            actualizarContador();
+        }
+        
+        // ACTUALIZAR POSICIÓN DEL CARRUSEL
+        function actualizarPosicion() {
+            if (carruselTrack) {
+                carruselTrack.style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
+            }
+        }
+        
+        // ACTUALIZAR CONTADOR
+        function actualizarContador() {
+            if (imageCounter) {
+                imageCounter.textContent = (currentSlide + 1) + ' / ' + images.length;
+            }
+            
+            // Actualizar indicadores activos
+            var indicadores = document.querySelectorAll('.indicator');
+            for (var i = 0; i < indicadores.length; i++) {
+                if (i === currentSlide) {
+                    indicadores[i].classList.add('active');
+                } else {
+                    indicadores[i].classList.remove('active');
+                }
+            }
+        }
+        
+        // INICIAR AUTO-DESPLAZAMIENTO
+        function iniciarAutoDesplazamiento() {
+            // Limpiar intervalo anterior
+            clearInterval(autoSlideInterval);
+            
+            // Solo iniciar si hay más de una imagen
+            if (images.length > 1) {
+                console.log("Iniciando auto-desplazamiento (5 segundos)");
+                
+                autoSlideInterval = setInterval(function() {
+                    siguienteSlide();
+                }, 5000);
+            }
+        }
+        
+        // DETENER AUTO-DESPLAZAMIENTO
+        function detenerAutoDesplazamiento() {
+            clearInterval(autoSlideInterval);
+        }
+        
+        // IR A SLIDE ESPECÍFICO
+        function irASlide(indice) {
+            if (images.length === 0) return;
+            
+            // Calcular nuevo índice
+            var nuevoIndice;
+            if (indice < 0) {
+                nuevoIndice = images.length - 1;
+            } else if (indice >= images.length) {
+                nuevoIndice = 0;
+            } else {
+                nuevoIndice = indice;
+            }
+            
+            // Actualizar slide actual
+            currentSlide = nuevoIndice;
+            
+            // Actualizar interfaz
+            actualizarPosicion();
+            actualizarContador();
+            
+            // Reiniciar auto-desplazamiento
+            reiniciarAutoDesplazamiento();
+        }
+        
+        // SLIDE SIGUIENTE
+        function siguienteSlide() {
+            irASlide(currentSlide + 1);
+        }
+        
+        // SLIDE ANTERIOR
+        function slideAnterior() {
+            irASlide(currentSlide - 1);
+        }
+        
+        // REINICIAR AUTO-DESPLAZAMIENTO
+        function reiniciarAutoDesplazamiento() {
+            detenerAutoDesplazamiento();
+            iniciarAutoDesplazamiento();
+        }
+        
+        // CONFIGURAR EVENTOS
+        function configurarEventos() {
+            // Botones de navegación
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function() {
+                    slideAnterior();
+                });
+            }
+            
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function() {
+                    siguienteSlide();
+                });
+            }
+            
+            // Teclado (para control remoto)
+            document.addEventListener('keydown', function(e) {
+                var key = e.key || e.keyCode;
+                
+                if (key === 'ArrowLeft' || key === 'Left' || key === 37) {
+                    slideAnterior();
+                } else if (key === 'ArrowRight' || key === 'Right' || key === 39) {
+                    siguienteSlide();
+                } else if (key === ' ' || key === 'Enter' || key === 32 || key === 13) {
+                    // Pausar/reanudar auto-desplazamiento
+                    if (autoSlideInterval) {
+                        detenerAutoDesplazamiento();
+                        console.log("Auto-desplazamiento pausado");
+                    } else {
+                        iniciarAutoDesplazamiento();
+                        console.log("Auto-desplazamiento reanudado");
+                    }
+                }
+            });
+            
+            // Swipe para pantallas táctiles
+            var inicioX = 0;
+            
+            if (carruselTrack) {
+                carruselTrack.addEventListener('touchstart', function(e) {
+                    inicioX = e.touches[0].clientX;
+                    detenerAutoDesplazamiento();
+                }, { passive: true });
+                
+                carruselTrack.addEventListener('touchend', function(e) {
+                    var finX = e.changedTouches[0].clientX;
+                    var diferencia = inicioX - finX;
+                    var umbral = 50;
+                    
+                    if (Math.abs(diferencia) > umbral) {
+                        if (diferencia > 0) {
+                            siguienteSlide();
+                        } else {
+                            slideAnterior();
+                        }
+                    }
+                    
+                    // Reanudar después de 5 segundos
+                    setTimeout(function() {
+                        iniciarAutoDesplazamiento();
+                    }, 5000);
+                }, { passive: true });
+                
+                // Pausar auto-desplazamiento al interactuar
+                carruselTrack.addEventListener('mouseenter', detenerAutoDesplazamiento);
+                carruselTrack.addEventListener('mouseleave', iniciarAutoDesplazamiento);
+            }
+            
+            // Pausar al hacer clic en indicadores
+            if (carruselIndicators) {
+                carruselIndicators.addEventListener('click', detenerAutoDesplazamiento);
+            }
+        }
+        
+        // OCULTAR PANTALLA DE CARGA
+        function ocultarPantallaCarga() {
+            if (loadingScreen) {
+                setTimeout(function() {
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(function() {
+                        loadingScreen.style.display = 'none';
+                    }, 500);
+                }, 500);
+            }
+        }
+        
+        // MOSTRAR ERROR
+        function mostrarError() {
+            if (loadingScreen) loadingScreen.style.display = 'none';
+            if (errorMessage) errorMessage.style.display = 'block';
+        }
+        
+        // MOSTRAR MENSAJE SIN IMÁGENES
+        function mostrarMensajeSinImagenes() {
+            if (loadingScreen) loadingScreen.style.display = 'none';
+            if (noImagesMessage) noImagesMessage.style.display = 'block';
+        }
+        
+        // ============================================
+        // SUSCRIPCIÓN EN TIEMPO REAL (ES5)
+        // ============================================
+        function suscribirCambios() {
+            if (!supabaseClient) return;
+            
+            try {
+                // Suscribirse a cambios en la tabla de imágenes
+                var subscription = supabaseClient
+                    .from('images')
+                    .on('*', function() {
+                        console.log("Cambio detectado, recargando imágenes...");
+                        cargarImagenes(function(error) {
+                            if (error) {
+                                console.error("Error recargando imágenes:", error);
+                            }
+                        });
+                    })
+                    .subscribe();
+                
+                console.log("Suscrito a cambios en tiempo real");
+                
+            } catch (error) {
+                console.error("Error en suscripción:", error);
+            }
+        }
+        
+        // ============================================
+        // INICIALIZAR AL CARGAR LA PÁGINA (ES5)
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM cargado, iniciando aplicación...");
+            
+            // Configurar manejo de errores global
+            window.onerror = function(msg, url, lineNo, columnNo, error) {
+                console.error('Error global:', msg);
+                return false;
+            };
+            
+            // Iniciar la aplicación
+            setTimeout(function() {
+                inicializarApp();
+            }, 100);
+            
+            // Mantener activa la conexión
+            setInterval(function() {
+                if (supabaseClient && images.length === 0) {
+                    cargarImagenes(function(error) {
+                        if (error) {
+                            console.error("Error recargando imágenes:", error);
+                        }
+                    });
+                }
+            }, 30000);
+        });
+        
+        // Manejar visibilidad de la página
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                console.log("Página oculta, pausando auto-desplazamiento");
+                detenerAutoDesplazamiento();
+            } else {
+                console.log("Página visible, reanudando auto-desplazamiento");
+                iniciarAutoDesplazamiento();
+            }
+        });
     </script>
 </body>
 </html>
