@@ -9,7 +9,13 @@
     <style>
         /* ESTILOS BÁSICOS */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: Arial; }
+        html, body { 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+            background: #000; 
+            font-family: Arial, sans-serif; 
+        }
         
         /* CARRUSEL - MÉTODO ALTERNATIVO */
         .carrusel-container { 
@@ -52,7 +58,7 @@
             background: #000; 
         }
         
-        /* CONTROLES */
+        /* CONTROLES DEL CARRUSEL */
         .carrusel-controls { 
             position: absolute; 
             top: 50%; 
@@ -118,6 +124,165 @@
             z-index: 10; 
         }
         
+        /* BOTÓN DE ADMIN OCULTO */
+        .admin-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            opacity: 0.2;
+        }
+        
+        .admin-btn:hover {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.5);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        /* PANEL DE ADMIN (OCULTO) */
+        .admin-panel {
+            position: fixed;
+            top: 60px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            width: 300px;
+            z-index: 99;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        .admin-panel.mostrado {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .admin-panel h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 8px;
+        }
+        
+        .admin-panel p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        .admin-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .admin-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .admin-btn-small {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .admin-btn-small:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .admin-btn-small.primary {
+            background: rgba(59, 130, 246, 0.8);
+            border-color: rgba(59, 130, 246, 0.9);
+        }
+        
+        .admin-btn-small.primary:hover {
+            background: rgba(59, 130, 246, 1);
+        }
+        
+        .admin-btn-small.danger {
+            background: rgba(239, 68, 68, 0.8);
+            border-color: rgba(239, 68, 68, 0.9);
+        }
+        
+        .admin-btn-small.danger:hover {
+            background: rgba(239, 68, 68, 1);
+        }
+        
+        .imagenes-lista {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .imagen-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+        }
+        
+        .imagen-item:last-child {
+            border-bottom: none;
+        }
+        
+        .imagen-item button {
+            background: rgba(239, 68, 68, 0.7);
+            border: none;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        
+        .imagen-item button:hover {
+            background: rgba(239, 68, 68, 1);
+        }
+        
         /* LOADING */
         .loading-screen { 
             position: fixed; 
@@ -147,6 +312,43 @@
         @keyframes spin { 
             to { transform: rotate(360deg); } 
         }
+        
+        /* MENSAJES */
+        .mensaje-flotante {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .mensaje-flotante.mostrado {
+            display: block;
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .admin-panel {
+                width: 250px;
+                left: 10px;
+            }
+            
+            .admin-btn {
+                top: 10px;
+                left: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -154,6 +356,44 @@
     <div id="loading-screen" class="loading-screen">
         <div class="loading-spinner"></div>
         <p id="loading-text">Cargando...</p>
+    </div>
+    
+    <!-- BOTÓN DE ADMIN OCULTO -->
+    <button class="admin-btn" id="admin-toggle" title="Panel de control">
+        ⚙️
+    </button>
+    
+    <!-- PANEL DE ADMIN -->
+    <div class="admin-panel" id="admin-panel">
+        <h3>📱 Panel de Control</h3>
+        <p>Desde aquí puedes cambiar las imágenes del carrusel desde tu celular o computadora.</p>
+        
+        <div class="imagenes-lista" id="imagenes-lista">
+            <!-- Las imágenes se listarán aquí -->
+        </div>
+        
+        <input type="text" class="admin-input" id="url-input" placeholder="https://ejemplo.com/imagen.jpg">
+        
+        <button class="admin-btn-small primary" id="btn-agregar">
+            ➕ Agregar Imagen
+        </button>
+        
+        <button class="admin-btn-small" id="btn-actualizar">
+            🔄 Actualizar desde JSON
+        </button>
+        
+        <button class="admin-btn-small danger" id="btn-limpiar">
+            🗑️ Limpiar Todo
+        </button>
+        
+        <p style="margin-top: 15px; font-size: 10px; color: rgba(255,255,255,0.4);">
+            Enlace de control: <span id="control-link">Cargando...</span>
+        </p>
+    </div>
+    
+    <!-- MENSAJE FLOTANTE -->
+    <div class="mensaje-flotante" id="mensaje">
+        Mensaje de confirmación
     </div>
     
     <!-- CARRUSEL -->
@@ -171,7 +411,7 @@
 
 <script>
 // ============================================
-// CONFIGURACIÓN - TUS IMÁGENES
+// CONFIGURACIÓN INICIAL
 // ============================================
 var IMAGENES_CONFIG = [
     {
@@ -202,24 +442,36 @@ var imageCounter = document.getElementById('image-counter');
 var loadingScreen = document.getElementById('loading-screen');
 var loadingText = document.getElementById('loading-text');
 var carruselContainer = document.getElementById('carrusel-container');
+var adminToggle = document.getElementById('admin-toggle');
+var adminPanel = document.getElementById('admin-panel');
+var urlInput = document.getElementById('url-input');
+var btnAgregar = document.getElementById('btn-agregar');
+var btnActualizar = document.getElementById('btn-actualizar');
+var btnLimpiar = document.getElementById('btn-limpiar');
+var imagenesLista = document.getElementById('imagenes-lista');
+var mensaje = document.getElementById('mensaje');
+var controlLink = document.getElementById('control-link');
 
 // ============================================
-// FUNCIONES PRINCIPALES - MÉTODO ALTERNATIVO
+// FUNCIONES DEL CARRUSEL
 // ============================================
 
 // INICIAR APLICACIÓN
 function iniciarApp() {
-    console.log("🚀 Iniciando carrusel (método alternativo)...");
+    console.log("🚀 Iniciando carrusel...");
     
-    // Usar imágenes configuradas
-    images = IMAGENES_CONFIG;
+    // Cargar imágenes desde localStorage si existen
+    cargarImagenesDesdeStorage();
     
     if (images.length === 0) {
-        mostrarError("No hay imágenes configuradas");
-        return;
+        // Usar configuración inicial
+        images = IMAGENES_CONFIG;
     }
     
     console.log("📸 " + images.length + " imágenes encontradas");
+    
+    // Actualizar link de control
+    actualizarControlLink();
     
     // Crear carrusel
     crearCarruselAlternativo();
@@ -228,7 +480,8 @@ function iniciarApp() {
     mostrarImagenAlternativo(0);
     
     // Configurar eventos
-    configurarEventos();
+    configurarEventosCarrusel();
+    configurarEventosAdmin();
     
     // Ocultar loading y mostrar carrusel
     ocultarLoading();
@@ -239,7 +492,7 @@ function iniciarApp() {
     console.log("✅ Carrusel listo");
 }
 
-// CREAR CARRUSEL (MÉTODO ALTERNATIVO)
+// CREAR CARRUSEL
 function crearCarruselAlternativo() {
     console.log("🛠️ Creando carrusel...");
     
@@ -249,7 +502,7 @@ function crearCarruselAlternativo() {
     for (var i = 0; i < images.length; i++) {
         var imagen = images[i];
         
-        // Crear slide con posición absoluta
+        // Crear slide
         var slide = document.createElement('div');
         slide.className = 'carrusel-slide';
         slide.id = 'slide-' + i;
@@ -259,7 +512,7 @@ function crearCarruselAlternativo() {
         img.className = 'carrusel-image';
         img.alt = imagen.title || 'Imagen ' + (i + 1);
         
-        // Cargar imagen con manejo de errores
+        // Cargar imagen
         cargarImagenConFallback(imagen.url, img, i);
         
         slide.appendChild(img);
@@ -270,7 +523,6 @@ function crearCarruselAlternativo() {
         indicador.className = 'indicator';
         if (i === 0) indicador.className += ' active';
         
-        // Usar closure para capturar el índice
         (function(index) {
             indicador.addEventListener('click', function() {
                 mostrarImagenAlternativo(index);
@@ -279,41 +531,21 @@ function crearCarruselAlternativo() {
         
         carruselIndicators.appendChild(indicador);
     }
+    
+    // Actualizar lista de imágenes en panel admin
+    actualizarListaImagenes();
 }
 
-// CARGAR IMAGEN CON FALLBACK
-function cargarImagenConFallback(url, imgElement, index) {
-    var imgTest = new Image();
-    
-    imgTest.onload = function() {
-        console.log("✅ Imagen " + (index + 1) + " cargada");
-        imgElement.src = url;
-    };
-    
-    imgTest.onerror = function() {
-        console.log("⚠️  Error cargando imagen " + (index + 1));
-        // Usar placeholder
-        imgElement.src = "https://via.placeholder.com/1920x1080/333/fff?text=Imagen+" + (index + 1);
-        imgElement.style.backgroundColor = "#222";
-    };
-    
-    imgTest.src = url;
-}
-
-// MOSTRAR IMAGEN (MÉTODO ALTERNATIVO - SIN TRANSFORM)
+// MOSTRAR IMAGEN
 function mostrarImagenAlternativo(indice) {
     if (images.length === 0) return;
     
-    // Calcular nuevo índice
     if (indice < 0) indice = images.length - 1;
     if (indice >= images.length) indice = 0;
     
     console.log("🔄 Cambiando a imagen " + (indice + 1));
     
-    // Guardar slide anterior
     var slideAnterior = currentSlide;
-    
-    // Actualizar slide actual
     currentSlide = indice;
     
     // Ocultar slide anterior
@@ -338,7 +570,344 @@ function mostrarImagenAlternativo(indice) {
     reiniciarAutoSlide();
 }
 
-// ACTUALIZAR INDICADORES
+// ============================================
+// FUNCIONES DEL PANEL DE ADMIN
+// ============================================
+
+// MOSTRAR/OCULTAR PANEL
+function togglePanelAdmin() {
+    if (adminPanel.classList.contains('mostrado')) {
+        adminPanel.classList.remove('mostrado');
+        adminToggle.innerHTML = '⚙️';
+    } else {
+        adminPanel.classList.add('mostrado');
+        adminToggle.innerHTML = '✕';
+        urlInput.focus();
+    }
+}
+
+// ACTUALIZAR LISTA DE IMÁGENES
+function actualizarListaImagenes() {
+    imagenesLista.innerHTML = '';
+    
+    if (images.length === 0) {
+        imagenesLista.innerHTML = '<div style="color: rgba(255,255,255,0.5); text-align: center; padding: 20px;">No hay imágenes</div>';
+        return;
+    }
+    
+    for (var i = 0; i < images.length; i++) {
+        var imagen = images[i];
+        var item = document.createElement('div');
+        item.className = 'imagen-item';
+        
+        // Acortar URL para mostrar
+        var urlCorta = imagen.url.length > 30 ? 
+            imagen.url.substring(0, 30) + '...' : 
+            imagen.url;
+        
+        item.innerHTML = `
+            <span>${i + 1}. ${urlCorta}</span>
+            <button data-index="${i}">✕</button>
+        `;
+        
+        // Agregar evento para eliminar
+        var btnEliminar = item.querySelector('button');
+        btnEliminar.addEventListener('click', function() {
+            var index = parseInt(this.getAttribute('data-index'));
+            eliminarImagen(index);
+        });
+        
+        imagenesLista.appendChild(item);
+    }
+}
+
+// AGREGAR IMAGEN
+function agregarImagen() {
+    var url = urlInput.value.trim();
+    
+    if (!url) {
+        mostrarMensaje('⚠️ Ingresa una URL válida', 'warning');
+        return;
+    }
+    
+    if (!url.startsWith('http')) {
+        mostrarMensaje('⚠️ La URL debe comenzar con http:// o https://', 'warning');
+        return;
+    }
+    
+    // Verificar si ya existe
+    for (var i = 0; i < images.length; i++) {
+        if (images[i].url === url) {
+            mostrarMensaje('⚠️ Esta imagen ya está en la lista', 'warning');
+            return;
+        }
+    }
+    
+    // Agregar nueva imagen
+    var nuevaImagen = {
+        url: url,
+        title: 'Imagen ' + (images.length + 1)
+    };
+    
+    images.push(nuevaImagen);
+    guardarImagenesEnStorage();
+    
+    // Actualizar carrusel
+    crearCarruselAlternativo();
+    mostrarImagenAlternativo(currentSlide);
+    
+    // Limpiar input
+    urlInput.value = '';
+    
+    // Mostrar mensaje
+    mostrarMensaje('✅ Imagen agregada correctamente', 'success');
+    
+    console.log('➕ Imagen agregada:', url);
+}
+
+// ELIMINAR IMAGEN
+function eliminarImagen(index) {
+    if (index < 0 || index >= images.length) return;
+    
+    if (confirm('¿Eliminar esta imagen?')) {
+        images.splice(index, 1);
+        guardarImagenesEnStorage();
+        
+        // Ajustar currentSlide si es necesario
+        if (currentSlide >= images.length) {
+            currentSlide = Math.max(0, images.length - 1);
+        }
+        
+        // Actualizar carrusel
+        crearCarruselAlternativo();
+        mostrarImagenAlternativo(currentSlide);
+        
+        mostrarMensaje('🗑️ Imagen eliminada', 'info');
+    }
+}
+
+// LIMPIAR TODAS LAS IMÁGENES
+function limpiarImagenes() {
+    if (images.length === 0) {
+        mostrarMensaje('ℹ️ No hay imágenes para limpiar', 'info');
+        return;
+    }
+    
+    if (confirm('¿Eliminar TODAS las imágenes?')) {
+        images = [];
+        guardarImagenesEnStorage();
+        
+        currentSlide = 0;
+        crearCarruselAlternativo();
+        mostrarImagenAlternativo(0);
+        
+        mostrarMensaje('🗑️ Todas las imágenes eliminadas', 'info');
+    }
+}
+
+// ACTUALIZAR DESDE JSON EXTERNO
+function actualizarDesdeJSON() {
+    var urlJSON = prompt('Ingresa la URL del archivo JSON:', 'https://tuservidor.com/imagenes.json');
+    
+    if (!urlJSON) return;
+    
+    mostrarMensaje('⏳ Cargando imágenes desde JSON...', 'info');
+    
+    // Usar XMLHttpRequest para cargar JSON
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', urlJSON, true);
+    
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            try {
+                var data = JSON.parse(xhr.responseText);
+                
+                if (data && Array.isArray(data)) {
+                    images = data;
+                    guardarImagenesEnStorage();
+                    
+                    currentSlide = 0;
+                    crearCarruselAlternativo();
+                    mostrarImagenAlternativo(0);
+                    
+                    mostrarMensaje('✅ Imágenes actualizadas desde JSON', 'success');
+                } else {
+                    mostrarMensaje('❌ El JSON no contiene un array válido', 'error');
+                }
+            } catch (e) {
+                mostrarMensaje('❌ Error al procesar el JSON: ' + e.message, 'error');
+            }
+        } else {
+            mostrarMensaje('❌ Error al cargar el JSON: ' + xhr.status, 'error');
+        }
+    };
+    
+    xhr.onerror = function() {
+        mostrarMensaje('❌ Error de red al cargar el JSON', 'error');
+    };
+    
+    xhr.send();
+}
+
+// ============================================
+// FUNCIONES AUXILIARES
+// ============================================
+
+// GUARDAR/CARGAR EN LOCALSTORAGE
+function guardarImagenesEnStorage() {
+    try {
+        localStorage.setItem('carrusel_imagenes', JSON.stringify(images));
+        localStorage.setItem('carrusel_ultima_actualizacion', new Date().toISOString());
+    } catch (e) {
+        console.log('⚠️ No se pudo guardar en localStorage');
+    }
+}
+
+function cargarImagenesDesdeStorage() {
+    try {
+        var guardadas = localStorage.getItem('carrusel_imagenes');
+        if (guardadas) {
+            images = JSON.parse(guardadas);
+            return true;
+        }
+    } catch (e) {
+        console.log('⚠️ Error cargando desde localStorage');
+    }
+    return false;
+}
+
+// MOSTRAR MENSAJE
+function mostrarMensaje(texto, tipo) {
+    mensaje.textContent = texto;
+    mensaje.className = 'mensaje-flotante mostrado';
+    
+    // Color según tipo
+    var borderColor = '#3b82f6'; // azul por defecto
+    if (tipo === 'success') borderColor = '#10b981';
+    if (tipo === 'error') borderColor = '#ef4444';
+    if (tipo === 'warning') borderColor = '#f59e0b';
+    if (tipo === 'info') borderColor = '#3b82f6';
+    
+    mensaje.style.borderLeftColor = borderColor;
+    
+    // Ocultar después de 3 segundos
+    setTimeout(function() {
+        mensaje.classList.remove('mostrado');
+    }, 3000);
+}
+
+// ACTUALIZAR LINK DE CONTROL
+function actualizarControlLink() {
+    var urlActual = window.location.href;
+    controlLink.textContent = urlActual;
+    
+    // Hacer clicable
+    controlLink.style.cursor = 'pointer';
+    controlLink.style.textDecoration = 'underline';
+    controlLink.style.color = '#3b82f6';
+    
+    controlLink.onclick = function() {
+        navigator.clipboard.writeText(urlActual)
+            .then(function() {
+                mostrarMensaje('✅ Enlace copiado al portapapeles', 'success');
+            })
+            .catch(function() {
+                // Fallback para navegadores antiguos
+                var tempInput = document.createElement('input');
+                tempInput.value = urlActual;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                mostrarMensaje('✅ Enlace copiado', 'success');
+            });
+    };
+}
+
+// ============================================
+// CONFIGURACIÓN DE EVENTOS
+// ============================================
+
+function configurarEventosCarrusel() {
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function() {
+            anteriorSlide();
+        });
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function() {
+            siguienteSlide();
+        });
+    }
+    
+    // Teclado
+    document.addEventListener('keydown', function(e) {
+        var key = e.key || e.keyCode;
+        
+        if (key === 'ArrowLeft' || key === 37) {
+            anteriorSlide();
+        } else if (key === 'ArrowRight' || key === 39) {
+            siguienteSlide();
+        } else if (key === 'Escape' || key === 27) {
+            // Ocultar panel admin con ESC
+            adminPanel.classList.remove('mostrado');
+            adminToggle.innerHTML = '⚙️';
+        }
+    });
+}
+
+function configurarEventosAdmin() {
+    // Toggle panel
+    adminToggle.addEventListener('click', togglePanelAdmin);
+    
+    // Agregar imagen
+    btnAgregar.addEventListener('click', agregarImagen);
+    
+    // Permitir Enter en input
+    urlInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            agregarImagen();
+        }
+    });
+    
+    // Actualizar desde JSON
+    btnActualizar.addEventListener('click', actualizarDesdeJSON);
+    
+    // Limpiar todo
+    btnLimpiar.addEventListener('click', limpiarImagenes);
+    
+    // Cerrar panel al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        if (!adminPanel.contains(e.target) && 
+            !adminToggle.contains(e.target) && 
+            adminPanel.classList.contains('mostrado')) {
+            togglePanelAdmin();
+        }
+    });
+}
+
+// ============================================
+// FUNCIONES RESTANTES (igual que antes)
+// ============================================
+
+function cargarImagenConFallback(url, imgElement, index) {
+    var imgTest = new Image();
+    
+    imgTest.onload = function() {
+        console.log("✅ Imagen " + (index + 1) + " cargada");
+        imgElement.src = url;
+    };
+    
+    imgTest.onerror = function() {
+        console.log("⚠️ Error cargando imagen " + (index + 1));
+        imgElement.src = "https://via.placeholder.com/1920x1080/333/fff?text=Imagen+" + (index + 1);
+        imgElement.style.backgroundColor = "#222";
+    };
+    
+    imgTest.src = url;
+}
+
 function actualizarIndicadores() {
     var indicadores = document.querySelectorAll('.indicator');
     for (var i = 0; i < indicadores.length; i++) {
@@ -350,18 +919,15 @@ function actualizarIndicadores() {
     }
 }
 
-// ACTUALIZAR CONTADOR
 function actualizarContador() {
     if (imageCounter) {
         imageCounter.textContent = (currentSlide + 1) + ' / ' + images.length;
     }
 }
 
-// AUTO-SLIDE
 function iniciarAutoSlide() {
     clearInterval(autoSlideInterval);
     if (images.length > 1) {
-        console.log("⏰ Auto-cambio cada 5 segundos");
         autoSlideInterval = setInterval(function() {
             siguienteSlide();
         }, 5000);
@@ -385,71 +951,9 @@ function anteriorSlide() {
     mostrarImagenAlternativo(currentSlide - 1);
 }
 
-// CONFIGURAR EVENTOS
-function configurarEventos() {
-    if (prevBtn) {
-        prevBtn.addEventListener('click', function() {
-            console.log("⬅️  Botón anterior presionado");
-            anteriorSlide();
-        });
-    }
-    
-    if (nextBtn) {
-        nextBtn.addEventListener('click', function() {
-            console.log("➡️  Botón siguiente presionado");
-            siguienteSlide();
-        });
-    }
-    
-    // Teclado
-    document.addEventListener('keydown', function(e) {
-        var key = e.key || e.keyCode;
-        
-        if (key === 'ArrowLeft' || key === 37 || key === 'Left') {
-            console.log("⬅️  Tecla izquierda presionada");
-            anteriorSlide();
-        } else if (key === 'ArrowRight' || key === 39 || key === 'Right') {
-            console.log("➡️  Tecla derecha presionada");
-            siguienteSlide();
-        }
-    });
-    
-    // Swipe para pantallas táctiles
-    var startX = 0;
-    if (carruselTrack) {
-        carruselTrack.addEventListener('touchstart', function(e) {
-            startX = e.touches[0].clientX;
-            detenerAutoSlide();
-        });
-        
-        carruselTrack.addEventListener('touchend', function(e) {
-            var endX = e.changedTouches[0].clientX;
-            var diff = startX - endX;
-            
-            if (Math.abs(diff) > 50) {
-                if (diff > 0) {
-                    console.log("👆 Swipe izquierda detectado");
-                    siguienteSlide();
-                } else {
-                    console.log("👆 Swipe derecha detectado");
-                    anteriorSlide();
-                }
-            }
-            
-            reiniciarAutoSlide();
-        });
-    }
-}
-
-// OCULTAR LOADING
 function ocultarLoading() {
     if (loadingScreen && carruselContainer) {
-        console.log("👁️  Mostrando carrusel...");
-        
-        // Ocultar loading
         loadingScreen.style.opacity = '0';
-        
-        // Mostrar carrusel
         carruselContainer.style.display = 'block';
         carruselContainer.style.opacity = '0';
         
@@ -460,35 +964,22 @@ function ocultarLoading() {
     }
 }
 
-// MOSTRAR ERROR
-function mostrarError(mensaje) {
-    console.error("❌ " + mensaje);
-    if (loadingText) {
-        loadingText.textContent = mensaje;
-        loadingText.style.color = '#ff4444';
-    }
-}
-
 // ============================================
 // INICIALIZAR
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
     console.log("📄 DOM cargado");
     
-    // Iniciar después de un pequeño delay
     setTimeout(function() {
         iniciarApp();
     }, 100);
 });
 
-// Manejar visibilidad para optimizar TV
 document.addEventListener('visibilitychange', function() {
     if (document.hidden) {
-        console.log("👻 Página oculta, pausando auto-slide");
         detenerAutoSlide();
     } else {
-        console.log("👀 Página visible, reanudando auto-slide");
-        iniciarAutoSlide();
+        reiniciarAutoSlide();
     }
 });
 </script>
