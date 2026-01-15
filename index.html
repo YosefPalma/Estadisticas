@@ -333,6 +333,7 @@ function crearCarruselAlternativo() {
             video.className = 'carrusel-video';
             video.id = 'video-' + i;
             video.dataset.index = i;
+            video.muted = true; // Silenciar video
             video.playsinline = true;
             video.preload = 'metadata'; // Precargar solo metadatos
             video.loop = false; // NO loop, se reproduce una vez
