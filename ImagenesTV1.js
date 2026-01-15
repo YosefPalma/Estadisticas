@@ -39,7 +39,7 @@ var IMAGENES_CONFIG = [
     {
         url: "https://image2url.com/r2/default/images/1768487438406-dad867cb-d3ba-4c1c-90e2-a41f39886254.jpeg",
         title: "Imagen 8"
-    }
+    },
     {
         url: "https://image2url.com/r2/default/images/1768339851577-ad1307f1-4f01-4a18-8356-3c009d521fd3.jpeg",
         title: "Imagen 9"
