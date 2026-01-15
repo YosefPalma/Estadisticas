@@ -3,9 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <!-- Quitar CSP para desarrollo local -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> -->
     <title>Carrusel de Imágenes y Videos</title>
-    <script src="/ImagenesTV1.js"></script>
+    
+    <!-- Archivo de configuración de imágenes/videos -->
+    <!-- IMPORTANTE: Crear este archivo ImagenesTV1.js -->
+    <!-- Ejemplo de contenido:
+    var IMAGENES_CONFIG = [
+        {url: "videos/video1.mp4", title: "Video 1"},
+        {url: "imagenes/foto1.jpg", title: "Imagen 1"},
+        {url: "videos/video2.mp4", title: "Video 2"}
+    ];
+    -->
+    <script src="./ImagenesTV1.js"></script>
+    
     <style>
         /* ESTILOS BÁSICOS */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -81,6 +93,11 @@
         
         .time-counter.video {
             background: rgba(0, 100, 200, 0.7);
+            cursor: pointer;
+        }
+        
+        .time-counter.video.error {
+            background: rgba(200, 50, 50, 0.7);
         }
         
         /* CONTROLES */
@@ -111,6 +128,12 @@
             justify-content: center; 
         }
         
+        .carrusel-btn:hover {
+            background: rgba(0,0,0,0.8);
+            transform: scale(1.1);
+            transition: all 0.2s;
+        }
+        
         /* INDICADORES */
         .carrusel-indicators { 
             position: absolute; 
@@ -129,6 +152,12 @@
             border-radius: 50%; 
             background: rgba(255,255,255,0.3); 
             cursor: pointer; 
+            transition: all 0.3s;
+        }
+        
+        .indicator:hover {
+            transform: scale(1.3);
+            background: rgba(255,255,255,0.7);
         }
         
         .indicator.active { 
@@ -173,6 +202,7 @@
             justify-content: center; 
             color: white; 
             z-index: 1000; 
+            transition: opacity 0.5s;
         }
         
         .loading-spinner { 
@@ -189,31 +219,88 @@
             to { transform: rotate(360deg); } 
         }
         
+        /* MENSAJE DE ERROR */
+        .error-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(200, 50, 50, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 1001;
+            display: none;
+            text-align: center;
+            max-width: 80%;
+        }
+        
+        .error-message button {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: white;
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        /* BOTÓN DE SONIDO */
+        .sound-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
     </style>
-    <head>
-        <meta http-equiv="refresh" content="316;url=https://estadisticasooe.netlify.app/">
-    </head>
 </head>
 <body>
     <!-- PANTALLA DE CARGA -->
     <div id="loading-screen" class="loading-screen">
         <div class="loading-spinner"></div>
-        <p id="loading-text">Cargando...</p>
+        <p id="loading-text">Cargando carrusel...</p>
+        <p id="browser-warning" style="font-size: 12px; color: #aaa; margin-top: 10px; display: none;">
+            Si los videos no se reproducen, haz click en la pantalla
+        </p>
+    </div>
+    
+    <!-- MENSAJE DE ERROR -->
+    <div id="error-message" class="error-message">
+        <p id="error-text"></p>
+        <button onclick="reintentarCarga()">Reintentar</button>
+        <button onclick="continuarSinVideos()" style="margin-left: 10px;">Continuar sin videos</button>
     </div>
     
     <!-- CARRUSEL -->
     <div class="carrusel-container" id="carrusel-container" style="display: none;">
         <div class="carrusel-track" id="carrusel-track"></div>
         
+        <!-- Botón de sonido (solo para videos) -->
+        <button class="sound-btn" id="sound-btn" style="display: none;" title="Activar/desactivar sonido">
+            🔇
+        </button>
+        
         <div class="carrusel-controls">
-            <button class="carrusel-btn" id="prev-btn">◀</button>
-            <button class="carrusel-btn" id="btn-next">▶</button>
+            <button class="carrusel-btn" id="prev-btn" title="Anterior">◀</button>
+            <button class="carrusel-btn" id="next-btn" title="Siguiente">▶</button>
         </div>
         
         <div class="image-counter" id="image-counter">0 / 0</div>
         <div class="time-counter" id="time-counter"></div>
         <div class="carrusel-indicators" id="carrusel-indicators"></div>
     </div>
+
 <script>
 // ============================================
 // VARIABLES GLOBALES
@@ -224,20 +311,44 @@ var videoEndTimeout;
 var images = [];
 var videoElements = [];
 var timeCounter = null;
-var slideDurations = {}; // Almacena duración de cada slide
+var slideDurations = {};
+var isSoundEnabled = false; // Sonido desactivado por defecto para autoplay
 
 // ============================================
 // CONSTANTES DE CONFIGURACIÓN
 // ============================================
-var IMAGE_DURATION = 25000; // 25 segundos para imágenes
+var IMAGE_DURATION = 1000; // 25 segundos para imágenes
 var VIDEO_END_BUFFER = 500; // 500ms después de terminar video
+var VIDEO_CONFIG = {
+    MUTED_FOR_AUTOPLAY: true, // Los videos muted pueden autoplay
+    RETRY_ATTEMPTS: 3, // Intentos de reproducción
+    RETRY_DELAY: 1000, // 1 segundo entre intentos
+    FALLBACK_IMAGE_DURATION: 10000 // 10 segundos si falla el video
+};
+
+// ============================================
+// ELEMENTOS DOM
+// ============================================
+var carruselTrack = document.getElementById('carrusel-track');
+var prevBtn = document.getElementById('prev-btn');
+var nextBtn = document.getElementById('next-btn');
+var carruselIndicators = document.getElementById('carrusel-indicators');
+var imageCounter = document.getElementById('image-counter');
+var timeCounterElement = document.getElementById('time-counter');
+var loadingScreen = document.getElementById('loading-screen');
+var loadingText = document.getElementById('loading-text');
+var browserWarning = document.getElementById('browser-warning');
+var carruselContainer = document.getElementById('carrusel-container');
+var errorMessage = document.getElementById('error-message');
+var errorText = document.getElementById('error-text');
+var soundBtn = document.getElementById('sound-btn');
 
 // ============================================
 // FUNCIONES AUXILIARES PARA DETECTAR TIPO
 // ============================================
 function esArchivoDeVideo(url) {
     if (!url) return false;
-    var extensionesVideo = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv', '.m4v', '.wmv'];
+    var extensionesVideo = ['.mp4', '.webm', '.ogg', '.ogv', '.mov', '.avi', '.mkv', '.m4v', '.wmv', '.flv', '.3gp'];
     var urlLower = url.toLowerCase();
     return extensionesVideo.some(ext => urlLower.includes(ext)) || 
            urlLower.includes('video/');
@@ -251,21 +362,43 @@ function obtenerTipoVideo(url) {
     if (urlLower.includes('.mov')) return 'video/quicktime';
     if (urlLower.includes('.avi')) return 'video/x-msvideo';
     if (urlLower.includes('.wmv')) return 'video/x-ms-wmv';
-    return 'video/mp4';
+    if (urlLower.includes('.flv')) return 'video/x-flv';
+    if (urlLower.includes('.3gp')) return 'video/3gpp';
+    if (urlLower.includes('.mkv')) return 'video/x-matroska';
+    return 'video/mp4'; // Por defecto, asumir MP4
 }
 
 // ============================================
-// ELEMENTOS DOM
+// DETECCIÓN DE COMPATIBILIDAD DEL NAVEGADOR
 // ============================================
-var carruselTrack = document.getElementById('carrusel-track');
-var prevBtn = document.getElementById('prev-btn');
-var nextBtn = document.getElementById('btn-next');
-var carruselIndicators = document.getElementById('carrusel-indicators');
-var imageCounter = document.getElementById('image-counter');
-var timeCounterElement = document.getElementById('time-counter');
-var loadingScreen = document.getElementById('loading-screen');
-var loadingText = document.getElementById('loading-text');
-var carruselContainer = document.getElementById('carrusel-container');
+function checkBrowserCompatibility() {
+    var compatibility = {
+        autoplay: true,
+        videoFormats: [],
+        mutedAutoplay: true,
+        touchSupport: 'ontouchstart' in window,
+        browser: 'desconocido'
+    };
+    
+    // Detectar navegador
+    var userAgent = navigator.userAgent.toLowerCase();
+    if (userAgent.indexOf('chrome') > -1) compatibility.browser = 'chrome';
+    else if (userAgent.indexOf('safari') > -1) compatibility.browser = 'safari';
+    else if (userAgent.indexOf('firefox') > -1) compatibility.browser = 'firefox';
+    else if (userAgent.indexOf('edge') > -1) compatibility.browser = 'edge';
+    else if (userAgent.indexOf('opera') > -1) compatibility.browser = 'opera';
+    
+    // Detectar formato de video soportado
+    var testVideo = document.createElement('video');
+    if (testVideo.canPlayType('video/mp4').replace('no', '')) compatibility.videoFormats.push('mp4');
+    if (testVideo.canPlayType('video/webm').replace('no', '')) compatibility.videoFormats.push('webm');
+    if (testVideo.canPlayType('video/ogg').replace('no', '')) compatibility.videoFormats.push('ogg');
+    
+    console.log("🌐 Navegador detectado:", compatibility.browser);
+    console.log("📹 Formatos soportados:", compatibility.videoFormats);
+    
+    return compatibility;
+}
 
 // ============================================
 // FUNCIONES PRINCIPALES
@@ -275,45 +408,79 @@ var carruselContainer = document.getElementById('carrusel-container');
 function iniciarApp() {
     console.log("🚀 Iniciando carrusel inteligente...");
     
+    // Verificar compatibilidad
+    var compatibility = checkBrowserCompatibility();
+    
+    // Mostrar advertencia según navegador
+    if (compatibility.browser === 'safari') {
+        browserWarning.textContent = "En Safari: toca la pantalla para reproducir videos";
+        browserWarning.style.display = 'block';
+    } else if (compatibility.videoFormats.length === 0) {
+        browserWarning.textContent = "Tu navegador no soporta videos HTML5";
+        browserWarning.style.display = 'block';
+    }
+    
     // Usar imágenes configuradas
-    images = IMAGENES_CONFIG || [];
+    images = window.IMAGENES_CONFIG || [];
     
     if (images.length === 0) {
-        mostrarError("No hay contenido configurado");
+        mostrarError("No hay contenido configurado. Verifica el archivo ImagenesTV1.js");
         return;
     }
     
     console.log("📸 " + images.length + " elementos encontrados");
     
+    // Verificar URLs
+    verificarContenido();
+}
+
+// VERIFICAR CONTENIDO ANTES DE CARGAR
+function verificarContenido() {
+    loadingText.textContent = "Verificando contenido...";
+    
+    var contenidoValido = 0;
+    var problemas = [];
+    
+    for (var i = 0; i < images.length; i++) {
+        var contenido = images[i];
+        if (!contenido.url) {
+            problemas.push("Elemento " + (i+1) + ": Sin URL");
+        } else {
+            contenidoValido++;
+        }
+    }
+    
+    if (contenidoValido === 0) {
+        mostrarError("No hay URLs válidas en la configuración");
+        return;
+    }
+    
+    if (problemas.length > 0) {
+        console.warn("⚠️ Problemas encontrados:", problemas);
+    }
+    
     // Crear carrusel
     crearCarruselAlternativo();
-    
-    // Mostrar primera imagen
-    mostrarImagenAlternativo(0);
-    
-    // Configurar eventos
-    configurarEventos();
-    
-    // Ocultar loading y mostrar carrusel
-    ocultarLoading();
-    
-    console.log("✅ Carrusel listo");
 }
 
 // CREAR CARRUSEL CON SOPORTE PARA VIDEOS
 function crearCarruselAlternativo() {
     console.log("🛠️ Creando carrusel inteligente...");
+    loadingText.textContent = "Preparando contenido...";
     
     carruselTrack.innerHTML = '';
     carruselIndicators.innerHTML = '';
     videoElements = [];
     slideDurations = {};
     
+    var elementosCargados = 0;
+    var totalElementos = images.length;
+    
     for (var i = 0; i < images.length; i++) {
         var contenido = images[i];
         var esVideo = esArchivoDeVideo(contenido.url);
         
-        console.log("Elemento " + (i + 1) + ": " + (esVideo ? "🎬 Video" : "🖼️  Imagen"));
+        console.log("Elemento " + (i + 1) + ": " + (esVideo ? "🎬 Video" : "🖼️ Imagen"));
         
         // Crear slide
         var slide = document.createElement('div');
@@ -321,6 +488,7 @@ function crearCarruselAlternativo() {
         slide.id = 'slide-' + i;
         slide.dataset.type = esVideo ? 'video' : 'image';
         slide.dataset.index = i;
+        slide.dataset.loaded = 'false';
         
         if (esVideo) {
             // CREAR ELEMENTO DE VIDEO
@@ -328,66 +496,116 @@ function crearCarruselAlternativo() {
             videoContainer.style.width = '100%';
             videoContainer.style.height = '100%';
             videoContainer.style.position = 'relative';
+            videoContainer.style.backgroundColor = '#000';
             
             var video = document.createElement('video');
             video.className = 'carrusel-video';
             video.id = 'video-' + i;
             video.dataset.index = i;
-            video.muted = true; // Silenciar video
-            video.playsinline = true;
-            video.preload = 'metadata'; // Precargar solo metadatos
-            video.loop = false; // NO loop, se reproduce una vez
-
+            video.dataset.originalSrc = contenido.url;
+            video.playsInline = true;
+            video.preload = 'metadata';
+            video.loop = false;
+            video.muted = VIDEO_CONFIG.MUTED_FOR_AUTOPLAY;
+            
+            // Añadir múltiples formatos si es posible
             var source = document.createElement('source');
             source.src = contenido.url;
-            source.type = obtenerTipoVideo(contenido.url);
+            
+            // Intentar determinar el mejor tipo
+            var tipoVideo = obtenerTipoVideo(contenido.url);
+            source.type = tipoVideo;
+            
+            // Mensaje de fallback
+            var fallbackMsg = document.createElement('p');
+            fallbackMsg.textContent = 'Tu navegador no soporta este formato de video';
+            fallbackMsg.style.color = 'white';
+            fallbackMsg.style.padding = '20px';
+            fallbackMsg.style.textAlign = 'center';
             
             video.appendChild(source);
+            video.appendChild(fallbackMsg);
             videoContainer.appendChild(video);
             slide.appendChild(videoContainer);
             
             // Manejar eventos del video
             video.onloadedmetadata = function() {
                 var index = parseInt(this.dataset.index);
-                var duration = Math.floor(this.duration * 1000); // Convertir a ms
+                var duration = Math.floor(this.duration * 1000);
                 slideDurations[index] = duration;
-                console.log("🎬 Video " + (index + 1) + " duración: " + (duration/1000) + "s");
+                slide.dataset.loaded = 'true';
+                elementosCargados++;
+                
+                console.log("✅ Video " + (index + 1) + " cargado: " + (duration/1000) + "s");
+                actualizarProgresoCarga(elementosCargados, totalElementos);
+                
+                if (elementosCargados === totalElementos) {
+                    finalizarCarga();
+                }
             };
             
             video.onerror = function() {
-                console.log("⚠️ Error cargando video " + (this.dataset.index + 1));
-                // Si el video falla, tratarlo como imagen con duración fija
-                slideDurations[this.dataset.index] = IMAGE_DURATION;
+                var index = parseInt(this.dataset.index);
+                console.log("⚠️ Error cargando video " + (index + 1));
+                
+                // Intentar cargar sin extensión
+                var originalSrc = this.dataset.originalSrc;
+                var newSrc = originalSrc.replace(/\.[^/.]+$/, ".mp4");
+                
+                if (newSrc !== originalSrc) {
+                    console.log("🔄 Intentando con formato MP4:", newSrc);
+                    this.querySelector('source').src = newSrc;
+                    this.load();
+                } else {
+                    slideDurations[index] = IMAGE_DURATION;
+                    slide.dataset.type = 'image'; // Cambiar a imagen
+                    slide.dataset.loaded = 'true';
+                    elementosCargados++;
+                    actualizarProgresoCarga(elementosCargados, totalElementos);
+                    
+                    if (elementosCargados === totalElementos) {
+                        finalizarCarga();
+                    }
+                }
             };
             
-            video.onended = function() {
+            video.oncanplay = function() {
                 var index = parseInt(this.dataset.index);
-                if (currentSlide === index) {
-                    console.log("✅ Video " + (index + 1) + " terminado, cambiando al siguiente");
-                    // Esperar un poco y cambiar al siguiente
-                    clearTimeout(videoEndTimeout);
-                    videoEndTimeout = setTimeout(function() {
-                        siguienteSlide();
-                    }, VIDEO_END_BUFFER);
-                }
+                console.log("▶️ Video " + (index + 1) + " listo para reproducir");
             };
             
             // Guardar referencia al video
             videoElements[i] = video;
             
-            // Por defecto, duración de video (se actualizará con metadata)
-            slideDurations[i] = null; // Temporalmente null hasta cargar
+            // Por defecto, duración de video
+            slideDurations[i] = null;
             
         } else {
             // CREAR ELEMENTO DE IMAGEN
+            var imgContainer = document.createElement('div');
+            imgContainer.style.width = '100%';
+            imgContainer.style.height = '100%';
+            imgContainer.style.position = 'relative';
+            imgContainer.style.backgroundColor = '#000';
+            
             var img = document.createElement('img');
             img.className = 'carrusel-image';
             img.alt = contenido.title || 'Imagen ' + (i + 1);
+            img.dataset.index = i;
+            
+            slide.appendChild(imgContainer);
+            imgContainer.appendChild(img);
             
             // Cargar imagen
-            cargarImagenConFallback(contenido.url, img, i);
-            
-            slide.appendChild(img);
+            cargarImagenConFallback(contenido.url, img, i, function() {
+                elementosCargados++;
+                slide.dataset.loaded = 'true';
+                actualizarProgresoCarga(elementosCargados, totalElementos);
+                
+                if (elementosCargados === totalElementos) {
+                    finalizarCarga();
+                }
+            });
             
             // Para imágenes, duración fija
             slideDurations[i] = IMAGE_DURATION;
@@ -398,6 +616,7 @@ function crearCarruselAlternativo() {
         // Crear indicador
         var indicador = document.createElement('div');
         indicador.className = 'indicator';
+        indicador.dataset.index = i;
         if (esVideo) indicador.classList.add('video');
         if (i === 0) indicador.classList.add('active');
         
@@ -409,24 +628,102 @@ function crearCarruselAlternativo() {
         
         carruselIndicators.appendChild(indicador);
     }
+    
+    // Si no hay elementos, finalizar inmediatamente
+    if (images.length === 0) {
+        finalizarCarga();
+    }
 }
 
 // CARGAR IMAGEN CON FALLBACK
-function cargarImagenConFallback(url, imgElement, index) {
+function cargarImagenConFallback(url, imgElement, index, callback) {
     var imgTest = new Image();
     
     imgTest.onload = function() {
         console.log("✅ Imagen " + (index + 1) + " cargada");
         imgElement.src = url;
+        if (callback) callback();
     };
     
     imgTest.onerror = function() {
         console.log("⚠️ Error cargando imagen " + (index + 1));
-        imgElement.src = "https://via.placeholder.com/1920x1080/333/fff?text=Imagen+" + (index + 1);
-        imgElement.style.backgroundColor = "#222";
+        
+        // Intentar rutas alternativas
+        var posiblesRutas = [
+            url,
+            './' + url,
+            'imagenes/' + url.split('/').pop(),
+            'media/' + url.split('/').pop()
+        ];
+        
+        intentarCargarImagen(posiblesRutas, 0, imgElement, index, callback);
     };
     
     imgTest.src = url;
+}
+
+function intentarCargarImagen(rutas, indice, imgElement, index, callback) {
+    if (indice >= rutas.length) {
+        // Todas las rutas fallaron
+        imgElement.src = "https://via.placeholder.com/1920x1080/333/fff?text=Error+" + (index + 1);
+        imgElement.style.backgroundColor = "#222";
+        if (callback) callback();
+        return;
+    }
+    
+    var testImg = new Image();
+    testImg.onload = function() {
+        console.log("✅ Imagen " + (index + 1) + " cargada desde ruta alternativa");
+        imgElement.src = rutas[indice];
+        if (callback) callback();
+    };
+    
+    testImg.onerror = function() {
+        console.log("⚠️ Ruta alternativa " + (indice + 1) + " falló");
+        intentarCargarImagen(rutas, indice + 1, imgElement, index, callback);
+    };
+    
+    testImg.src = rutas[indice];
+}
+
+// ACTUALIZAR PROGRESO DE CARGA
+function actualizarProgresoCarga(cargados, total) {
+    var porcentaje = Math.round((cargados / total) * 100);
+    loadingText.textContent = "Cargando: " + porcentaje + "% (" + cargados + "/" + total + ")";
+}
+
+// FINALIZAR CARGA
+function finalizarCarga() {
+    console.log("✅ Todo el contenido cargado");
+    
+    // Mostrar primera imagen
+    mostrarImagenAlternativo(0);
+    
+    // Configurar eventos
+    configurarEventos();
+    
+    // Ocultar loading y mostrar carrusel
+    setTimeout(function() {
+        ocultarLoading();
+    }, 500);
+}
+
+// OCULTAR LOADING
+function ocultarLoading() {
+    if (loadingScreen && carruselContainer) {
+        loadingScreen.style.opacity = '0';
+        
+        setTimeout(function() {
+            loadingScreen.style.display = 'none';
+            carruselContainer.style.display = 'block';
+            
+            setTimeout(function() {
+                carruselContainer.style.opacity = '1';
+            }, 50);
+            
+            console.log("✅ Carrusel listo");
+        }, 500);
+    }
 }
 
 // MOSTRAR SLIDE ACTUAL
@@ -449,15 +746,19 @@ function mostrarImagenAlternativo(indice) {
         var videoActual = document.getElementById('video-' + currentSlide);
         if (videoActual) {
             videoActual.pause();
-            videoActual.currentTime = 0; // Reiniciar video
-            console.log("⏸️  Video anterior pausado y reiniciado");
+            videoActual.currentTime = 0;
+            console.log("⏸️ Video anterior pausado");
         }
     }
     
     // Ocultar contador de tiempo
     if (timeCounterElement) {
-        timeCounterElement.classList.remove('visible');
+        timeCounterElement.classList.remove('visible', 'video', 'error');
+        timeCounterElement.onclick = null;
     }
+    
+    // Ocultar botón de sonido
+    soundBtn.style.display = 'none';
     
     // Guardar slide anterior
     var slideAnterior = currentSlide;
@@ -493,36 +794,174 @@ function mostrarImagenAlternativo(indice) {
 
 // MANEJAR SLIDE DE VIDEO
 function manejarVideoSlide() {
-    console.log("🎬 Iniciando reproducción de video");
+    console.log("🎬 Iniciando reproducción de video " + (currentSlide + 1));
     
     var video = document.getElementById('video-' + currentSlide);
     if (!video) {
-        console.log("⚠️ Video no encontrado, tratando como imagen");
-        manejarImagenSlide();
+        console.log("⚠️ Elemento video no encontrado, usando fallback");
+        fallbackToImage();
         return;
     }
     
-    // Iniciar reproducción
-    var playPromise = video.play();
+    // Configurar video para compatibilidad
+    configurarVideoParaCompatibilidad(video);
     
-    if (playPromise !== undefined) {
-        playPromise.then(function() {
-            console.log("▶️ Video reproduciéndose");
-            
-            // Mostrar contador de tiempo para video
-            if (timeCounterElement) {
-                timeCounterElement.textContent = "🎬 Video en reproducción...";
-                timeCounterElement.className = 'time-counter video visible';
-            }
-            
-            // No usar autoSlide para videos, esperar evento 'ended'
-            
-        }).catch(function(error) {
-            console.log("⚠️ Error reproduciendo video:", error);
-            // Si no se puede reproducir, tratar como imagen
-            manejarImagenSlide();
-        });
+    // Intentar reproducción
+    intentarReproducirVideo(video, 0);
+}
+
+function configurarVideoParaCompatibilidad(video) {
+    // Configuraciones esenciales para compatibilidad
+    video.muted = VIDEO_CONFIG.MUTED_FOR_AUTOPLAY || !isSoundEnabled;
+    video.volume = isSoundEnabled ? 1.0 : 0;
+    video.playsInline = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    video.setAttribute('x5-playsinline', 'true');
+    video.setAttribute('x5-video-player-type', 'h5-page');
+    video.preload = 'auto';
+    
+    // Actualizar botón de sonido
+    actualizarBotonSonido();
+    soundBtn.style.display = 'flex';
+    
+    // Limpiar listeners anteriores
+    video.onerror = null;
+    video.oncanplaythrough = null;
+    video.onended = null;
+}
+
+function intentarReproducirVideo(video, intento) {
+    console.log("🔄 Intento de reproducción #" + (intento + 1));
+    
+    // Verificar si el video tiene source válido
+    var hasValidSource = video.src || (video.children && video.children.length > 0);
+    if (!hasValidSource) {
+        console.log("❌ Video no tiene fuente válida");
+        fallbackToImage();
+        return;
     }
+    
+    // Cargar el video primero
+    video.load();
+    
+    // Configurar eventos
+    video.oncanplaythrough = function() {
+        console.log("✅ Video listo para reproducirse");
+        
+        var playPromise = video.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(function() {
+                console.log("✅ Video reproduciéndose exitosamente");
+                onVideoPlaySuccess(video);
+            }).catch(function(error) {
+                console.log("⚠️ Error en play():", error.name, error.message);
+                
+                // Estrategias de recuperación
+                if (intento < VIDEO_CONFIG.RETRY_ATTEMPTS) {
+                    console.log("🔄 Reintentando en " + (VIDEO_CONFIG.RETRY_DELAY/1000) + "s...");
+                    setTimeout(function() {
+                        intentarReproducirVideo(video, intento + 1);
+                    }, VIDEO_CONFIG.RETRY_DELAY);
+                } else {
+                    console.log("❌ Máximos intentos alcanzados");
+                    mostrarErrorVideo("No se pudo reproducir el video. " + error.message);
+                }
+            });
+        }
+    };
+    
+    // Manejar errores de carga
+    video.onerror = function() {
+        console.log("❌ Error cargando video");
+        if (intento < VIDEO_CONFIG.RETRY_ATTEMPTS) {
+            setTimeout(function() {
+                intentarReproducirVideo(video, intento + 1);
+            }, VIDEO_CONFIG.RETRY_DELAY);
+        } else {
+            fallbackToImage();
+        }
+    };
+    
+    // Timeout para evitar espera infinita
+    setTimeout(function() {
+        if (video.readyState < 3 && intento >= VIDEO_CONFIG.RETRY_ATTEMPTS) {
+            console.log("⏱️ Timeout de carga del video");
+            fallbackToImage();
+        }
+    }, 8000);
+}
+
+function onVideoPlaySuccess(video) {
+    // Configurar evento de finalización
+    video.onended = function() {
+        console.log("✅ Video finalizado, siguiente slide");
+        clearTimeout(videoEndTimeout);
+        videoEndTimeout = setTimeout(function() {
+            siguienteSlide();
+        }, VIDEO_END_BUFFER);
+    };
+    
+    // Mostrar UI
+    if (timeCounterElement) {
+        timeCounterElement.textContent = "🎬 Video reproduciéndose";
+        timeCounterElement.className = 'time-counter video visible';
+        timeCounterElement.onclick = function() {
+            if (video.paused) {
+                video.play();
+                timeCounterElement.textContent = "🎬 Video reproduciéndose";
+            } else {
+                video.pause();
+                timeCounterElement.textContent = "⏸️ Video pausado (click para continuar)";
+            }
+        };
+    }
+    
+    // Intentar desmutar gradualmente si el usuario quiere sonido
+    if (isSoundEnabled && video.muted) {
+        setTimeout(function() {
+            try {
+                video.muted = false;
+                video.volume = 0.5;
+            } catch (e) {
+                console.log("⚠️ No se pudo ajustar volumen:", e);
+            }
+        }, 1000);
+    }
+}
+
+function mostrarErrorVideo(mensaje) {
+    if (timeCounterElement) {
+        timeCounterElement.textContent = "❌ " + mensaje + " (click para saltar)";
+        timeCounterElement.className = 'time-counter video error visible';
+        timeCounterElement.onclick = function() {
+            siguienteSlide();
+        };
+    }
+    
+    // Saltar automáticamente después de 5 segundos
+    setTimeout(function() {
+        if (currentSlide === parseInt(document.getElementById('video-' + currentSlide)?.dataset.index || -1)) {
+            siguienteSlide();
+        }
+    }, 5000);
+}
+
+function fallbackToImage() {
+    console.log("🖼️ Usando fallback a imagen");
+    
+    // Cambiar el tipo de slide a imagen
+    var slide = document.getElementById('slide-' + currentSlide);
+    if (slide) {
+        slide.dataset.type = 'image';
+    }
+    
+    // Ocultar botón de sonido
+    soundBtn.style.display = 'none';
+    
+    // Mostrar como imagen
+    manejarImagenSlide();
 }
 
 // MANEJAR SLIDE DE IMAGEN
@@ -570,7 +1009,19 @@ function iniciarAutoSlideParaImagen() {
             siguienteSlide();
         }, IMAGE_DURATION);
     }
-    // Para videos, NO programar auto-slide (se maneja con evento 'ended')
+}
+
+// ACTUALIZAR BOTÓN DE SONIDO
+function actualizarBotonSonido() {
+    var video = document.getElementById('video-' + currentSlide);
+    if (!video) return;
+    
+    soundBtn.innerHTML = isSoundEnabled ? "🔊" : "🔇";
+    soundBtn.title = isSoundEnabled ? "Desactivar sonido" : "Activar sonido";
+    
+    // Actualizar estado del video
+    video.muted = !isSoundEnabled;
+    video.volume = isSoundEnabled ? 1.0 : 0;
 }
 
 // ACTUALIZAR INDICADORES
@@ -584,7 +1035,8 @@ function actualizarIndicadores() {
 // ACTUALIZAR CONTADOR
 function actualizarContador() {
     if (imageCounter) {
-        var tipo = document.getElementById('slide-' + currentSlide)?.dataset.type === 'video' ? '🎬' : '🖼️';
+        var slide = document.getElementById('slide-' + currentSlide);
+        var tipo = slide?.dataset.type === 'video' ? '🎬' : '🖼️';
         imageCounter.textContent = tipo + ' ' + (currentSlide + 1) + ' / ' + images.length;
     }
 }
@@ -598,19 +1050,70 @@ function anteriorSlide() {
     mostrarImagenAlternativo(currentSlide - 1);
 }
 
+// MOSTRAR ERROR
+function mostrarError(mensaje) {
+    console.error("❌ " + mensaje);
+    
+    if (errorMessage && errorText) {
+        errorText.textContent = mensaje;
+        errorMessage.style.display = 'block';
+    }
+    
+    if (loadingText) {
+        loadingText.textContent = "Error: " + mensaje;
+        loadingText.style.color = '#ff4444';
+    }
+}
+
+function reintentarCarga() {
+    errorMessage.style.display = 'none';
+    iniciarApp();
+}
+
+function continuarSinVideos() {
+    errorMessage.style.display = 'none';
+    
+    // Convertir todos los videos a imágenes
+    for (var i = 0; i < images.length; i++) {
+        if (esArchivoDeVideo(images[i].url)) {
+            // Cambiar a una imagen de placeholder
+            images[i].url = "https://via.placeholder.com/1920x1080/333/fff?text=Video+" + (i+1);
+        }
+    }
+    
+    iniciarApp();
+}
+
+// ============================================
 // CONFIGURAR EVENTOS
+// ============================================
 function configurarEventos() {
+    // Botones de navegación
     if (prevBtn) {
         prevBtn.addEventListener('click', function() {
-            console.log("⬅️  Botón anterior presionado");
+            console.log("⬅️ Botón anterior presionado");
             anteriorSlide();
         });
     }
     
     if (nextBtn) {
         nextBtn.addEventListener('click', function() {
-            console.log("➡️  Botón siguiente presionado");
+            console.log("➡️ Botón siguiente presionado");
             siguienteSlide();
+        });
+    }
+    
+    // Botón de sonido
+    if (soundBtn) {
+        soundBtn.addEventListener('click', function() {
+            isSoundEnabled = !isSoundEnabled;
+            actualizarBotonSonido();
+            
+            var video = document.getElementById('video-' + currentSlide);
+            if (video) {
+                video.muted = !isSoundEnabled;
+                video.volume = isSoundEnabled ? 1.0 : 0;
+            }
         });
     }
     
@@ -638,22 +1141,33 @@ function configurarEventos() {
                     e.preventDefault();
                 }
             }
+        } else if (key === 'm' || key === 'M') {
+            // Tecla M para mute/unmute
+            isSoundEnabled = !isSoundEnabled;
+            actualizarBotonSonido();
+            e.preventDefault();
         }
     });
     
     // Swipe para pantallas táctiles
     var startX = 0;
+    var startY = 0;
+    
     if (carruselTrack) {
         carruselTrack.addEventListener('touchstart', function(e) {
             startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
         });
         
         carruselTrack.addEventListener('touchend', function(e) {
             var endX = e.changedTouches[0].clientX;
-            var diff = startX - endX;
+            var endY = e.changedTouches[0].clientY;
+            var diffX = startX - endX;
+            var diffY = startY - endY;
             
-            if (Math.abs(diff) > 50) {
-                if (diff > 0) {
+            // Solo considerar swipe horizontal significativo
+            if (Math.abs(diffX) > 50 && Math.abs(diffY) < 100) {
+                if (diffX > 0) {
                     siguienteSlide();
                 } else {
                     anteriorSlide();
@@ -661,43 +1175,20 @@ function configurarEventos() {
             }
         });
     }
-}
-
-// OCULTAR LOADING
-function ocultarLoading() {
-    if (loadingScreen && carruselContainer) {
-        loadingScreen.style.opacity = '0';
-        carruselContainer.style.display = 'block';
-        carruselContainer.style.opacity = '0';
-        
-        setTimeout(function() {
-            loadingScreen.style.display = 'none';
-            carruselContainer.style.opacity = '1';
-        }, 300);
-    }
-}
-
-// MOSTRAR ERROR
-function mostrarError(mensaje) {
-    console.error("❌ " + mensaje);
-    if (loadingText) {
-        loadingText.textContent = mensaje;
-        loadingText.style.color = '#ff4444';
-    }
-}
-
-// ============================================
-// INICIALIZAR
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("📄 DOM cargado - Carrusel inteligente");
     
-    setTimeout(function() {
-        iniciarApp();
-    }, 100);
-});
+    // Click en el contenedor para interacción necesaria en algunos navegadores
+    carruselContainer.addEventListener('click', function(e) {
+        // Solo si se hace click en el área central (no en controles)
+        if (!e.target.closest('.carrusel-btn') && !e.target.closest('.time-counter')) {
+            console.log("👆 Interacción de usuario detectada");
+            // Esto puede ayudar a desbloquear autoplay en algunos navegadores
+        }
+    });
+}
 
-// Manejar visibilidad
+// ============================================
+// MANEJO DE VISIBILIDAD DE LA PÁGINA
+// ============================================
 document.addEventListener('visibilitychange', function() {
     if (document.hidden) {
         console.log("👻 Página oculta, pausando");
@@ -708,6 +1199,7 @@ document.addEventListener('visibilitychange', function() {
             var video = document.getElementById('video-' + currentSlide);
             if (video && !video.paused) {
                 video.pause();
+                console.log("⏸️ Video pausado por visibilidad");
             }
         }
         
@@ -724,13 +1216,54 @@ document.addEventListener('visibilitychange', function() {
             if (slideActual.dataset.type === 'video') {
                 var video = document.getElementById('video-' + currentSlide);
                 if (video && video.paused) {
-                    video.play();
+                    // Esperar un momento antes de reanudar
+                    setTimeout(function() {
+                        video.play().catch(function(e) {
+                            console.log("⚠️ No se pudo reanudar video:", e);
+                        });
+                    }, 300);
                 }
             } else {
                 iniciarAutoSlideParaImagen();
             }
         }
     }
+});
+
+// ============================================
+// INICIALIZAR
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("📄 DOM cargado - Carrusel inteligente");
+    
+    // Verificar si hay configuración
+    if (typeof IMAGENES_CONFIG === 'undefined') {
+        mostrarError("No se encontró el archivo ImagenesTV1.js o la configuración IMAGENES_CONFIG");
+        return;
+    }
+    
+    // Iniciar después de un breve delay para asegurar carga
+    setTimeout(function() {
+        iniciarApp();
+    }, 100);
+});
+
+// Manejar errores no capturados
+window.addEventListener('error', function(e) {
+    console.error("🔥 Error no capturado:", e.message, e.filename, e.lineno);
+});
+
+// Forzar recarga si hay problemas
+window.addEventListener('offline', function() {
+    console.log("📡 Sin conexión");
+    if (timeCounterElement) {
+        timeCounterElement.textContent = "📡 Sin conexión";
+        timeCounterElement.className = 'time-counter visible error';
+    }
+});
+
+window.addEventListener('online', function() {
+    console.log("📡 Conexión restaurada");
 });
 </script>
 </body>
