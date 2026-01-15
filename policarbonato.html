@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <title>Carrusel de Imágenes</title>
+    <title>Carrusel de Imágenes y Videos</title>
     <script src="/ImagenesTV2.js"></script>
     <style>
         /* ESTILOS BÁSICOS */
@@ -50,6 +50,37 @@
             object-fit: contain; 
             display: block; 
             background: #000; 
+        }
+        
+        /* ESTILOS PARA VIDEOS */
+        .carrusel-video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+            display: block;
+        }
+        
+        /* CONTADOR DE TIEMPO */
+        .time-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 10;
+            display: none;
+        }
+        
+        .time-counter.visible {
+            display: block;
+        }
+        
+        .time-counter.video {
+            background: rgba(0, 100, 200, 0.7);
         }
         
         /* CONTROLES */
@@ -105,6 +136,16 @@
             transform: scale(1.2); 
         }
         
+        .indicator.video::after {
+            content: "▶";
+            font-size: 6px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000;
+        }
+        
         /* CONTADOR */
         .image-counter { 
             position: absolute; 
@@ -147,11 +188,11 @@
         @keyframes spin { 
             to { transform: rotate(360deg); } 
         }
+        
     </style>
     <head>
-  <meta http-equiv="refresh" content="316;url=https://estadisticasooe.netlify.app/policarbonato.html">
-</head>
-
+        <meta http-equiv="refresh" content="316;url=https://estadisticasooe.netlify.app/policarbonato.html">
+    </head>
 </head>
 <body>
     <!-- PANTALLA DE CARGA -->
@@ -170,17 +211,48 @@
         </div>
         
         <div class="image-counter" id="image-counter">0 / 0</div>
+        <div class="time-counter" id="time-counter"></div>
         <div class="carrusel-indicators" id="carrusel-indicators"></div>
     </div>
-
 <script>
-
 // ============================================
 // VARIABLES GLOBALES
 // ============================================
 var currentSlide = 0;
 var autoSlideInterval;
+var videoEndTimeout;
 var images = [];
+var videoElements = [];
+var timeCounter = null;
+var slideDurations = {}; // Almacena duración de cada slide
+
+// ============================================
+// CONSTANTES DE CONFIGURACIÓN
+// ============================================
+var IMAGE_DURATION = 25000; // 25 segundos para imágenes
+var VIDEO_END_BUFFER = 500; // 500ms después de terminar video
+
+// ============================================
+// FUNCIONES AUXILIARES PARA DETECTAR TIPO
+// ============================================
+function esArchivoDeVideo(url) {
+    if (!url) return false;
+    var extensionesVideo = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv', '.m4v', '.wmv'];
+    var urlLower = url.toLowerCase();
+    return extensionesVideo.some(ext => urlLower.includes(ext)) || 
+           urlLower.includes('video/');
+}
+
+function obtenerTipoVideo(url) {
+    var urlLower = url.toLowerCase();
+    if (urlLower.includes('.mp4') || urlLower.includes('.m4v')) return 'video/mp4';
+    if (urlLower.includes('.webm')) return 'video/webm';
+    if (urlLower.includes('.ogg') || urlLower.includes('.ogv')) return 'video/ogg';
+    if (urlLower.includes('.mov')) return 'video/quicktime';
+    if (urlLower.includes('.avi')) return 'video/x-msvideo';
+    if (urlLower.includes('.wmv')) return 'video/x-ms-wmv';
+    return 'video/mp4';
+}
 
 // ============================================
 // ELEMENTOS DOM
@@ -190,27 +262,28 @@ var prevBtn = document.getElementById('prev-btn');
 var nextBtn = document.getElementById('btn-next');
 var carruselIndicators = document.getElementById('carrusel-indicators');
 var imageCounter = document.getElementById('image-counter');
+var timeCounterElement = document.getElementById('time-counter');
 var loadingScreen = document.getElementById('loading-screen');
 var loadingText = document.getElementById('loading-text');
 var carruselContainer = document.getElementById('carrusel-container');
 
 // ============================================
-// FUNCIONES PRINCIPALES - MÉTODO ALTERNATIVO
+// FUNCIONES PRINCIPALES
 // ============================================
 
 // INICIAR APLICACIÓN
 function iniciarApp() {
-    console.log("🚀 Iniciando carrusel (método alternativo)...");
+    console.log("🚀 Iniciando carrusel inteligente...");
     
     // Usar imágenes configuradas
-    images = IMAGENES_CONFIG;
+    images = IMAGENES_CONFIG || [];
     
     if (images.length === 0) {
-        mostrarError("No hay imágenes configuradas");
+        mostrarError("No hay contenido configurado");
         return;
     }
     
-    console.log("📸 " + images.length + " imágenes encontradas");
+    console.log("📸 " + images.length + " elementos encontrados");
     
     // Crear carrusel
     crearCarruselAlternativo();
@@ -224,44 +297,108 @@ function iniciarApp() {
     // Ocultar loading y mostrar carrusel
     ocultarLoading();
     
-    // Iniciar auto-cambio
-    iniciarAutoSlide();
-    
     console.log("✅ Carrusel listo");
 }
 
-// CREAR CARRUSEL (MÉTODO ALTERNATIVO)
+// CREAR CARRUSEL CON SOPORTE PARA VIDEOS
 function crearCarruselAlternativo() {
-    console.log("🛠️ Creando carrusel...");
+    console.log("🛠️ Creando carrusel inteligente...");
     
     carruselTrack.innerHTML = '';
     carruselIndicators.innerHTML = '';
+    videoElements = [];
+    slideDurations = {};
     
     for (var i = 0; i < images.length; i++) {
-        var imagen = images[i];
+        var contenido = images[i];
+        var esVideo = esArchivoDeVideo(contenido.url);
         
-        // Crear slide con posición absoluta
+        console.log("Elemento " + (i + 1) + ": " + (esVideo ? "🎬 Video" : "🖼️  Imagen"));
+        
+        // Crear slide
         var slide = document.createElement('div');
         slide.className = 'carrusel-slide';
         slide.id = 'slide-' + i;
+        slide.dataset.type = esVideo ? 'video' : 'image';
+        slide.dataset.index = i;
         
-        // Crear imagen
-        var img = document.createElement('img');
-        img.className = 'carrusel-image';
-        img.alt = imagen.title || 'Imagen ' + (i + 1);
+        if (esVideo) {
+            // CREAR ELEMENTO DE VIDEO
+            var videoContainer = document.createElement('div');
+            videoContainer.style.width = '100%';
+            videoContainer.style.height = '100%';
+            videoContainer.style.position = 'relative';
+            
+            var video = document.createElement('video');
+            video.className = 'carrusel-video';
+            video.id = 'video-' + i;
+            video.dataset.index = i;
+            video.playsinline = true;
+            video.preload = 'metadata'; // Precargar solo metadatos
+            video.loop = false; // NO loop, se reproduce una vez
+            var source = document.createElement('source');
+            source.src = contenido.url;
+            source.type = obtenerTipoVideo(contenido.url);
+            
+            video.appendChild(source);
+            videoContainer.appendChild(video);
+            slide.appendChild(videoContainer);
+            
+            // Manejar eventos del video
+            video.onloadedmetadata = function() {
+                var index = parseInt(this.dataset.index);
+                var duration = Math.floor(this.duration * 1000); // Convertir a ms
+                slideDurations[index] = duration;
+                console.log("🎬 Video " + (index + 1) + " duración: " + (duration/1000) + "s");
+            };
+            
+            video.onerror = function() {
+                console.log("⚠️ Error cargando video " + (this.dataset.index + 1));
+                // Si el video falla, tratarlo como imagen con duración fija
+                slideDurations[this.dataset.index] = IMAGE_DURATION;
+            };
+            
+            video.onended = function() {
+                var index = parseInt(this.dataset.index);
+                if (currentSlide === index) {
+                    console.log("✅ Video " + (index + 1) + " terminado, cambiando al siguiente");
+                    // Esperar un poco y cambiar al siguiente
+                    clearTimeout(videoEndTimeout);
+                    videoEndTimeout = setTimeout(function() {
+                        siguienteSlide();
+                    }, VIDEO_END_BUFFER);
+                }
+            };
+            
+            // Guardar referencia al video
+            videoElements[i] = video;
+            
+            // Por defecto, duración de video (se actualizará con metadata)
+            slideDurations[i] = null; // Temporalmente null hasta cargar
+            
+        } else {
+            // CREAR ELEMENTO DE IMAGEN
+            var img = document.createElement('img');
+            img.className = 'carrusel-image';
+            img.alt = contenido.title || 'Imagen ' + (i + 1);
+            
+            // Cargar imagen
+            cargarImagenConFallback(contenido.url, img, i);
+            
+            slide.appendChild(img);
+            
+            // Para imágenes, duración fija
+            slideDurations[i] = IMAGE_DURATION;
+        }
         
-        // Cargar imagen con manejo de errores
-        cargarImagenConFallback(imagen.url, img, i);
-        
-        slide.appendChild(img);
         carruselTrack.appendChild(slide);
         
         // Crear indicador
         var indicador = document.createElement('div');
         indicador.className = 'indicator';
-        if (i === 0) indicador.className += ' active';
+        if (esVideo) indicador.classList.add('video');
+        if (i === 0) indicador.classList.add('active');
         
-        // Usar closure para capturar el índice
         (function(index) {
             indicador.addEventListener('click', function() {
                 mostrarImagenAlternativo(index);
@@ -282,8 +419,7 @@ function cargarImagenConFallback(url, imgElement, index) {
     };
     
     imgTest.onerror = function() {
-        console.log("⚠️  Error cargando imagen " + (index + 1));
-        // Usar placeholder
+        console.log("⚠️ Error cargando imagen " + (index + 1));
         imgElement.src = "https://via.placeholder.com/1920x1080/333/fff?text=Imagen+" + (index + 1);
         imgElement.style.backgroundColor = "#222";
     };
@@ -291,7 +427,7 @@ function cargarImagenConFallback(url, imgElement, index) {
     imgTest.src = url;
 }
 
-// MOSTRAR IMAGEN (MÉTODO ALTERNATIVO - SIN TRANSFORM)
+// MOSTRAR SLIDE ACTUAL
 function mostrarImagenAlternativo(indice) {
     if (images.length === 0) return;
     
@@ -299,7 +435,27 @@ function mostrarImagenAlternativo(indice) {
     if (indice < 0) indice = images.length - 1;
     if (indice >= images.length) indice = 0;
     
-    console.log("🔄 Cambiando a imagen " + (indice + 1));
+    console.log("🔄 Cambiando a elemento " + (indice + 1));
+    
+    // DETENER TIMERS ANTERIORES
+    clearInterval(autoSlideInterval);
+    clearTimeout(videoEndTimeout);
+    
+    // PAUSAR VIDEO ACTUAL si existe
+    var slideActual = document.getElementById('slide-' + currentSlide);
+    if (slideActual && slideActual.dataset.type === 'video') {
+        var videoActual = document.getElementById('video-' + currentSlide);
+        if (videoActual) {
+            videoActual.pause();
+            videoActual.currentTime = 0; // Reiniciar video
+            console.log("⏸️  Video anterior pausado y reiniciado");
+        }
+    }
+    
+    // Ocultar contador de tiempo
+    if (timeCounterElement) {
+        timeCounterElement.classList.remove('visible');
+    }
     
     // Guardar slide anterior
     var slideAnterior = currentSlide;
@@ -317,6 +473,13 @@ function mostrarImagenAlternativo(indice) {
     var slideActualElement = document.getElementById('slide-' + currentSlide);
     if (slideActualElement) {
         slideActualElement.classList.add('activo');
+        
+        // MANEJAR SEGÚN TIPO
+        if (slideActualElement.dataset.type === 'video') {
+            manejarVideoSlide();
+        } else {
+            manejarImagenSlide();
+        }
     }
     
     // Actualizar indicadores
@@ -324,50 +487,107 @@ function mostrarImagenAlternativo(indice) {
     
     // Actualizar contador
     actualizarContador();
+}
+
+// MANEJAR SLIDE DE VIDEO
+function manejarVideoSlide() {
+    console.log("🎬 Iniciando reproducción de video");
     
-    // Reiniciar auto-slide
-    reiniciarAutoSlide();
+    var video = document.getElementById('video-' + currentSlide);
+    if (!video) {
+        console.log("⚠️ Video no encontrado, tratando como imagen");
+        manejarImagenSlide();
+        return;
+    }
+    
+    // Iniciar reproducción
+    var playPromise = video.play();
+    
+    if (playPromise !== undefined) {
+        playPromise.then(function() {
+            console.log("▶️ Video reproduciéndose");
+            
+            // Mostrar contador de tiempo para video
+            if (timeCounterElement) {
+                timeCounterElement.textContent = "🎬 Video en reproducción...";
+                timeCounterElement.className = 'time-counter video visible';
+            }
+            
+            // No usar autoSlide para videos, esperar evento 'ended'
+            
+        }).catch(function(error) {
+            console.log("⚠️ Error reproduciendo video:", error);
+            // Si no se puede reproducir, tratar como imagen
+            manejarImagenSlide();
+        });
+    }
+}
+
+// MANEJAR SLIDE DE IMAGEN
+function manejarImagenSlide() {
+    console.log("🖼️ Mostrando imagen por " + (IMAGE_DURATION/1000) + " segundos");
+    
+    // Mostrar contador de tiempo para imagen
+    if (timeCounterElement) {
+        timeCounterElement.textContent = "🖼️ Cambiando en: 25s";
+        timeCounterElement.className = 'time-counter visible';
+        
+        // Actualizar contador cada segundo
+        var tiempoRestante = IMAGE_DURATION / 1000;
+        var countdownInterval = setInterval(function() {
+            tiempoRestante--;
+            if (tiempoRestante >= 0) {
+                timeCounterElement.textContent = "🖼️ Cambiando en: " + tiempoRestante + "s";
+            }
+            
+            if (tiempoRestante <= 0) {
+                clearInterval(countdownInterval);
+            }
+        }, 1000);
+        
+        // Limpiar intervalo cuando cambie de slide
+        setTimeout(function() {
+            clearInterval(countdownInterval);
+        }, IMAGE_DURATION);
+    }
+    
+    // Configurar auto-slide para imágenes
+    iniciarAutoSlideParaImagen();
+}
+
+// INICIAR AUTO-SLIDE SOLO PARA IMÁGENES
+function iniciarAutoSlideParaImagen() {
+    clearInterval(autoSlideInterval);
+    
+    var slideActual = document.getElementById('slide-' + currentSlide);
+    if (slideActual && slideActual.dataset.type === 'image') {
+        console.log("⏰ Programando cambio en " + (IMAGE_DURATION/1000) + " segundos");
+        
+        autoSlideInterval = setTimeout(function() {
+            console.log("⏰ Tiempo completado, cambiando al siguiente");
+            siguienteSlide();
+        }, IMAGE_DURATION);
+    }
+    // Para videos, NO programar auto-slide (se maneja con evento 'ended')
 }
 
 // ACTUALIZAR INDICADORES
 function actualizarIndicadores() {
     var indicadores = document.querySelectorAll('.indicator');
     for (var i = 0; i < indicadores.length; i++) {
-        if (i === currentSlide) {
-            indicadores[i].className = 'indicator active';
-        } else {
-            indicadores[i].className = 'indicator';
-        }
+        indicadores[i].classList.toggle('active', i === currentSlide);
     }
 }
 
 // ACTUALIZAR CONTADOR
 function actualizarContador() {
     if (imageCounter) {
-        imageCounter.textContent = (currentSlide + 1) + ' / ' + images.length;
+        var tipo = document.getElementById('slide-' + currentSlide)?.dataset.type === 'video' ? '🎬' : '🖼️';
+        imageCounter.textContent = tipo + ' ' + (currentSlide + 1) + ' / ' + images.length;
     }
 }
 
-// AUTO-SLIDE
-function iniciarAutoSlide() {
-    clearInterval(autoSlideInterval);
-    if (images.length > 1) {
-        console.log("⏰ Auto-cambio cada 5 segundos");
-        autoSlideInterval = setInterval(function() {
-            siguienteSlide();
-        }, 25000);
-    }
-}
-
-function detenerAutoSlide() {
-    clearInterval(autoSlideInterval);
-}
-
-function reiniciarAutoSlide() {
-    detenerAutoSlide();
-    iniciarAutoSlide();
-}
-
+// FUNCIONES DE NAVEGACIÓN
 function siguienteSlide() {
     mostrarImagenAlternativo(currentSlide + 1);
 }
@@ -397,11 +617,25 @@ function configurarEventos() {
         var key = e.key || e.keyCode;
         
         if (key === 'ArrowLeft' || key === 37 || key === 'Left') {
-            console.log("⬅️  Tecla izquierda presionada");
             anteriorSlide();
+            e.preventDefault();
         } else if (key === 'ArrowRight' || key === 39 || key === 'Right') {
-            console.log("➡️  Tecla derecha presionada");
             siguienteSlide();
+            e.preventDefault();
+        } else if (key === ' ' || key === 32) {
+            // Espacio para pausar/reproducir video actual
+            var slideActual = document.getElementById('slide-' + currentSlide);
+            if (slideActual && slideActual.dataset.type === 'video') {
+                var video = document.getElementById('video-' + currentSlide);
+                if (video) {
+                    if (video.paused) {
+                        video.play();
+                    } else {
+                        video.pause();
+                    }
+                    e.preventDefault();
+                }
+            }
         }
     });
     
@@ -410,7 +644,6 @@ function configurarEventos() {
     if (carruselTrack) {
         carruselTrack.addEventListener('touchstart', function(e) {
             startX = e.touches[0].clientX;
-            detenerAutoSlide();
         });
         
         carruselTrack.addEventListener('touchend', function(e) {
@@ -419,15 +652,11 @@ function configurarEventos() {
             
             if (Math.abs(diff) > 50) {
                 if (diff > 0) {
-                    console.log("👆 Swipe izquierda detectado");
                     siguienteSlide();
                 } else {
-                    console.log("👆 Swipe derecha detectado");
                     anteriorSlide();
                 }
             }
-            
-            reiniciarAutoSlide();
         });
     }
 }
@@ -435,12 +664,7 @@ function configurarEventos() {
 // OCULTAR LOADING
 function ocultarLoading() {
     if (loadingScreen && carruselContainer) {
-        console.log("👁️  Mostrando carrusel...");
-        
-        // Ocultar loading
         loadingScreen.style.opacity = '0';
-        
-        // Mostrar carrusel
         carruselContainer.style.display = 'block';
         carruselContainer.style.opacity = '0';
         
@@ -464,22 +688,46 @@ function mostrarError(mensaje) {
 // INICIALIZAR
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("📄 DOM cargado");
+    console.log("📄 DOM cargado - Carrusel inteligente");
     
-    // Iniciar después de un pequeño delay
     setTimeout(function() {
         iniciarApp();
     }, 100);
 });
 
-// Manejar visibilidad para optimizar TV
+// Manejar visibilidad
 document.addEventListener('visibilitychange', function() {
     if (document.hidden) {
-        console.log("👻 Página oculta, pausando auto-slide");
-        detenerAutoSlide();
+        console.log("👻 Página oculta, pausando");
+        
+        // Pausar video actual si existe
+        var slideActual = document.getElementById('slide-' + currentSlide);
+        if (slideActual && slideActual.dataset.type === 'video') {
+            var video = document.getElementById('video-' + currentSlide);
+            if (video && !video.paused) {
+                video.pause();
+            }
+        }
+        
+        // Pausar timers
+        clearInterval(autoSlideInterval);
+        clearTimeout(videoEndTimeout);
+        
     } else {
-        console.log("👀 Página visible, reanudando auto-slide");
-        iniciarAutoSlide();
+        console.log("👀 Página visible, reanudando");
+        
+        // Reanudar según tipo de slide actual
+        var slideActual = document.getElementById('slide-' + currentSlide);
+        if (slideActual) {
+            if (slideActual.dataset.type === 'video') {
+                var video = document.getElementById('video-' + currentSlide);
+                if (video && video.paused) {
+                    video.play();
+                }
+            } else {
+                iniciarAutoSlideParaImagen();
+            }
+        }
     }
 });
 </script>
