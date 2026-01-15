@@ -336,6 +336,7 @@ function crearCarruselAlternativo() {
             video.playsinline = true;
             video.preload = 'metadata'; // Precargar solo metadatos
             video.loop = false; // NO loop, se reproduce una vez
+
             var source = document.createElement('source');
             source.src = contenido.url;
             source.type = obtenerTipoVideo(contenido.url);
