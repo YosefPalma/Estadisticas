@@ -13,7 +13,7 @@ var IMAGENES_CONFIG = [
         title: "Imagen 2"
     },
     {
-        url: "https://image2url.com/r2/default/images/1768602998200-8bb491cb-1eee-4788-a0b8-244cc178ac33.png",
+        url: "https://image2url.com/r2/default/images/1769094406049-9bada8cf-737e-4e9a-a8f1-93507a0a9f20.png",
         title: "Imagen 3"
     },
     {
