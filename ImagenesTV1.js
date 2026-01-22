@@ -5,7 +5,7 @@
 //Cambia los links solamente
 var IMAGENES_CONFIG = [
     {
-        url: "https://image2url.com/r2/default/images/1769111773488-d3fd0152-575b-4427-9289-4b09cdaf8921.png",
+        url: "https://image2url.com/r2/default/images/1769122308396-870121f1-0062-40ff-9df4-b5ed19d3d674.png",
         title: "Imagen 1"
     },
     {
@@ -17,7 +17,7 @@ var IMAGENES_CONFIG = [
         title: "Imagen 3"
     },
     {
-        url: "https://image2url.com/r2/default/images/1769094406049-9bada8cf-737e-4e9a-a8f1-93507a0a9f20.png",
+        url: "https://image2url.com/r2/default/images/1769122382042-4cb18afa-27d6-4ebb-aae9-c1050d8cb142.png",
         title: "Imagen 4"
     },
     {
