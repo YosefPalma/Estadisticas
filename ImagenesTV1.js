@@ -59,5 +59,10 @@ var IMAGENES_CONFIG = [
     {
         url: "https://image2url.com/r2/default/images/1768928657605-9607a814-bfca-47ec-b79e-c62978d9262e.png",
         title: "Imagen 14"
+    },
+    {
+        url: "https://image2url.com/r2/default/images/1769188219759-be7b8dd7-3524-4403-b6dc-c26da64efc26.png",
+        title: "Imagen 15"
     }
+
 ];
