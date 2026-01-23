@@ -5,11 +5,11 @@
 //Cambia los links solamente
 var IMAGENES_CONFIG = [
     {
-        url: "https://image2url.com/r2/default/images/1769122308396-870121f1-0062-40ff-9df4-b5ed19d3d674.png",
+        url: "https://image2url.com/r2/default/images/1769187029491-6c0d0aca-d5ad-49e9-9f4c-dd48c3406c6e.png",
         title: "Imagen 1"
     },
     {
-        url: "https://image2url.com/r2/default/images/1769120587893-6bc0bacf-71e7-4b58-8993-2faad2890d32.png",
+        url: "https://image2url.com/r2/default/images/1769186435829-b9496373-6425-40d8-9255-a9eb85a27e94.png",
         title: "Imagen 2"
     },
     {
@@ -59,5 +59,9 @@ var IMAGENES_CONFIG = [
     {
         url: "https://image2url.com/r2/default/images/1768928657605-9607a814-bfca-47ec-b79e-c62978d9262e.png",
         title: "Imagen 14"
+    },
+    {
+        url: "https://image2url.com/r2/default/images/1769188219759-be7b8dd7-3524-4403-b6dc-c26da64efc26.png",
+        title: "Imagen 15"
     }
 ];
