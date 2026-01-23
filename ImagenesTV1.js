@@ -13,7 +13,7 @@ var IMAGENES_CONFIG = [
         title: "Imagen 2"
     },
     {
-        url: "https://image2url.com/r2/default/images/1769112038579-9d42b95f-6148-45ca-a6f3-3bb30fa4b154.png",
+        url: "https://image2url.com/r2/default/images/1769188390500-1dd90dae-2916-4cfa-b0fa-a8207f429f3f.png",
         title: "Imagen 3"
     },
     {
@@ -21,11 +21,11 @@ var IMAGENES_CONFIG = [
         title: "Imagen 4"
     },
     {
-        url: "https://image2url.com/r2/default/images/1769122977032-884c3c81-4493-4879-8ffe-a75858177140.png",
+        url: "https://image2url.com/r2/default/images/1769188459685-04111dca-2870-4cee-b055-343f39f3b99d.png",
         title: "Imagen 5"
     },
     {
-        url: "https://image2url.com/r2/default/images/1769123036295-888162d6-7362-4652-bfdd-4361e5e3163c.png",
+        url: "https://image2url.com/r2/default/images/1769188593039-6462ac6e-a1d4-44ea-9853-d34c77fc619f.png",
         title: "Imagen 6"
     },
     {
