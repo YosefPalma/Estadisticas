@@ -49,11 +49,11 @@ var IMAGENES_CONFIG = [
         title: "Imagen 11"
     },
     {
-        url: "https://image2url.com/r2/default/images/1768941721347-78650bc7-45ba-40f4-bb78-b80c7375b279.png",
+        url: "https://image2url.com/r2/default/images/1769701328831-6a6e4280-1402-4355-8f23-3394b5ace124.png",
         title: "Imagen 12"
     },
     {
-        url: "https://image2url.com/r2/default/images/1768941766173-b7efe65b-b288-421f-a152-8bd6a7f666e1.png",
+        url: "https://image2url.com/r2/default/images/1769701328831-6a6e4280-1402-4355-8f23-3394b5ace124.png",
         title: "Imagen 13"
     },
     {
