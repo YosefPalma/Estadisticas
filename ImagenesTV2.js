@@ -9,7 +9,7 @@ var IMAGENES_CONFIG = [
         title: "Imagen 1"
     },
     {
-        url: "https://image2url.com/r2/default/images/1770413526520-c9c32ad6-5acf-4caa-8a38-53ff8e5ec6f6.png",
+        url: "https://image2url.com/r2/default/images/1770419875915-3ce93ba9-992d-4f0d-b92c-7f9eb8747cee.jpeg",
         title: "Imagen 2"
     },
     {
@@ -17,7 +17,7 @@ var IMAGENES_CONFIG = [
         title: "Imagen 3"
     },
     {
-        url: "https://image2url.com/r2/default/images/1770413573194-1fe5b963-e22a-4bd2-a8ab-84ac7aa726ac.png",
+        url: "https://image2url.com/r2/default/images/1770419919676-34082ccd-32ba-43bf-ae80-7aa8a4c734de.jpeg",
         title: "Imagen 4"
     },
     {
