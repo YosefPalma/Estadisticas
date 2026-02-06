@@ -5,27 +5,27 @@
 //Cambia los links solamente
 var IMAGENES_CONFIG = [
     {
-        url: "https://image2url.com/r2/default/images/1770243674058-97c84d9b-ecc8-46a6-bf26-5e7ac1c22cd5.png",
+        url: "https://image2url.com/r2/default/images/1770413451769-9945dd22-69b3-487f-8f91-4520f3449161.jpeg",
         title: "Imagen 1"
     },
     {
-        url: "https://image2url.com/r2/default/images/1770243698492-06a9d664-97ae-4dd7-ac41-f6e1fe2d3c51.png",
+        url: "https://image2url.com/r2/default/images/1770413526520-c9c32ad6-5acf-4caa-8a38-53ff8e5ec6f6.png",
         title: "Imagen 2"
     },
     {
-        url: "https://image2url.com/r2/default/images/1770243729538-0eb30990-3e26-4c8d-b521-5a3f2a2acb43.png",
+        url: "https://image2url.com/r2/default/images/1770413627303-09d0e323-b617-4ca9-84d9-21ea5732b40f.png",
         title: "Imagen 3"
     },
     {
-        url: "https://image2url.com/r2/default/images/1769617875606-1a192bfd-9634-4a2b-851a-95bf484dae27.png",
+        url: "https://image2url.com/r2/default/images/1770413573194-1fe5b963-e22a-4bd2-a8ab-84ac7aa726ac.png",
         title: "Imagen 4"
     },
     {
-        url: "https://image2url.com/r2/default/images/1770243762009-9adf25a6-452b-4eff-814d-047069c0b606.png",
+        url: "https://image2url.com/r2/default/images/1770413697997-864c11eb-df13-414d-a771-b78b21d8dcd6.jpeg",
         title: "Imagen 5"
     },
     {
-        url: "https://image2url.com/r2/default/images/1770243825437-6ab7dc06-0b2c-489b-97b1-48f86bc70cf1.png",
+        url: "https://image2url.com/r2/default/images/1770413724327-c3957524-9d2e-4837-aa3d-f609429c06b5.jpeg",
         title: "Imagen 6"
     },
     {
@@ -49,11 +49,11 @@ var IMAGENES_CONFIG = [
         title: "Imagen 11"
     },
     {
-        url: "https://image2url.com/r2/default/images/1769701328831-6a6e4280-1402-4355-8f23-3394b5ace124.png",
+        url: "https://image2url.com/r2/default/images/1770413796637-afbc4adf-247e-4533-abf5-f5b85d61a78f.jpeg",
         title: "Imagen 12"
     },
     {
-        url: "https://image2url.com/r2/default/images/1769701328831-6a6e4280-1402-4355-8f23-3394b5ace124.png",
+        url: "https://image2url.com/r2/default/images/1770413815856-77a92a9d-1241-4265-bb66-5809df9024e7.jpeg",
         title: "Imagen 13"
     },
     {
