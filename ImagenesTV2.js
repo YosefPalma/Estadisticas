@@ -49,16 +49,8 @@ var IMAGENES_CONFIG = [
         title: "Imagen 11"
     },
     {
-        url: "https://image2url.com/r2/default/images/1770413796637-afbc4adf-247e-4533-abf5-f5b85d61a78f.jpeg",
-        title: "Imagen 12"
-    },
-    {
         url: "https://image2url.com/r2/default/images/1770413815856-77a92a9d-1241-4265-bb66-5809df9024e7.jpeg",
         title: "Imagen 13"
-    },
-    {
-        url: "https://image2url.com/r2/default/images/1769534529151-ec76c4ac-c132-4170-95e6-2185527840f6.png",
-        title: "Imagen 14"
     },
     {
         url: "https://image2url.com/r2/default/images/1769188219759-be7b8dd7-3524-4403-b6dc-c26da64efc26.png",
