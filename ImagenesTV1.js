@@ -17,15 +17,15 @@ var IMAGENES_CONFIG = [
         title: "Imagen 3"
     },
     {
-        url: "https://image2url.com/r2/default/images/1771276897377-25b7fa72-a038-45a6-91e4-5433815f34da.jpeg",
+        url: "https://image2url.com/r2/default/images/1771440375924-0b8d207a-ac48-4c77-8f96-efe7f4dcc04f.jpeg",
         title: "Imagen 4"
     },
     {
-        url: "https://image2url.com/r2/default/images/1771440375924-0b8d207a-ac48-4c77-8f96-efe7f4dcc04f.jpeg",
+        url: "https://image2url.com/r2/default/images/1771440401313-440bf324-edf7-499f-ae32-af9da3816d63.jpeg",
         title: "Imagen 5"
     },
     {
-        url: "https://image2url.com/r2/default/images/1771440401313-440bf324-edf7-499f-ae32-af9da3816d63.jpeg",
+        url: "https://image2url.com/r2/default/images/1771440507213-12afa9b6-bb71-4291-a674-1051159130a2.jpeg",
         title: "Imagen 6"
     },
     {
