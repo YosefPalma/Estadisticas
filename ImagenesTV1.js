@@ -5,7 +5,7 @@
 //Cambia los links solamente
 var IMAGENES_CONFIG = [
     {
-        url: "https://image2url.com/r2/default/images/1771964668561-d75e1e5a-bd06-4744-b833-a0b79010691c.png",
+        url: "https://image2url.com/r2/default/images/1771973961606-211cb8f0-cd91-4c7f-975b-cc2b2ddde0f2.png",
         title: "Imagen 1"
     },
     {
