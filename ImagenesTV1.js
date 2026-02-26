@@ -4,12 +4,12 @@
 // Puedes editar solo este archivo para cambiar las imágenes
 //Cambia los links solamente
 var IMAGENES_CONFIG = [
-    { url: "https://image2url.com/r2/default/images/1772040749898-cf325252-2245-489d-93d4-6bc8c8c347d4.png", title: "Imagen 1" }, 
-    { url: "https://image2url.com/r2/default/images/1772040843655-4bda1e13-2bb9-4e61-9e15-4122279f5362.png", title: "Imagen 2" }, 
-    { url: "https://image2url.com/r2/default/images/1772040875343-d36967ad-8c50-4b26-bdbc-d0f8c67e9de2.png", title: "Imagen 3" }, 
-    { url: "https://image2url.com/r2/default/images/1772040905783-b07c71b8-c329-43d5-9717-4bc36e5f5503.png", title: "Imagen 4" }, 
-    { url: "https://image2url.com/r2/default/images/1772040949695-854f7cf1-c7e8-4a01-8c75-ffb36135c829.png", title: "Imagen 5" }, 
-    { url: "https://image2url.com/r2/default/images/1772041001499-03e96c91-cbf7-49ec-bb0e-d60b0658680b.png", title: "Imagen 6" }, 
+    { url: "https://image2url.com/r2/default/images/1772127798955-e83efe87-c299-4a78-8278-ee76a39164c2.png", title: "Imagen 1" }, 
+    { url: "https://image2url.com/r2/default/images/1772127971588-870e8d61-cd96-4260-a2d2-90bbb174160a.png", title: "Imagen 2" }, 
+    { url: "https://image2url.com/r2/default/images/1772128043026-6d28a704-ec28-4b34-a61d-2bb2d6f46502.png", title: "Imagen 3" }, 
+    { url: "https://image2url.com/r2/default/images/1772128079259-23aa2afe-3ed2-41e5-85c9-cd35e266a6c2.png", title: "Imagen 4" }, 
+    { url: "https://image2url.com/r2/default/images/1772128151248-d5f99989-93ae-4bd7-a26c-faa8481eb4dd.png", title: "Imagen 5" }, 
+    { url: "https://image2url.com/r2/default/images/1772128211050-303aec40-b30c-425e-ad42-6b14b1280eeb.png", title: "Imagen 6" }, 
     { url: "https://image2url.com/r2/default/images/1769188219759-be7b8dd7-3524-4403-b6dc-c26da64efc26.png", title: "Imagen 15" }, 
     { url: "https://image2url.com/r2/default/images/1769636991660-5034fcd3-a564-4710-a65a-73e64d024735.png", title: "Imagen 16" },
     { url: "/WhatsApp Video 2026-02-16 at 5.39.35 PM.mp4", title: "Video 1" },
