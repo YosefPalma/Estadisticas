@@ -4,12 +4,12 @@
 // Puedes editar solo este archivo para cambiar las imágenes
 //Cambia los links solamente
 var IMAGENES_CONFIG = [
-    { url: "https://image2url.com/r2/default/images/1772040749898-cf325252-2245-489d-93d4-6bc8c8c347d4.png", title: "Imagen 1" }, 
-    { url: "https://image2url.com/r2/default/images/1772040843655-4bda1e13-2bb9-4e61-9e15-4122279f5362.png", title: "Imagen 2" }, 
-    { url: "https://image2url.com/r2/default/images/1772040875343-d36967ad-8c50-4b26-bdbc-d0f8c67e9de2.png", title: "Imagen 3" }, 
-    { url: "https://image2url.com/r2/default/images/1772040905783-b07c71b8-c329-43d5-9717-4bc36e5f5503.png", title: "Imagen 4" }, 
-    { url: "https://image2url.com/r2/default/images/1772040949695-854f7cf1-c7e8-4a01-8c75-ffb36135c829.png", title: "Imagen 5" }, 
-    { url: "https://image2url.com/r2/default/images/1772041001499-03e96c91-cbf7-49ec-bb0e-d60b0658680b.png", title: "Imagen 6" }, 
+    { url: "https://image2url.com/r2/default/images/1772639193209-4a820509-8110-442d-9f12-a27d3091ee4b.png", title: "Imagen 1" }, 
+    { url: "https://image2url.com/r2/default/images/1772638759444-9a421008-c674-4338-bb55-11bbd66af86b.png", title: "Imagen 2" }, 
+    { url: "https://image2url.com/r2/default/images/1772639303837-3a1bbe1a-343b-4f80-8afd-7906618f098c.png", title: "Imagen 3" }, 
+    { url: "https://image2url.com/r2/default/images/1772638899434-c9ef574e-c57c-412e-92cb-33301e05cbdd.png", title: "Imagen 4" }, 
+    { url: "https://image2url.com/r2/default/images/1772639347614-836fe618-df23-443f-bf57-200273ccc4f9.png", title: "Imagen 5" }, 
+    { url: "https://image2url.com/r2/default/images/1772639061734-24a1d2a5-8935-452f-8a15-4e61e7987c0f.png", title: "Imagen 6" }, 
     { url: "https://image2url.com/r2/default/images/1769188219759-be7b8dd7-3524-4403-b6dc-c26da64efc26.png", title: "Imagen 15" }, 
     { url: "https://image2url.com/r2/default/images/1769636991660-5034fcd3-a564-4710-a65a-73e64d024735.png", title: "Imagen 16" }
 ];
