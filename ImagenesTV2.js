@@ -4,7 +4,7 @@
 // Puedes editar solo este archivo para cambiar las imágenes
 //Cambia los links solamente
 var IMAGENES_CONFIG = [
-    { url: "https://image2url.com/r2/default/images/1774365408659-53a9df93-2ccb-4a66-beb3-201a1a3f4bce.png", title: "Imagen 1" }, 
+    { url: "https://image2url.com/r2/default/images/1774383970096-05498532-3d43-4c08-8bdb-d9309dca784c.png", title: "Imagen 1" }, 
     { url: "https://image2url.com/r2/default/images/1774365797890-b4cfacb5-a235-48a1-9b89-bfe7bd80d63d.png", title: "Imagen 2" }, 
     { url: "https://image2url.com/r2/default/images/1774365862903-efea2bc4-91b2-4b40-a284-c15fd58ee074.png", title: "Imagen 3" }, 
     { url: "https://image2url.com/r2/default/images/1774366000398-06d105ca-0cc0-41c3-9b4f-9fc618459311.png", title: "Imagen 4" }, 
