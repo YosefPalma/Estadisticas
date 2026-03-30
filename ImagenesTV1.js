@@ -11,8 +11,5 @@ var IMAGENES_CONFIG = [
     { url: "https://image2url.com/r2/default/images/1774541146337-0e782c68-1c40-40c7-878f-53127ce91862.png", title: "Imagen 5" }, 
     { url: "https://image2url.com/r2/default/images/1774541196524-63b3332d-e1e0-4f07-8ac0-136260040422.png", title: "Imagen 6" }, 
     { url: "https://image2url.com/r2/default/images/1769188219759-be7b8dd7-3524-4403-b6dc-c26da64efc26.png", title: "Imagen 15" }, 
-    { url: "https://image2url.com/r2/default/images/1769636991660-5034fcd3-a564-4710-a65a-73e64d024735.png", title: "Imagen 16" },
-    { url: "/WhatsApp Video 2026-02-16 at 5.39.35 PM.mp4", title: "Video 1" },
-    { url: "/video2.mp4", title: "Video 2" },
-    { url: "/video3.mp4", title: "Video 3" }
+    { url: "https://image2url.com/r2/default/images/1769636991660-5034fcd3-a564-4710-a65a-73e64d024735.png", title: "Imagen 16" }
 ];
